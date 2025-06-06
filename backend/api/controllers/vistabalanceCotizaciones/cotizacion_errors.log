@@ -1,0 +1,5 @@
+[07-May-2025 18:29:58 Europe/Berlin] PHP Warning:  Undefined variable $conexion in C:\xampp\htdocs\cusquena\backend\api\controllers\vistabalanceCotizaciones\obtenerCotizaciones.php on line 27
+[07-May-2025 18:29:58 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in C:\xampp\htdocs\cusquena\backend\api\controllers\vistabalanceCotizaciones\obtenerCotizaciones.php:27
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\cusquena\backend\api\controllers\vistabalanceCotizaciones\obtenerCotizaciones.php on line 27

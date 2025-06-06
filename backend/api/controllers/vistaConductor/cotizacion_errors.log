@@ -1,0 +1,4 @@
+[06-May-2025 03:51:20 Europe/Berlin] [2025-05-06 03:51:20] Error: Método no permitido
+[06-May-2025 04:12:20 Europe/Berlin] Error: Error en prueba: Cannot add or update a child row: a foreign key constraint fails (`la_cusquena`.`cotizacion`, CONSTRAINT `cotizacion_ibfk_2` FOREIGN KEY (`idConductor`) REFERENCES `conductor` (`idConductor`))
+[06-May-2025 04:13:28 Europe/Berlin] Error: Error al ejecutar: Cannot add or update a child row: a foreign key constraint fails (`la_cusquena`.`cotizacion`, CONSTRAINT `cotizacion_ibfk_2` FOREIGN KEY (`idConductor`) REFERENCES `conductor` (`idConductor`))
+[06-May-2025 04:14:51 Europe/Berlin] Error: Error al ejecutar: Cannot add or update a child row: a foreign key constraint fails (`la_cusquena`.`cotizacion`, CONSTRAINT `fk_cotizacion_tipo` FOREIGN KEY (`idTipoConductor`) REFERENCES `tipo_de_conductor` (`idTipoConductor`) ON DELETE SET NULL ON UPDATE CASCADE)

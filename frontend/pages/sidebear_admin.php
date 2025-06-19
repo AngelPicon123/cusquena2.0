@@ -11,60 +11,35 @@
         <a class="nav-link collapsed" href="gestionProducto.php" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsProductos"
           aria-expanded="false" aria-controls="collapseLayouts">
           <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-          Gestionar Productos
+          Lubricentros
           <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
         </a>
         <div class="collapse" id="collapseLayoutsProductos" aria-labelledby="headingOne"
           data-bs-parent="#sidenavAccordion">
           <nav class="sb-sidenav-menu-nested nav">
-            <a class="nav-link" href="gestionCategoria.php">Gestión de Categorias</a>
+            <a class="nav-link" href="gestionServicioo.php">Gestión de Servicios</a>
             <a class="nav-link" href="gestionProducto.php">Gestión de Productos</a>
-            <a class="nav-link" href="gestionHistorialIngreso.php">Ingresos de Productos</a>
+            <a class="nav-link" href="gestionDeudas.php">Gestion de Deudas</a>
+            <a class="nav-link" href="gestionGastosLubri.php">Gestion de Gastos</a>
+            <a class="nav-link" href="balanceLubricentro.php">Balances de Lubricentros</a>
           </nav>
         </div>
-        <a class="nav-link" href="gestionServicio.php">
-          <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-          Gestionar Servicios
-        </a>
         <a class="nav-link collapsed" href="gestionConductor.php" data-bs-toggle="collapse"
           data-bs-target="#collapseLayoutsConductores" aria-expanded="false" aria-controls="collapseLayouts">
           <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-          Gestionar Conductores
+          Empresa
           <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
         </a>
         <div class="collapse" id="collapseLayoutsConductores" aria-labelledby="headingOne"
           data-bs-parent="#sidenavAccordion">
           <nav class="sb-sidenav-menu-nested nav">
-            <a class="nav-link" href="gestionConductor.php">Gestión de Conductores</a>
-            <a class="nav-link" href="gestionSoat.php">Lista de SOAT</a>
-            <a class="nav-link" href="gestionCobroPlanilla.php">Cobro de Planilla</a>
+            <a class="nav-link" href="gestionCotizacion.php">Gestión de Cotizaciones</a>
+            <a class="nav-link" href="gestionPrestamos.php">Gestión de Prestamos</a>
+            <a class="nav-link" href="gestionAlquiler.php">Gestión de Alquileres</a>
+            <a class="nav-link" href="gestionGaastos.php">Gestión de Gastos</a>
+            <a class="nav-link" href="balanceEmpresa.php">Balance de Empresa</a>
           </nav>
         </div>
-        <a class="nav-link" href="gestionAlquiler.php">
-          <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-          Gestionar Alquileres
-        </a>
-        <a class="nav-link" href="gestionGastos.php">
-          <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-          Gestionar Gastos
-        </a>
-        <div class="sb-sidenav-menu-heading">Balances</div>
-        <a class="nav-link" href="balanceServicio.php">
-          <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-          Balance de Servicios
-        </a>
-        <a class="nav-link" href="balanceProducto.php">
-          <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-          Balance de Productos
-        </a>
-        <a class="nav-link" href="balacenCotizacion.php">
-          <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-          Balance de Cotizaciones
-        </a>
-        <a class="nav-link" href="balacenGastos.php">
-          <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-          Balance de Gastos
-        </a>
       </div>
     </div>
     <div class="sb-sidenav-footer">

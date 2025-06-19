@@ -1,6 +1,6 @@
 <?php
 require_once '../../backend/includes/auth.php';
-verificarPermiso(['Administrador']);
+verificarPermiso(['Administrador', 'Secretaria']);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -83,8 +83,10 @@ verificarPermiso(['Administrador']);
                       <label for="tipo" class="form-label fw-bold">Tipo de Gastos:</label>
                       <select class="form-select" id="tipo" name="tipo" required>
                         <option value="">Seleccione una opción:</option>
-                        <option value="Empresa">Empresa</option>
-                        <option value="Lubricentro">Lubricentro</option>
+                        <option value="operativo">Operativo</option>
+                        <option value="administrativo">Administrativo</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                        <option value="otro">Otro</option>
                       </select>
                     </div>
                     <div class="mb-3">
@@ -121,27 +123,29 @@ verificarPermiso(['Administrador']);
                   <form action="" method="">
                     <div class="mb-3">
                       <input type="hidden" id="editarId">
-                      <label for="descripcion" class="form-label fw-bold">Descripcion:</label>
+                      <label for="editardescripcion" class="form-label fw-bold">Descripcion:</label>
                       <input type="text" class="form-control" id="editardescripcion" name="descripcion" required>
                     </div>
                     <div class="mb-3">
-                      <label for="tipo" class="form-label fw-bold">Tipo de Gasto:</label>
+                      <label for="editartipo" class="form-label fw-bold">Tipo de Gasto:</label>
                       <select class="form-select" id="editartipo" name="tipo" required>
                         <option value="">Seleccione una opción:</option>
-                        <option value="Empresa">Empresa</option>
-                        <option value="Lubricentro">Lubricentro</option>
+                        <option value="operativo">Operativo</option>
+                        <option value="administrativo">Administrativo</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                        <option value="otro">Otro</option>
                       </select>
                     </div>
                     <div class="mb-3">
-                      <label for="monto" class="form-label fw-bold">Monto:</label>
+                      <label for="editarmonto" class="form-label fw-bold">Monto:</label>
                       <input type="number" class="form-control" id="editarmonto" name="monto" required>
                     </div>
                     <div class="mb-3">
-                      <label for="fecha" class="form-label fw-bold">Fecha:</label>
+                      <label for="editarfecha" class="form-label fw-bold">Fecha:</label>
                       <input type="date" class="form-control" id="editarfecha" name="fecha" required>
                     </div>
                     <div class="mb-3">
-                      <label for="detalle" class="form-label fw-bold">Detalle:</label>
+                      <label for="editardetalle" class="form-label fw-bold">Detalle:</label>
                       <textarea class="form-control" id="editardetalle" name="detalle" rows="3" required></textarea>
                     </div>
                     <div class="modal-footer d-flex justify-content-center">
@@ -155,7 +159,7 @@ verificarPermiso(['Administrador']);
           <!-- Fin Modal Editar -->
 
           <div class="table-responsive my-4">
-            <table class="table  table-bordered table-hover text-center">
+            <table class="table table-bordered table-hover text-center">
               <thead>
                 <tr class="table-dark">
                   <th>ID</th>
@@ -169,23 +173,26 @@ verificarPermiso(['Administrador']);
               </thead>
               <tbody class="align-middle">
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  <td>01</td>
+                  <td>Cambio de bujias</td>
+                  <td>Mantenimiento</td>
+                  <td>S/. 70</td>
+                  <td>12/05/2025</td>
+                  <td>Limpieza y cambio de bujias.</td>
+                  <td>
+                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditar" onclick="cargarDatosGasto(1, 'Cambio de aceite', 'mantenimiento', 150, '2025-05-10', 'Limpieza y cambio de aceite de motor.')">Editar</button>
+                    <button class="btn btn-sm btn-danger">Eliminar</button>
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <nav aria-label="Page navigation example" class="d-flex justify-content-end ">
+          <nav aria-label="Page navigation example" class="d-flex justify-content-end">
             <ul class="pagination">
               <li class="page-item">
                 <a class="page-link" href="#" aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
+                  <span aria-hidden="true">«</span>
                 </a>
               </li>
               <li class="page-item"><a class="page-link" href="#">1</a></li>
@@ -193,7 +200,7 @@ verificarPermiso(['Administrador']);
               <li class="page-item"><a class="page-link" href="#">3</a></li>
               <li class="page-item">
                 <a class="page-link" href="#" aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
+                  <span aria-hidden="true">»</span>
                 </a>
               </li>
             </ul>
@@ -205,6 +212,7 @@ verificarPermiso(['Administrador']);
   <!-- Toast Bootstrap Personalizado -->
   <div id="toastAgregar" class="toast align-items-center border-0 position-fixed bottom-0 end-0 mb-3 me-3 z-3"
     role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 250px;">
+    <div>
     <div id="toastHeaderAgregar" class="toast-header bg-success text-white d-flex justify-content-between w-100">
       <strong id="toastTitleAgregar" class="me-auto"></strong>
       <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -213,7 +221,7 @@ verificarPermiso(['Administrador']);
   </div>
 
   <div id="toastEditar" class="toast align-items-center border-0 position-fixed bottom-0 end-0 mb-3 me-3 z-3"
-    role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 250px; ">
+    role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 250px;">
     <div id="toastHeaderEditar" class="toast-header bg-success text-white">
       <strong id="toastTitleEditar" class="me-auto"></strong>
       <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -227,11 +235,8 @@ verificarPermiso(['Administrador']);
       <strong class="me-auto">Eliminación Exitosa</strong>
       <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
-    <div class="toast-body bg-white text-dark" id="toastMessageEliminar">
-
-    </div>
+    <div class="toast-body bg-white text-dark" id="toastMessageEliminar"></div>
   </div>
-
 
   <div class="modal fade" id="modalEliminarConfirmacion" tabindex="-1" aria-labelledby="modalEliminarLabel"
     aria-hidden="true">
@@ -253,8 +258,16 @@ verificarPermiso(['Administrador']);
   </div>
 
   <script src="../js/bootstrap.bundle.min.js"></script>
-  <script src="../js/functions/gestionGastos.js"></script>
-
+  <script>
+    function cargarDatosGasto(id, descripcion, tipo, monto, fecha, detalle) {
+      document.getElementById('editarId').value = id;
+      document.getElementById('editardescripcion').value = descripcion;
+      document.getElementById('editartipo').value = tipo;
+      document.getElementById('editarmonto').value = monto;
+      document.getElementById('editarfecha').value = fecha;
+      document.getElementById('editardetalle').value = detalle;
+    }
+  </script>
 </body>
 
 </html>

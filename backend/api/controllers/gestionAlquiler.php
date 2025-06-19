@@ -21,7 +21,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         // Buscar por ID o listar todo
         if (isset($_GET['buscar']) && !empty($_GET['buscar'])) {
             $buscar = "%" . $_GET['buscar'] . "%";
-            $stmt = $conn->prepare("SELECT * FROM Alquiler WHERE identificador LIKE :buscar OR nombre LIKE :buscar OR telefono LIKE :buscar OR tipo LIKE :buscar OR ubicacion LIKE :buscar OR estado LIKE :buscar");
+            $stmt = $conn->prepare("SELECT * FROM Alquiler WHERE nombre LIKE :buscar OR tipo LIKE :buscar OR estado LIKE :buscar");
             $stmt->execute(['buscar' => $buscar]);
         } else {
             $stmt = $conn->query("SELECT * FROM Alquiler");
@@ -33,18 +33,15 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case 'POST':
         $data = json_decode(file_get_contents("php://input"), true);
 
-        $stmt = $conn->prepare("INSERT INTO Alquiler (identificador, nombre, telefono, tipo, fechaInicio, periodicidad, pago, ubicacion, estado) 
-            VALUES (:identificador, :nombre, :telefono, :tipo, :fechaInicio, :periodicidad, :pago, :ubicacion, :estado)");
+        $stmt = $conn->prepare("INSERT INTO Alquiler (nombre, tipo, fechaInicio, periodicidad, pago, estado) 
+            VALUES (:nombre, :tipo, :fechaInicio, :periodicidad, :pago, :estado)");
 
         $stmt->execute([
-            'identificador' => $data['identificador'],
             'nombre'        => $data['nombre'],
-            'telefono'      => $data['telefono'],
             'tipo'          => $data['tipo'],
             'fechaInicio'   => $data['fechaInicio'],
             'periodicidad'  => $data['periodicidad'],
             'pago'          => $data['pago'],
-            'ubicacion'     => $data['ubicacion'],
             'estado'        => $data['estado']
         ]);
 
@@ -55,27 +52,21 @@ switch ($_SERVER['REQUEST_METHOD']) {
         $data = json_decode(file_get_contents("php://input"), true);
 
         $stmt = $conn->prepare("UPDATE Alquiler SET 
-            identificador = :identificador,
             nombre = :nombre,
-            telefono = :telefono,
             tipo = :tipo,
             fechaInicio = :fechaInicio,
             periodicidad = :periodicidad,
             pago = :pago,
-            ubicacion = :ubicacion,
             estado = :estado
             WHERE idAlquiler = :id");
 
         $stmt->execute([
             'id'           => $data['idAlquiler'],
-            'identificador'=> $data['identificador'],
             'nombre'       => $data['nombre'],
-            'telefono'     => $data['telefono'],
             'tipo'         => $data['tipo'],
             'fechaInicio'  => $data['fechaInicio'],
             'periodicidad' => $data['periodicidad'],
             'pago'         => $data['pago'],
-            'ubicacion'    => $data['ubicacion'],
             'estado'       => $data['estado']
         ]);
 

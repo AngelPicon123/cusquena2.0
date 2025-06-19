@@ -1,7 +1,3 @@
-<?php
-require_once '../../backend/includes/auth.php';
-verificarPermiso(['Administrador', 'Secretaria']);
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,13 +10,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
 <body class="sb-nav-fixed">
   <!-- Navbar Superior (fijo) -->
   <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark fixed-top">
-    <?php if ($_SESSION['rol'] === 'Administrador'): ?>
     <a class="navbar-brand ps-3" href="base.php">La Cusqueña</a>
-    <?php endif; ?>
-
-    <?php if ($_SESSION['rol'] === 'Secretaria'): ?>
-    <a class="navbar-brand ps-3" href="base2.php">La Cusqueña</a>
-    <?php endif; ?>
     <button class="btn btn-link btn-sm me-4" id="sidebarToggle">
       <i class="fas fa-bars"></i>
     </button>
@@ -37,22 +27,12 @@ verificarPermiso(['Administrador', 'Secretaria']);
   </nav>
   <div id="layoutSidenav">
     <div id="layoutSidenav_nav">
-      <?php if ($_SESSION['rol'] === 'Administrador'): ?>
       <script>
         fetch('sidebear_Admin.php')
           .then(r => r.text())
           .then(html => document.getElementById('layoutSidenav_nav').innerHTML = html)
           .catch(e => console.error('Error cargando sidebar:', e));
       </script>
-      <?php endif; ?>
-      <?php if ($_SESSION['rol'] === 'Secretaria'): ?>
-      <script>
-        fetch('sidebear_secre.php')
-          .then(r => r.text())
-          .then(html => document.getElementById('layoutSidenav_nav').innerHTML = html)
-          .catch(e => console.error('Error cargando sidebar:', e));
-      </script>
-      <?php endif; ?>
     </div>
 
     <div id="layoutSidenav_content">
@@ -80,16 +60,8 @@ verificarPermiso(['Administrador', 'Secretaria']);
                 <div class="modal-body">
                   <form action="" method="">
                     <div class="mb-3">
-                      <label for="identificador" class="form-label fw-bold">Identificador(RUC/DNI):</label>
-                      <input type="number" class="form-control" id="identificador" name="identificador" required>
-                    </div>
-                    <div class="mb-3">
                       <label for="nombre" class="form-label fw-bold">Nombre:</label>
                       <input type="text" class="form-control" id="nombre" name="nombre" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="telefono" class="form-label fw-bold">Telefono:</label>
-                      <input type="tel" class="form-control" id="telefono" name="telefono" required>
                     </div>
                     <div class="mb-3">
                       <label for="tipo" class="form-label fw-bold">Tipo:</label>
@@ -115,10 +87,6 @@ verificarPermiso(['Administrador', 'Secretaria']);
                     <div class="mb-3">
                       <label for="pago" class="form-label fw-bold">Pago:</label>
                       <input type="number" class="form-control" id="pago" name="pago" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="ubicacion" class="form-label fw-bold">Ubicacion:</label>
-                      <input type="text" class="form-control" id="ubicacion" name="ubicacion" required>
                     </div>
                     <div class="mb-3 d-flex align-items-center">
                       <label class="form-label me-3 fw-bold">Estado:</label>
@@ -153,16 +121,8 @@ verificarPermiso(['Administrador', 'Secretaria']);
                   <form action="" method="">
                     <input type="hidden" id="editarId">
                     <div class="mb-3">
-                      <label for="identificador" class="form-label fw-bold">Identificador (RUC/DNI):</label>
-                      <input type="number" class="form-control" id="editarIdentificador" name="identificador" required>
-                    </div>
-                    <div class="mb-3">
                       <label for="nombre" class="form-label fw-bold">Nombre:</label>
                       <input type="text" class="form-control" id="editarNombre" name="nombre" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="telefono" class="form-label fw-bold">Telefono:</label>
-                      <input type="tel" class="form-control" id="editarTelefono" name="telefono" required>
                     </div>
                     <div class="mb-3">
                       <label for="tipo" class="form-label fw-bold">Tipo:</label>
@@ -182,16 +142,12 @@ verificarPermiso(['Administrador', 'Secretaria']);
                         <option value="">--Seleccionar--</option>
                         <option value="mensual">Mensual</option>
                         <option value="semanal">Semanal</option>
-                        <option value="diario">diario</option>
+                        <option value="diario">Diario</option>
                       </select>
                     </div>
                     <div class="mb-3">
                       <label for="pago" class="form-label fw-bold">Pago:</label>
                       <input type="number" class="form-control" id="editarPago" name="pago" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="ubicacion" class="form-label fw-bold">Ubicacion:</label>
-                      <input type="text" class="form-control" id="editarUbicacion" name="ubicacion" required>
                     </div>
                     <div class="mb-3 d-flex align-items-center">
                       <label class="form-label me-3 fw-bold">Estado:</label>
@@ -219,14 +175,11 @@ verificarPermiso(['Administrador', 'Secretaria']);
               <thead>
                 <tr class="table-dark">
                   <th>ID</th>
-                  <th>Identificador</th>
                   <th>Nombre</th>
-                  <th>Telefono</th>
                   <th>Tipo</th>
                   <th>Inicio</th>
                   <th>Periodicidad</th>
                   <th>Pago</th>
-                  <th>Ubicacion</th>
                   <th>Estado</th>
                   <th>Acciones</th>
                 </tr>

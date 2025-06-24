@@ -20,7 +20,7 @@
             <a class="nav-link" href="gestionServicioo.php">Gestión de Servicios</a>
             <a class="nav-link" href="gestionProducto.php">Gestión de Productos</a>
             <a class="nav-link" href="gestionDeudas.php">Gestion de Deudas</a>
-            <a class="nav-link" href="gestionGastosLubri.php">Gestion de Gastos</a>
+            <a class="nav-link" href="gestionGastosLubricentros.php">Gestion de Gastos</a>
             <a class="nav-link" href="balanceLubricentro.php">Balances de Lubricentros</a>
           </nav>
         </div>
@@ -36,7 +36,7 @@
             <a class="nav-link" href="gestionCotizacion.php">Gestión de Cotizaciones</a>
             <a class="nav-link" href="gestionPrestamos.php">Gestión de Prestamos</a>
             <a class="nav-link" href="gestionAlquiler.php">Gestión de Alquileres</a>
-            <a class="nav-link" href="gestionGaastos.php">Gestión de Gastos</a>
+            <a class="nav-link" href="gestionGastosEmpresa.php">Gestión de Gastos</a>
             <a class="nav-link" href="balanceEmpresa.php">Balance de Empresa</a>
           </nav>
         </div>

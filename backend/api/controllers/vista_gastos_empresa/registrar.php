@@ -1,19 +1,17 @@
 <?php
-
+// C:\xampp\htdocs\cusquena\backend\api\controllers\vista_gastos_empresa\registrar.php
 
 require_once __DIR__ . '/../../../includes/db.php';
 require_once __DIR__ . '/../../../includes/auth.php';
 
 header('Content-Type: application/json');
 
-// Verificar permisos
 verificarPermiso(['Administrador']); // Solo administradores pueden registrar gastos
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-// Validación básica de datos
 if (!isset($data['descripcion'], $data['tipoGasto'], $data['monto'], $data['fecha'], $data['detalle'])) {
-    http_response_code(400); // Bad Request
+    http_response_code(400);
     echo json_encode(['error' => 'Datos incompletos para registrar el gasto.']);
     exit();
 }
@@ -33,27 +31,27 @@ if (!in_array($tipo_gasto, $allowed_types)) {
 }
 
 try {
-    $stmt = $conn->prepare("INSERT INTO gastos_empresa(descripcion, tipo_gasto, monto, fecha, detalle) VALUES (:descripcion, :tipo_gasto, :monto, :fecha, :detalle)");
+    $stmt = $conn->prepare("INSERT INTO gastos_empresa (descripcion, tipo_gasto, monto, fecha, detalle) VALUES (:descripcion, :tipo_gasto, :monto, :fecha, :detalle)");
     if ($stmt === false) {
-        throw new Exception("Error al preparar la consulta.");
+        throw new Exception("Error al preparar la consulta: " . implode(" ", $conn->errorInfo()));
     }
     $stmt->bindParam(':descripcion', $descripcion);
     $stmt->bindParam(':tipo_gasto', $tipo_gasto);
-    $stmt->bindParam(':monto', $monto);
+    $stmt->bindParam(':monto', $monto, PDO::PARAM_STR); // PDO::PARAM_STR para DECIMAL
     $stmt->bindParam(':fecha', $fecha);
     $stmt->bindParam(':detalle', $detalle);
 
     if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Gasto registrado exitosamente!', 'id' => $conn->lastInsertId()]);
+        echo json_encode(['success' => true, 'message' => 'Gasto de empresa registrado exitosamente!', 'id' => $conn->lastInsertId()]);
     } else {
-        throw new Exception("Error al ejecutar la consulta: " . $stmt->errorInfo()[2]); // Obtener error más detallado
+        throw new Exception("Error al ejecutar la consulta: " . implode(" ", $stmt->errorInfo()));
     }
 
-    $stmt = null; // Cerrar statement
-    $conn = null; // Cerrar conexión
+    $stmt = null;
+    $conn = null;
 
 } catch (Exception $e) {
-    http_response_code(500); // Internal Server Error
+    http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }
 ?>

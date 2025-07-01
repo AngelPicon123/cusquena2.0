@@ -1,19 +1,17 @@
 <?php
-
+// C:\xampp\htdocs\cusquena\backend\api\controllers\vista_gastos_empresa\actualizar.php
 
 require_once __DIR__ . '/../../../includes/db.php';
 require_once __DIR__ . '/../../../includes/auth.php';
 
 header('Content-Type: application/json');
 
-// Verificar permisos
 verificarPermiso(['Administrador']); // Solo administradores pueden actualizar gastos
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-// Validación básica de datos
 if (!isset($data['id'], $data['descripcion'], $data['tipoGasto'], $data['monto'], $data['fecha'], $data['detalle'])) {
-    http_response_code(400); // Bad Request
+    http_response_code(400);
     echo json_encode(['error' => 'Datos incompletos para actualizar el gasto.']);
     exit();
 }
@@ -36,30 +34,30 @@ if (!in_array($tipo_gasto, $allowed_types)) {
 try {
     $stmt = $conn->prepare("UPDATE gastos_empresa SET descripcion = :descripcion, tipo_gasto = :tipo_gasto, monto = :monto, fecha = :fecha, detalle = :detalle WHERE id = :id");
     if ($stmt === false) {
-        throw new Exception("Error al preparar la consulta.");
+        throw new Exception("Error al preparar la consulta: " . implode(" ", $conn->errorInfo()));
     }
     $stmt->bindParam(':descripcion', $descripcion);
     $stmt->bindParam(':tipo_gasto', $tipo_gasto);
-    $stmt->bindParam(':monto', $monto);
+    $stmt->bindParam(':monto', $monto, PDO::PARAM_STR); // PDO::PARAM_STR para DECIMAL
     $stmt->bindParam(':fecha', $fecha);
     $stmt->bindParam(':detalle', $detalle);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 
     if ($stmt->execute()) {
-        if ($stmt->rowCount() > 0) { // rowCount() para PDO
-            echo json_encode(['success' => true, 'message' => 'Gasto actualizado exitosamente!']);
+        if ($stmt->rowCount() > 0) {
+            echo json_encode(['success' => true, 'message' => 'Gasto de empresa actualizado exitosamente!']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Gasto no encontrado o no se realizaron cambios.']);
+            echo json_encode(['success' => false, 'message' => 'Gasto de empresa no encontrado o no se realizaron cambios.']);
         }
     } else {
-        throw new Exception("Error al ejecutar la consulta: " . $stmt->errorInfo()[2]);
+        throw new Exception("Error al ejecutar la consulta: " . implode(" ", $stmt->errorInfo()));
     }
 
     $stmt = null;
     $conn = null;
 
 } catch (Exception $e) {
-    http_response_code(500); // Internal Server Error
+    http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }
 ?>

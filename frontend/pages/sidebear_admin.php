@@ -35,7 +35,7 @@
           <nav class="sb-sidenav-menu-nested nav">
             <a class="nav-link" href="gestionCotizacion.php">Gestión de Cotizaciones</a>
             <a class="nav-link" href="gestionPrestamos.php">Gestión de Prestamos</a>
-            <a class="nav-link" href="gestionAlquiler.php">Gestión de Alquileres</a>
+            <a class="nav-link" href="gestionAlquileres.php">Gestión de Alquileres</a>
             <a class="nav-link" href="gestionGastosEmpresa.php">Gestión de Gastos</a>
             <a class="nav-link" href="balanceEmpresa.php">Balance de Empresa</a>
           </nav>

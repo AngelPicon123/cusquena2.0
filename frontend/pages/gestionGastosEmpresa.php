@@ -13,12 +13,11 @@ if (isset($_SESSION['rol'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="es">.
-  <body>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Lubricentro Cusqueña - Gestión de Gastos</title>
+    <title>Lubricentro Cusqueña - Gestión de Gastos de Empresa</title>
     <link href="../css/bootstrap.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     <style>
@@ -98,7 +97,7 @@ if (isset($_SESSION['rol'])) {
         <div id="layoutSidenav_content">
             <main class="container-xl my-2 col-11 mx-auto">
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4 text-center mb-4">Gestión de Gastos</h1>
+                    <h1 class="mt-4 text-center mb-4">Gestión de Gastos de Empresa</h1>
 
                     <div class="row">
                         <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center">
@@ -108,7 +107,8 @@ if (isset($_SESSION['rol'])) {
                                 <label for="filterFechaFin" class="me-2">Fin:</label>
                                 <input type="date" id="filterFechaFin" class="form-control me-2">
                                 <input type="text" class="form-control me-2" id="filterDescripcion" placeholder="Buscar por Descripción">
-                                <button class="btn btn-primary" id="btnBuscarGastos">Buscar</button>
+                                <button class="btn btn-primary me-2" id="btnBuscarGastos">Buscar</button>
+                     
                             </div>
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregar">Agregar Gasto</button>
                         </div>
@@ -226,6 +226,8 @@ if (isset($_SESSION['rol'])) {
                         </table>
                     </div>
 
+                   
+
                     <nav aria-label="Page navigation example" class="d-flex justify-content-end">
                         <ul class="pagination" id="pagination">
                             <!-- Los enlaces de paginación se cargarán dinámicamente con JavaScript -->
@@ -275,9 +277,9 @@ if (isset($_SESSION['rol'])) {
             </div>
         </div>
     </div>
-
+                
     <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="../js/functions/gestionGastosEmpresa.js"></script>
     <script src="../js/scripts.js"></script> <!-- Asegúrate de que este script maneje el sidebarToggle -->
+    <script src="../js/functions/gestionGastosEmpresa.js"></script>
 </body>
 </html>

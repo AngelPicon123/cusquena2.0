@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Definimos la URL base de tu API para facilitar la gestión de rutas
-    // Asegúrate de que esta URL coincida exactamente con la ubicación de tu proyecto en XAMPP
-    const API_BASE_URL = 'http://localhost/cusquena/backend/api/controllers/vista_gastos_Empresa/';
+    const API_BASE_URL = 'http://localhost/cusquena/backend/api/controllers/vista_gastos_empresa/';
 
     // Referencias a elementos del DOM
     const tablaGastos = document.getElementById('tablaGastos');
@@ -11,11 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
     const modalEliminarConfirmacion = new bootstrap.Modal(document.getElementById('modalEliminarConfirmacion'));
     const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminar');
+
     const filterFechaInicio = document.getElementById('filterFechaInicio');
     const filterFechaFin = document.getElementById('filterFechaFin');
     const filterDescripcion = document.getElementById('filterDescripcion');
     const btnBuscarGastos = document.getElementById('btnBuscarGastos');
+    const btnResetSearch = document.getElementById('btnResetSearch');
     const paginationContainer = document.getElementById('pagination');
+    const totalGeneralSpan = document.getElementById('totalGeneral');
 
     // Toasts de Bootstrap para mensajes al usuario
     const toastSuccess = new bootstrap.Toast(document.getElementById('toastSuccess'));
@@ -23,15 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const toastSuccessBody = document.getElementById('toastSuccessBody');
     const toastErrorBody = document.getElementById('toastErrorBody');
 
-    let gastoIdToDelete = null; // Variable para almacenar el ID del gasto a eliminar
+    let gastoIdToDelete = null;
 
-    // --- Funciones de Utilidad ---
-
-    /**
-     * Muestra un toast de Bootstrap.
-     * @param {string} type - Tipo de toast ('success' o 'error').
-     * @param {string} message - Mensaje a mostrar.
-     */
     function showToast(type, message) {
         if (type === 'success') {
             toastSuccessBody.textContent = message;
@@ -42,34 +37,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * Resetea un formulario.
-     * @param {HTMLFormElement} form - El formulario a resetear.
-     */
     function resetForm(form) {
         form.reset();
-        // Asegurarse de que los select y textareas también se reseteen correctamente si no son afectados por form.reset()
         const selects = form.querySelectorAll('select');
         selects.forEach(select => select.value = '');
-        const textareas = form.querySelectorAll('textarea');
-        textareas.forEach(textarea => textarea.value = '');
     }
 
     // --- Funciones CRUD (Interfaz con el Backend) ---
 
-    /**
-     * Fetches expenses data from the backend.
-     * @param {object} filters - Object containing filter parameters (descripcion, fecha_inicio, fecha_fin, page, limit).
-     * @returns {Promise<Array>} - A promise that resolves to an array of expense objects.
-     */
     async function fetchGastos(filters = {}) {
-        const queryParams = new URLSearchParams(filters).toString();
+        // Filtramos los parámetros que no tienen valor para no enviarlos
+        const cleanFilters = Object.fromEntries(
+            Object.entries(filters).filter(([_, v]) => v != null && v !== '')
+        );
+        const queryParams = new URLSearchParams(cleanFilters).toString();
+        
         try {
-            // RUTA ABSOLUTA COMPLETA para listar.php
             const response = await fetch(`${API_BASE_URL}listar.php?${queryParams}`);
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                throw new Error(`Error HTTP: ${response.status}, ${errorText}`);
             }
             const data = await response.json();
             if (data.error) {
@@ -79,107 +66,62 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error al cargar gastos:', error);
             showToast('error', `Error al cargar gastos: ${error.message}`);
-            return { gastos: [], total: 0 };
+            return { gastos: [], total: 0, total_general_monto: 0 };
         }
     }
 
-    /**
-     * Adds a new expense to the backend.
-     * @param {object} gastoData - Data of the expense to add.
-     * @returns {Promise<object>} - A promise that resolves to the new expense object or an error.
-     */
     async function addGasto(gastoData) {
         try {
-            // RUTA ABSOLUTA COMPLETA para registrar.php
             const response = await fetch(`${API_BASE_URL}registrar.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(gastoData)
             });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-            }
-            const data = await response.json();
-            if (data.error) {
-                throw new Error(data.error);
-            }
-            return data;
+            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+            return await response.json();
         } catch (error) {
-            console.error('Error al agregar gasto:', error);
             showToast('error', `Error al agregar gasto: ${error.message}`);
             return { success: false, message: error.message };
         }
     }
 
-    /**
-     * Updates an existing expense in the backend.
-     * @param {object} gastoData - Data of the expense to update (must include ID).
-     * @returns {Promise<object>} - A promise that resolves to a success message or an error.
-     */
     async function updateGasto(gastoData) {
         try {
-            // RUTA ABSOLUTA COMPLETA para actualizar.php
             const response = await fetch(`${API_BASE_URL}actualizar.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(gastoData)
             });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-            }
-            const data = await response.json();
-            if (data.error) {
-                throw new Error(data.error);
-            }
-            return data;
+            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+            return await response.json();
         } catch (error) {
-            console.error('Error al actualizar gasto:', error);
             showToast('error', `Error al actualizar gasto: ${error.message}`);
             return { success: false, message: error.message };
         }
     }
-
-    /**
-     * Deletes an expense from the backend.
-     * @param {number} id - ID of the expense to delete.
-     * @returns {Promise<object>} - A promise that resolves to a success message or an error.
-     */
+    
     async function deleteGasto(id) {
         try {
-            // RUTA ABSOLUTA COMPLETA para eliminar.php
             const response = await fetch(`${API_BASE_URL}eliminar.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: id })
             });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-            }
-            const data = await response.json();
-            if (data.error) {
-                throw new Error(data.error);
-            }
-            return data;
+            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+            return await response.json();
         } catch (error) {
-            console.error('Error al eliminar gasto:', error);
             showToast('error', `Error al eliminar gasto: ${error.message}`);
             return { success: false, message: error.message };
         }
     }
+    
+    // --- Renderizado y Paginación ---
 
-    // --- Renderizado de la Tabla ---
-
-    /**
-     * Renders the expenses data into the table.
-     * @param {Array<object>} gastos - Array of expense objects to display.
-     */
-    function renderGastos(gastos) {
-        tablaGastos.innerHTML = ''; // Limpiar tabla antes de renderizar
+    function renderGastos(gastos, totalGeneralMonto) {
+        tablaGastos.innerHTML = '';
         if (gastos.length === 0) {
             tablaGastos.innerHTML = '<tr><td colspan="7" class="text-center">No hay gastos para mostrar.</td></tr>';
+            totalGeneralSpan.textContent = `Total General: S/. 0.00`;
             return;
         }
 
@@ -187,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = tablaGastos.insertRow();
             row.insertCell().textContent = gasto.id;
             row.insertCell().textContent = gasto.descripcion;
-            row.insertCell().textContent = gasto.tipo_gasto.charAt(0).toUpperCase() + gasto.tipo_gasto.slice(1); // Capitalizar tipo
+            row.insertCell().textContent = gasto.tipo_gasto.charAt(0).toUpperCase() + gasto.tipo_gasto.slice(1);
             row.insertCell().textContent = `S/. ${parseFloat(gasto.monto).toFixed(2)}`;
             row.insertCell().textContent = gasto.fecha;
             row.insertCell().textContent = gasto.detalle;
@@ -195,27 +137,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const actionsCell = row.insertCell();
             const editButton = document.createElement('button');
             editButton.className = 'btn btn-sm btn-warning me-2';
-            editButton.textContent = 'Editar';
-            editButton.dataset.id = gasto.id;
+            editButton.innerHTML = '<i class="fas fa-edit"></i> Editar';
             editButton.addEventListener('click', () => populateEditModal(gasto));
             actionsCell.appendChild(editButton);
 
             const deleteButton = document.createElement('button');
             deleteButton.className = 'btn btn-sm btn-danger';
-            deleteButton.textContent = 'Eliminar';
-            deleteButton.dataset.id = gasto.id;
+            deleteButton.innerHTML = '<i class="fas fa-trash"></i> Eliminar';
             deleteButton.addEventListener('click', () => {
                 gastoIdToDelete = gasto.id;
                 modalEliminarConfirmacion.show();
             });
             actionsCell.appendChild(deleteButton);
         });
+
+        // ⭐ AQUÍ SE ACTUALIZA CORRECTAMENTE
+        totalGeneralSpan.textContent = `Total General: S/. ${parseFloat(totalGeneralMonto || 0).toFixed(2)}`;
     }
 
-    /**
-     * Fills the edit modal with the selected expense's data.
-     * @param {object} gasto - The expense object to edit.
-     */
     function populateEditModal(gasto) {
         document.getElementById('editGastoId').value = gasto.id;
         document.getElementById('editDescripcion').value = gasto.descripcion;
@@ -225,68 +164,41 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('editDetalle').value = gasto.detalle;
         modalEditar.show();
     }
-
-    // --- Paginación ---
+    
     let currentPage = 1;
     const recordsPerPage = 10;
-
-    /**
-     * Sets up pagination links.
-     * @param {number} totalRecords - Total number of records.
-     * @param {number} currentPage - Current page number.
-     * @param {number} recordsPerPage - Number of records per page.
-     */
-    function setupPagination(totalRecords, currentPage, recordsPerPage) {
+    
+    function setupPagination(totalRecords, currentPageNum, recordsPerPageNum) {
         paginationContainer.innerHTML = '';
-        const totalPages = Math.ceil(totalRecords / recordsPerPage);
+        const totalPages = Math.ceil(totalRecords / recordsPerPageNum);
+        if (totalPages <= 1) return;
 
-        if (totalPages <= 1) {
-            return;
-        }
-
-        // Previous button
-        const prevLi = document.createElement('li');
-        prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-        prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">«</span></a>`;
-        prevLi.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (currentPage > 1) {
-                currentPage--;
-                loadGastos();
-            }
-        });
-        paginationContainer.appendChild(prevLi);
-
-        // Page numbers
-        for (let i = 1; i <= totalPages; i++) {
-            const pageLi = document.createElement('li');
-            pageLi.className = `page-item ${currentPage === i ? 'active' : ''}`;
-            pageLi.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-            pageLi.addEventListener('click', (e) => {
+        const createPageItem = (text, pageNum, isDisabled = false, isActive = false) => {
+            const li = document.createElement('li');
+            li.className = `page-item ${isDisabled ? 'disabled' : ''} ${isActive ? 'active' : ''}`;
+            const a = document.createElement('a');
+            a.className = 'page-link';
+            a.href = '#';
+            a.innerHTML = text;
+            a.addEventListener('click', (e) => {
                 e.preventDefault();
-                currentPage = i;
-                loadGastos();
+                if (!isDisabled) {
+                    currentPage = pageNum;
+                    loadGastos();
+                }
             });
-            paginationContainer.appendChild(pageLi);
+            li.appendChild(a);
+            return li;
+        };
+
+        paginationContainer.appendChild(createPageItem('«', currentPageNum - 1, currentPageNum === 1));
+        for (let i = 1; i <= totalPages; i++) {
+            paginationContainer.appendChild(createPageItem(i, i, false, currentPageNum === i));
         }
-
-        // Next button
-        const nextLi = document.createElement('li');
-        nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
-        nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">»</span></a>`;
-        nextLi.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (currentPage < totalPages) {
-                currentPage++;
-                loadGastos();
-            }
-        });
-        paginationContainer.appendChild(nextLi);
+        paginationContainer.appendChild(createPageItem('»', currentPageNum + 1, currentPageNum === totalPages));
     }
-
-    /**
-     * Carga los gastos aplicando filtros y paginación.
-     */
+    
+    // ⭐ FUNCIÓN CLAVE MODIFICADA
     async function loadGastos() {
         const filters = {
             descripcion: filterDescripcion.value,
@@ -295,23 +207,23 @@ document.addEventListener('DOMContentLoaded', () => {
             page: currentPage,
             limit: recordsPerPage
         };
-
+        
         const result = await fetchGastos(filters);
         if (result && result.gastos) {
-            renderGastos(result.gastos);
+            renderGastos(result.gastos, result.total_general_monto);
             setupPagination(result.total, currentPage, recordsPerPage);
         }
     }
-
+    
     // --- Event Listeners ---
 
-    // Listener para el formulario de agregar gasto
     formAgregarGasto.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(formAgregarGasto);
         const gastoData = Object.fromEntries(formData.entries());
-
-        gastoData.tipoGasto = document.getElementById('tipoGasto').value;
+        // Aseguramos que el nombre del campo coincida con la BD (tipo_gasto)
+        gastoData.tipo_gasto = gastoData.tipoGasto;
+        delete gastoData.tipoGasto; 
 
         const result = await addGasto(gastoData);
         if (result && result.success) {
@@ -319,27 +231,29 @@ document.addEventListener('DOMContentLoaded', () => {
             resetForm(formAgregarGasto);
             modalAgregar.hide();
             loadGastos();
+        } else {
+            showToast('error', `Error: ${result.message || 'No se pudo agregar el gasto.'}`);
         }
     });
 
-    // Listener para el formulario de editar gasto
     formEditarGasto.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(formEditarGasto);
         const gastoData = Object.fromEntries(formData.entries());
-        gastoData.id = document.getElementById('editGastoId').value;
-
-        gastoData.tipoGasto = document.getElementById('editTipoGasto').value;
+        // Aseguramos que el nombre del campo coincida con la BD (tipo_gasto)
+        gastoData.tipo_gasto = gastoData.tipoGasto;
+        delete gastoData.tipoGasto;
 
         const result = await updateGasto(gastoData);
         if (result && result.success) {
             showToast('success', 'Gasto actualizado exitosamente!');
             modalEditar.hide();
             loadGastos();
+        } else {
+            showToast('error', `Error: ${result.message || 'No se pudo actualizar el gasto.'}`);
         }
     });
 
-    // Listener para el botón de confirmar eliminación
     btnConfirmarEliminar.addEventListener('click', async () => {
         if (gastoIdToDelete) {
             const result = await deleteGasto(gastoIdToDelete);
@@ -348,16 +262,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalEliminarConfirmacion.hide();
                 gastoIdToDelete = null;
                 loadGastos();
+            } else {
+                showToast('error', `Error: ${result.message || 'No se pudo eliminar el gasto.'}`);
             }
         }
     });
 
-    // Listener para el botón de búsqueda
     btnBuscarGastos.addEventListener('click', () => {
         currentPage = 1;
         loadGastos();
     });
 
-    // Carga inicial de gastos al cargar la página
+    btnResetSearch.addEventListener('click', () => {
+        filterFechaInicio.value = '';
+        filterFechaFin.value = '';
+        filterDescripcion.value = '';
+        currentPage = 1;
+        loadGastos();
+    });
+
+    // Carga inicial de gastos
     loadGastos();
 });

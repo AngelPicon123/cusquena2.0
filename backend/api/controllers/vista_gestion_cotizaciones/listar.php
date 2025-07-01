@@ -1,18 +1,14 @@
 <?php
-// C:\xampp\htdocs\cusquena\backend\api\controllers\vista_gastos_empresa\listar.php
+// C:\xampp\htdocs\cusquena\backend\api\controllers\vista_cotizaciones\listar.php
 
 require_once __DIR__ . '/../../../includes/db.php';
 require_once __DIR__ . '/../../../includes/auth.php';
-
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 header('Content-Type: application/json');
 
 verificarPermiso(['Administrador', 'Secretaria']);
 
-$descripcion = $_GET['descripcion'] ?? '';
+$nombre_apellido = $_GET['nombre'] ?? ''; // Usaremos un solo parámetro para buscar en nombre o apellido
 $fecha_inicio = $_GET['fecha_inicio'] ?? '';
 $fecha_fin = $_GET['fecha_fin'] ?? '';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -23,9 +19,11 @@ try {
     $conditions = [];
     $params = [];
 
-    if (!empty($descripcion)) {
-        $conditions[] = "descripcion LIKE ?";
-        $params[] = "%" . $descripcion . "%";
+    // Filtro por nombre o apellido
+    if (!empty($nombre_apellido)) {
+        $conditions[] = "(nombre LIKE ? OR apellido LIKE ?)";
+        $params[] = "%" . $nombre_apellido . "%";
+        $params[] = "%" . $nombre_apellido . "%";
     }
     if (!empty($fecha_inicio)) {
         $conditions[] = "fecha >= ?";
@@ -42,7 +40,7 @@ try {
     }
 
     // --- Obtener el total de registros para paginación ---
-    $sqlTotal = "SELECT COUNT(*) FROM gastos_empresa " . $whereClause;
+    $sqlTotal = "SELECT COUNT(*) FROM cotizaciones " . $whereClause;
     $stmtTotal = $conn->prepare($sqlTotal);
     if ($stmtTotal === false) {
         throw new Exception("Error al preparar la consulta de conteo: " . implode(" ", $conn->errorInfo()));
@@ -51,37 +49,37 @@ try {
     $totalRecords = $stmtTotal->fetchColumn();
     $stmtTotal = null;
 
-    // --- Obtener el total general del monto de gastos filtrados ---
-    $sqlTotalMonto = "SELECT SUM(monto) FROM gastos_empresa " . $whereClause;
+    // --- Obtener el total general del monto de cotizaciones filtradas ---
+    $sqlTotalMonto = "SELECT SUM(pago) FROM cotizaciones " . $whereClause;
     $stmtTotalMonto = $conn->prepare($sqlTotalMonto);
     if ($stmtTotalMonto === false) {
         throw new Exception("Error al preparar la consulta de suma total: " . implode(" ", $conn->errorInfo()));
     }
     $stmtTotalMonto->execute($params);
     $totalGeneralMonto = $stmtTotalMonto->fetchColumn();
-    $totalGeneralMonto = $totalGeneralMonto !== null ? (float)$totalGeneralMonto : 0.00;
+    $totalGeneralMonto = $totalGeneralMonto !== null ? (float)$totalGeneralMonto : 0.00; // Asegurarse que sea float y 0 si es null
     $stmtTotalMonto = null;
 
-    // --- Obtener los gastos con paginación y filtros ---
-    $sqlGastos = "SELECT id, descripcion, tipo_gasto, monto, fecha, detalle FROM gastos_empresa " . $whereClause . " ORDER BY fecha DESC LIMIT ? OFFSET ?";
-    $stmtGastos = $conn->prepare($sqlGastos);
-    if ($stmtGastos === false) {
-        throw new Exception("Error al preparar la consulta de gastos: " . implode(" ", $conn->errorInfo()));
+    // --- Obtener las cotizaciones con paginación y filtros ---
+    $sqlCotizaciones = "SELECT id, nombre, apellido, tipo_cotizacion, pago, fecha, dia_semana, estado FROM cotizaciones " . $whereClause . " ORDER BY fecha DESC, nombre ASC LIMIT ? OFFSET ?";
+    $stmtCotizaciones = $conn->prepare($sqlCotizaciones);
+    if ($stmtCotizaciones === false) {
+        throw new Exception("Error al preparar la consulta de cotizaciones: " . implode(" ", $conn->errorInfo()));
     }
 
     $paramIndex = 1;
     foreach ($params as $value) {
-        $stmtGastos->bindValue($paramIndex++, $value);
+        $stmtCotizaciones->bindValue($paramIndex++, $value);
     }
-    $stmtGastos->bindValue($paramIndex++, $limit, PDO::PARAM_INT);
-    $stmtGastos->bindValue($paramIndex++, $offset, PDO::PARAM_INT);
+    $stmtCotizaciones->bindValue($paramIndex++, $limit, PDO::PARAM_INT);
+    $stmtCotizaciones->bindValue($paramIndex++, $offset, PDO::PARAM_INT);
 
-    $stmtGastos->execute();
-    $gastos = $stmtGastos->fetchAll(PDO::FETCH_ASSOC);
-    $stmtGastos = null;
+    $stmtCotizaciones->execute();
+    $cotizaciones = $stmtCotizaciones->fetchAll(PDO::FETCH_ASSOC);
+    $stmtCotizaciones = null;
     $conn = null;
 
-    echo json_encode(['gastos' => $gastos, 'total' => $totalRecords, 'total_general_monto' => $totalGeneralMonto]);
+    echo json_encode(['cotizaciones' => $cotizaciones, 'total' => $totalRecords, 'total_general_monto' => $totalGeneralMonto]);
 
 } catch (Exception $e) {
     http_response_code(500);

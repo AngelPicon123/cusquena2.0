@@ -37,6 +37,8 @@
             <a class="nav-link" href="gestionPrestamos.php">Gestión de Prestamos</a>
             <a class="nav-link" href="gestionAlquiler.php">Gestión de Alquileres</a>
             <a class="nav-link" href="gestionGaastos.php">Gestión de Gastos</a>
+            <a class="nav-link" href="gestionCoordinadores.php">Gestión de Coordinadores</a>
+            <a class="nav-link" href="gestionDominical.php">Gestión Dominical</a>
             <a class="nav-link" href="balanceEmpresa.php">Balance de Empresa</a>
           </nav>
         </div>

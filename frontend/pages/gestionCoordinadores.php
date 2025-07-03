@@ -128,7 +128,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                     </div>
                     <div class="mb-3">
                       <label for="montoDiario" class="form-label fw-bold">Monto Diario:</label>
-                      <input type="number" step="0.01" class="form-control" id="montoDiario" name="montoDiario" required>
+                      <input type="number" step="0.01" class="form-control" id="montoDiario" name="monto_diario" required>
                     </div>
                     <div class="mb-3">
                       <label for="fecha" class="form-label fw-bold">Fecha:</label>
@@ -143,7 +143,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                     </div>
                     <div class="mb-3">
                       <label for="contacto" class="form-label fw-bold">Contacto:</label>
-                      <input type="text" class="form-control" id="contacto" name="contacto">
+                      <input type="text" class="form-control" id="contacto" name="contacto" required>
                     </div>
                     <div class="modal-footer d-flex justify-content-center">
                       <button type="submit" class="btn btn-primary">Agregar Coordinador</button>
@@ -216,6 +216,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                   <th scope="col">Monto Diario</th>
                   <th scope="col">Fecha</th>
                   <th scope="col">Estado</th>
+                  <th scope="col">Contacto</th>
                   <th scope="col">Acciones</th>
                 </tr>
               </thead>

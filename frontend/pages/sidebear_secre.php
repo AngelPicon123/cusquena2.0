@@ -17,10 +17,10 @@
         <div class="collapse" id="collapseLayoutsProductos" aria-labelledby="headingOne"
           data-bs-parent="#sidenavAccordion">
           <nav class="sb-sidenav-menu-nested nav">
-            <a class="nav-link" href="gestionServicioo.php">Gestión de Servicios</a>
+            <a class="nav-link" href="gestionServicio.php">Gestión de Servicios</a>
             <a class="nav-link" href="gestionProducto.php">Gestión de Productos</a>
             <a class="nav-link" href="gestionDeudas.php">Gestion de Deudas</a>
-            <a class="nav-link" href="gestionGastosLubri.php">Gestion de Gastos</a>
+            <a class="nav-link" href="gestionGastosLubricentro.php">Gestion de Gastos</a>
             <a class="nav-link" href="balanceLubricentro.php">Balances de Lubricentros</a>
           </nav>
         </div>
@@ -35,8 +35,8 @@
           <nav class="sb-sidenav-menu-nested nav">
             <a class="nav-link" href="gestionCotizacion.php">Gestión de Cotizaciones</a>
             <a class="nav-link" href="gestionPrestamos.php">Gestión de Prestamos</a>
-            <a class="nav-link" href="gestionAlquiler.php">Gestión de Alquileres</a>
-            <a class="nav-link" href="gestionGaastos.php">Gestión de Gastos</a>
+            <a class="nav-link" href="gestionAlquileres.php">Gestión de Alquileres</a>
+            <a class="nav-link" href="gestionGastosEmpresa.php">Gestión de Gastos</a>
             <a class="nav-link" href="gestionCoordinadores.php">Gestión de Coordinadores</a>
             <a class="nav-link" href="gestionDominical.php">Gestión Dominical</a>
             <a class="nav-link" href="balanceEmpresa.php">Balance de Empresa</a>

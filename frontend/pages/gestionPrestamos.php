@@ -100,7 +100,8 @@ verificarPermiso(['Administrador', 'Secretaria']);
               <?php endif; ?>
             </div>
           </div>
-          <!-- Modal Agregar -->
+         <!-- Modal Agregar -->
+
           <div class="modal fade" id="modalAgregar">
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
@@ -115,19 +116,19 @@ verificarPermiso(['Administrador', 'Secretaria']);
                       <input type="text" class="form-control" id="nombre" name="nombre" required>
                     </div>
                     <div class="mb-3">
-                      <label for="tipoPersona" class="form-label fw-bold">Tipo de Persona:</label>
-                      <select class="form-select" id="tipoPersona" name="tipoPersona" required>
+                      <label for="tipo_persona" class="form-label fw-bold">Tipo de Persona:</label>
+                      <select class="form-select" id="tipo_persona" name="tipo_persona" required>
                         <option value="natural">Natural</option>
                         <option value="juridica">Jurídica</option>
                       </select>
                     </div>
                     <div class="mb-3">
-                      <label for="montoDeuda" class="form-label fw-bold">Monto Deuda:</label>
-                      <input type="number" step="0.01" class="form-control" id="montoDeuda" name="montoDeuda" required>
+                      <label for="monto_deuda" class="form-label fw-bold">Monto Deuda:</label>
+                      <input type="number" step="0.01" class="form-control" id="monto_deuda" name="monto_deuda" required>
                     </div>
                     <div class="mb-3">
-                      <label for="saldoPendiente" class="form-label fw-bold">Saldo Pendiente:</label>
-                      <input type="number" step="0.01" class="form-control" id="saldoPendiente" name="saldoPendiente" required>
+                      <label for="saldo_pendiente" class="form-label fw-bold">Saldo Pendiente:</label>
+                      <input type="number" step="0.01" class="form-control" id="saldo_pendiente" name="saldo_pendiente" required>
                     </div>
                     <div class="mb-3">
                       <label for="estado" class="form-label fw-bold">Estado:</label>
@@ -137,8 +138,8 @@ verificarPermiso(['Administrador', 'Secretaria']);
                       </select>
                     </div>
                     <div class="mb-3">
-                      <label for="fechaInicio" class="form-label fw-bold">Fecha Inicio Deuda:</label>
-                      <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+                      <label for="fecha_inicio_deuda" class="form-label fw-bold">Fecha Inicio Deuda:</label>
+                      <input type="date" class="form-control" id="fecha_inicio_deuda" name="fecha_inicio_deuda" required>
                     </div>
                     <div class="modal-footer d-flex justify-content-center">
                       <button type="submit" class="btn btn-primary">Agregar</button>
@@ -148,6 +149,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
               </div>
             </div>
           </div>
+
           <!-- Fin Modal Agregar -->
 
           <!-- Modal Vista Pago Préstamo -->

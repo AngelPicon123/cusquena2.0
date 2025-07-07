@@ -124,10 +124,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                     </div>
                     <div class="mb-3">
                       <label for="paradero" class="form-label fw-bold">Paradero:</label>
-                      <select class="form-select" id="paradero" name="paradero" required>
-                        <option value="">Seleccione un paradero</option>
-                        <option value="San Pedro">San Pedro</option>
-                      </select>
+                      <input type="text" class="form-control" id="paradero" name="paradero" required>
                     </div>
                     <div class="mb-3">
                       <label for="montoDiario" class="form-label fw-bold">Monto Diario:</label>

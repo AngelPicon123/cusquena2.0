@@ -113,56 +113,50 @@ verificarPermiso(['Administrador', 'Secretaria']);
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                  <form id="formAgregarDominical">
-                    <div class="mb-3">
-                      <label for="cotizacionId" class="form-label fw-bold">Cotización:</label>
-                      <select class="form-select" id="cotizacionId" name="cotizacionId" required>
-                        <!-- Opciones cargadas dinámicamente con JavaScript/PHP -->
-                      </select>
-                    </div>
-                    <div class="mb-3">
-                      <label for="nombre" class="form-label fw-bold">Nombre:</label>
-                      <input type="text" class="form-control" id="nombre" name="nombre" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="apellidos" class="form-label fw-bold">Apellidos:</label>
-                      <input type="text" class="form-control" id="apellidos" name="apellidos" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="fechaDomingo" class="form-label fw-bold">Fecha Domingo:</label>
-                      <input type="date" class="form-control" id="fechaDomingo" name="fechaDomingo" required>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-6 mb-3">
-                        <label for="semanaInicio" class="form-label fw-bold">Semana Inicio:</label>
-                        <input type="date" class="form-control" id="semanaInicio" name="semanaInicio" required>
-                      </div>
-                      <div class="col-md-6 mb-3">
-                        <label for="semanaFin" class="form-label fw-bold">Semana Fin:</label>
-                        <input type="date" class="form-control" id="semanaFin" name="semanaFin" required>
-                      </div>
-                    </div>
-                    <div class="mb-3">
-                      <label for="montoDominical" class="form-label fw-bold">Monto Dominical:</label>
-                      <input type="number" step="0.01" class="form-control" id="montoDominical" name="montoDominical" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="estado" class="form-label fw-bold">Estado:</label>
-                      <select class="form-select" id="estado" name="estado" required>
-                        <option value="Pendiente">Pendiente</option>
-                        <option value="Pagado">Pagado</option>
-                        <option value="Exento">Exento</option>
-                      </select>
-                    </div>
-                    <div class="mb-3">
-                      <label for="diferencia" class="form-label fw-bold">Diferencia:</label>
-                      <input type="number" step="0.01" class="form-control" id="diferencia" name="diferencia" value="0.00">
-                    </div>
-                    <div class="modal-footer d-flex justify-content-center">
-                      <button type="submit" class="btn btn-primary">Agregar Dominical</button>
-                    </div>
-                  </form>
+              <form id="formAgregarDominical">
+                <div class="mb-3">
+                  <label for="nombre" class="form-label fw-bold">Nombre:</label>
+                  <input type="text" class="form-control" id="nombre" name="nombre" required>
                 </div>
+                <div class="mb-3">
+                  <label for="apellidos" class="form-label fw-bold">Apellidos:</label>
+                  <input type="text" class="form-control" id="apellidos" name="apellidos" required>
+                </div>
+                <div class="mb-3">
+                  <label for="fechaDomingo" class="form-label fw-bold">Fecha Domingo:</label>
+                  <input type="date" class="form-control" id="fechaDomingo" name="fecha_domingo" required>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="semanaInicio" class="form-label fw-bold">Semana Inicio:</label>
+                    <input type="date" class="form-control" id="semanaInicio" name="semana_inicio" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="semanaFin" class="form-label fw-bold">Semana Fin:</label>
+                    <input type="date" class="form-control" id="semanaFin" name="semana_fin" required>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="montoDominical" class="form-label fw-bold">Monto Dominical:</label>
+                  <input type="number" step="0.01" class="form-control" id="montoDominical" name="monto_dominical" required>
+                </div>
+                <div class="mb-3">
+                  <label for="estado" class="form-label fw-bold">Estado:</label>
+                  <select class="form-select" id="estado" name="estado" required>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Pagado">Pagado</option>
+                    <option value="Exento">Exento</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="diferencia" class="form-label fw-bold">Diferencia:</label>
+                  <input type="number" step="0.01" class="form-control" id="diferencia" name="diferencia" value="0.00">
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                  <button type="submit" class="btn btn-primary">Agregar Dominical</button>
+                </div>
+              </form>
+               </div>
               </div>
             </div>
           </div>
@@ -290,10 +284,10 @@ verificarPermiso(['Administrador', 'Secretaria']);
                   <th scope="col">Nombre</th>
                   <th scope="col">Apellidos</th>
                   <th scope="col">Fecha Domingo</th>
-                  <th scope="col">Semana</th>
+                  <th scope="col">Semana Inicio</th>
+                  <th scope="col">Semana Fin</th>
                   <th scope="col">Monto Dominical</th>
                   <th scope="col">Estado</th>
-                  <th scope="col">Días Pagados</th>
                   <th scope="col">Diferencia</th>
                   <th scope="col">Acciones</th>
                 </tr>

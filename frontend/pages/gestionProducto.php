@@ -229,20 +229,19 @@ verificarPermiso(['Administrador', 'Secretaria']);
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover table-sm w-100 text-center align-middle" style="table-layout: auto;">
                             <thead>
-                                <tr class="table-dark">
-                                    <th>ID</th>
-                                    <th>Descripción</th>
-                                    <th>P. Compra</th>
-                                    <th>P. Venta</th>
-                                    <th>Inicial</th>
-                                    <th>Ingreso</th>
-                                    <th>Total</th>
-                                    <th>Queda</th>
-                                    <th>Venta</th>
-                                    <th>Monto</th>
-                                    <th>Categoría</th>
-                                    <th>Acciones</th>
-                                </tr>
+                            <tr class="table-dark">
+                                <th>ID</th>
+                                <th>Descripción</th>
+                                <th>P. Compra</th>
+                                <th>P. Venta</th>
+                                <th>Inicial</th>
+                                <th>Ingreso</th>
+                                <th>Queda</th>
+                                <th>Venta</th>
+                                <th>Monto</th>
+                                <th>Categoría</th>
+                                <th>Acciones</th>
+                            </tr>
                             </thead>
                             <tbody id="tablaProductos">
                             </tbody>

@@ -1,45 +1,47 @@
 <?php
-// C:\xampp\htdocs\cusquena\backend\api\controllers\vista_alquileres\eliminar.php
-
 require_once __DIR__ . '/../../../includes/db.php';
 require_once __DIR__ . '/../../../includes/auth.php';
 
 header('Content-Type: application/json');
 
-verificarPermiso(['Administrador']); // Solo administradores pueden eliminar alquileres
+// Verifica el permiso del usuario. Asumo que solo los administradores pueden eliminar.
+// Si Secretarias también pueden eliminar, cambia a ['Administrador', 'Secretaria']
+verificarPermiso(['Administrador']);
 
+// Decodifica los datos JSON enviados en el cuerpo de la solicitud
 $data = json_decode(file_get_contents('php://input'), true);
 
+// Valida si el ID de la cotización fue proporcionado
 if (!isset($data['id'])) {
-    http_response_code(400);
-    echo json_encode(['error' => 'ID de alquiler no proporcionado.']);
+    http_response_code(400); // Bad Request
+    echo json_encode(['success' => false, 'message' => 'ID de cotización no proporcionado.']);
     exit();
 }
 
-$id = (int)$data['id'];
+$id = $data['id']; // Obtiene el ID de la cotización a eliminar
 
 try {
-    $stmt = $conn->prepare("DELETE FROM alquileres WHERE id = :id");
-    if ($stmt === false) {
-        throw new Exception("Error al preparar la consulta: " . implode(" ", $conn->errorInfo()));
-    }
+    // Prepara la consulta SQL para eliminar la cotización por su ID
+    $stmt = $conn->prepare("DELETE FROM cotizaciones WHERE id = :id");
+    // Vincula el parámetro ID de forma segura para prevenir inyecciones SQL
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
 
-    if ($stmt->execute()) {
-        if ($stmt->rowCount() > 0) {
-            echo json_encode(['success' => true, 'message' => 'Alquiler eliminado exitosamente!']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Alquiler no encontrado.']);
-        }
+    // Verifica si se eliminó alguna fila
+    if ($stmt->rowCount() > 0) {
+        echo json_encode(['success' => true, 'message' => 'Cotización eliminada correctamente.']);
     } else {
-        throw new Exception("Error al ejecutar la consulta: " . implode(" ", $stmt->errorInfo()));
+        // Si no se eliminó ninguna fila, es porque el ID no existía
+        http_response_code(404); // Not Found
+        echo json_encode(['success' => false, 'message' => 'La cotización con el ID especificado no fue encontrada.']);
     }
 
     $stmt = null;
     $conn = null;
 
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()]);
+} catch (PDOException $e) {
+    // Captura cualquier excepción de PDO (errores de base de datos)
+    http_response_code(500); // Internal Server Error
+    echo json_encode(['success' => false, 'message' => 'Error al eliminar la cotización: ' . $e->getMessage()]);
 }
 ?>

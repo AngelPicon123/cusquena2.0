@@ -136,23 +136,26 @@ if (isset($_SESSION['rol'])) {
                                             <label for="apellido" class="form-label fw-bold">Apellido:</label>
                                             <input type="text" class="form-control" id="apellido" name="apellido" required>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="tipoCotizacion" class="form-label fw-bold">Tipo de Cotización:</label>
-                                            <select class="form-select" id="tipoCotizacion" name="tipoCotizacion" required>
-                                                <option value="">Seleccione una opción:</option>
-                                                <option value="servicios">Servicios</option>
-                                                <option value="producto">Producto</option>
-                                            </select>
+                                       <div class="mb-3">
+                                        <label for="tipoCotizacion" class="form-label fw-bold">Tipo de Cotización:</label>
+                                        <select class="form-select" id="tipoCotizacion" name="tipo_cotizacion" required> <option value="">Seleccione una opción:</option>
+                                            <option value="servicios">Servicios</option>
+                                            <option value="producto">Producto</option>
+                                        </select>
                                         </div>
                                         <div class="mb-3">
                                             <label for="pago" class="form-label fw-bold">Pago:</label>
                                             <input type="number" step="0.01" class="form-control" id="pago" name="pago" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="fecha" class="form-label fw-bold">Fecha:</label>
-                                            <input type="date" class="form-control" id="fecha" name="fecha" required>
+                                            <label for="fecha_inicio" class="form-label fw-bold">Fecha Inicio:</label>
+                                            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
                                         </div>
                                         <div class="mb-3">
+                                            <label for="fecha_fin" class="form-label fw-bold">Fecha Fin:</label>
+                                            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                                        </div>
+                                      <div class="mb-3">
                                             <label for="estado" class="form-label fw-bold">Estado:</label>
                                             <select class="form-select" id="estado" name="estado" required>
                                                 <option value="Pendiente">Pendiente</option>
@@ -189,7 +192,7 @@ if (isset($_SESSION['rol'])) {
                                         </div>
                                         <div class="mb-3">
                                             <label for="editTipoCotizacion" class="form-label fw-bold">Tipo de Cotización:</label>
-                                            <select class="form-select" id="editTipoCotizacion" name="tipoCotizacion" required>
+                                            <select class="form-select" id="editTipoCotizacion" name="tipo_cotizacion" required>
                                                 <option value="">Seleccione una opción:</option>
                                                 <option value="servicios">Servicios</option>
                                                 <option value="producto">Producto</option>
@@ -200,9 +203,14 @@ if (isset($_SESSION['rol'])) {
                                             <input type="number" step="0.01" class="form-control" id="editPago" name="pago" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="editFecha" class="form-label fw-bold">Fecha:</label>
-                                            <input type="date" class="form-control" id="editFecha" name="fecha" required>
+                                            <label for="editFechaInicio" class="form-label fw-bold">Fecha Inicio:</label>
+                                            <input type="date" class="form-control" id="editFechaInicio" name="fecha_inicio" required>
                                         </div>
+                                        <div class="mb-3">
+                                            <label for="editFechaFin" class="form-label fw-bold">Fecha Fin:</label>
+                                            <input type="date" class="form-control" id="editFechaFin" name="fecha_fin" required>
+                                        </div>
+
                                         <div class="mb-3">
                                             <label for="editEstado" class="form-label fw-bold">Estado:</label>
                                             <select class="form-select" id="editEstado" name="estado" required>
@@ -224,24 +232,23 @@ if (isset($_SESSION['rol'])) {
                         <table class="table table-striped table-bordered table-hover text-center" id="cotizacionesTable">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>ID</th>
                                     <th>Nombre</th>
                                     <th>Apellido</th>
                                     <th>Tipo Cotización</th>
                                     <th>Pago</th>
-                                    <th>Fecha</th>
+                                    <th>Fecha Inicio</th>
+                                    <th>Fecha Fin</th>
                                     <th>Estado</th>
-                                    <th>Día Semana</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="tablaCotizaciones" class="align-middle">
+                           <tbody id="tablaCotizaciones" class="align-middle">
                                 <!-- Los datos se cargarán dinámicamente con JavaScript -->
                             </tbody>
                         </table>
                     </div>
                     <div class="text-end mb-4">
-                        <span id="totalGeneral">Total General: S/. 0.00</span>
+                        <p id="totalGeneral" class="mt-3 fw-bold">Total General: S/. 0.00</p>
                     </div>
                     <nav aria-label="Page navigation example" class="d-flex justify-content-end">
                         <ul class="pagination" id="pagination">
@@ -291,10 +298,7 @@ if (isset($_SESSION['rol'])) {
             </div>
         </div>
     </div>
-
     <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" xintegrity="sha512-BNaRQnYJLWx6docvCadT5WbIAEvEE2IMdnTgBjCEAOxadSVuqA9OfG8Krh6FFmutBo4HfdaPhtXrqPWXk07JCQg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="../js/scripts.js"></script> <!-- Asegúrate de que este script maneje el sidebarToggle -->
     <script src="../js/functions/gestionCotizaciones.js"></script>
 </body>
 </html>

@@ -208,6 +208,24 @@ verificarPermiso(['Administrador', 'Secretaria']);
             </div>
           </div>
 
+        <!-- Modal de Confirmación de Eliminación -->
+      <div class="modal fade" id="modalEliminarConfirmacion" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title" id="modalEliminarLabel">¿Confirmar Eliminación?</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              ¿Estás seguro de que deseas eliminar este coordinador? Esta acción no se puede deshacer.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-danger" id="btnEliminarConfirmado">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      </div>
           <!-- Tabla de Coordinadores -->
           <div class="table-responsive my-4">
             <table class="table table-striped table-bordered">
@@ -224,7 +242,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                 </tr>
               </thead>
               <tbody id="tablaCoordinadores">
-                <!-- Los datos se cargarán dinámicamente con JavaScript o PHP -->
+        
               </tbody>
             </table>
           </div>

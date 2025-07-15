@@ -6,10 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const formEditar = document.getElementById('formEditarCoordinador');
     const modalAgregar = new bootstrap.Modal(document.getElementById('modalAgregarCoordinador'));
     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditarCoordinador'));
-
-    // Si tienes modalEliminar en tu HTML, descomenta esto:
-    // const modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminarConfirmacion'));
-    // const btnEliminar = document.getElementById('btnConfirmarEliminar');
+    const modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminarConfirmacion'));
+    const btnEliminarConfirmado = document.getElementById('btnEliminarConfirmado');
 
     let idAEliminar = null;
 
@@ -43,65 +41,48 @@ document.addEventListener('DOMContentLoaded', () => {
             row.insertCell().textContent = c.contacto || '';
 
             const acciones = row.insertCell();
+
             const btnEditar = document.createElement('button');
             btnEditar.className = 'btn btn-warning btn-sm me-1';
             btnEditar.textContent = 'Editar';
-            btnEditar.onclick = () => llenarModalEditar(c);
+            btnEditar.addEventListener('click', () => llenarModalEditar(c));
             acciones.appendChild(btnEditar);
 
-            // Solo si tienes modalEliminar implementado en tu HTML
-            /*
             const btnEliminar = document.createElement('button');
             btnEliminar.className = 'btn btn-danger btn-sm';
             btnEliminar.textContent = 'Eliminar';
-            btnEliminar.onclick = () => {
+            btnEliminar.addEventListener('click', () => {
                 idAEliminar = c.id;
                 modalEliminar.show();
-            };
+            });
             acciones.appendChild(btnEliminar);
-            */
         });
     }
 
-  formAgregar.addEventListener('submit', async e => {
-    e.preventDefault();
-    const formData = new FormData(formAgregar);
-    const datos = Object.fromEntries(formData.entries());
+    formAgregar.addEventListener('submit', async e => {
+        e.preventDefault();
+        const formData = new FormData(formAgregar);
+        const datos = Object.fromEntries(formData.entries());
 
-    console.log('Datos enviados:', datos); // ✅ Aquí está bien
+        try {
+            const response = await fetch(`${API_BASE_URL}registrar.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
 
-    try {
-        const response = await fetch(`${API_BASE_URL}registrar.php`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(datos)
-        });
-
-        const data = await response.json();
-        if (data.success) {
-            modalAgregar.hide();
-            formAgregar.reset();
-            cargarCoordinadores();
-        } else {
-            alert(data.error || 'Error al registrar.');
+            const data = await response.json();
+            if (data.success) {
+                modalAgregar.hide();
+                formAgregar.reset();
+                cargarCoordinadores();
+            } else {
+                alert(data.error || 'Error al registrar.');
+            }
+        } catch (error) {
+            console.error('Error al registrar:', error);
         }
-    } catch (error) {
-        console.error('Error al registrar:', error);
-    }
-});
-
-    function llenarModalEditar(c) {
-        document.getElementById('editCoordinadorId').value = c.id;
-        document.getElementById('edit_nombre').value = c.nombre;
-        document.getElementById('edit_apellidos').value = c.apellidos;
-        document.getElementById('edit_paradero').value = c.paradero;
-        document.getElementById('edit_montoDiario').value = parseFloat(c.monto_diario).toFixed(2);
-        document.getElementById('edit_fecha').value = c.fecha;
-        document.getElementById('edit_estado').value = c.estado;
-        document.getElementById('edit_contacto').value = c.contacto || '';
-
-        modalEditar.show();
-    }
+    });
 
     formEditar.addEventListener('submit', async e => {
         e.preventDefault();
@@ -127,6 +108,42 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error al actualizar:', error);
         }
     });
+
+    btnEliminarConfirmado.addEventListener('click', async () => {
+        if (!idAEliminar) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}eliminar.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: idAEliminar })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                modalEliminar.hide();
+                cargarCoordinadores();
+                idAEliminar = null;
+            } else {
+                alert(data.error || 'Error al eliminar.');
+            }
+        } catch (error) {
+            console.error('Error al eliminar:', error);
+        }
+    });
+
+    function llenarModalEditar(c) {
+        document.getElementById('editCoordinadorId').value = c.id;
+        document.getElementById('edit_nombre').value = c.nombre;
+        document.getElementById('edit_apellidos').value = c.apellidos;
+        document.getElementById('edit_paradero').value = c.paradero;
+        document.getElementById('edit_montoDiario').value = parseFloat(c.monto_diario).toFixed(2);
+        document.getElementById('edit_fecha').value = c.fecha;
+        document.getElementById('edit_estado').value = c.estado;
+        document.getElementById('edit_contacto').value = c.contacto || '';
+
+        modalEditar.show();
+    }
 
     cargarCoordinadores();
 });

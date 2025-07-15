@@ -1,6 +1,4 @@
 <?php
-// C:\xampp\htdocs\cusquena\backend\api\controllers\vista_cotizaciones\eliminar.php
-
 require_once __DIR__ . '/../../../includes/db.php';
 require_once __DIR__ . '/../../../includes/auth.php';
 
@@ -12,34 +10,26 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 if (!isset($data['id'])) {
     http_response_code(400);
-    echo json_encode(['error' => 'ID de cotización no proporcionado.']);
+    echo json_encode(['error' => 'ID de alquiler no proporcionado.']);
     exit();
 }
 
 $id = (int)$data['id'];
 
 try {
-    $stmt = $conn->prepare("DELETE FROM cotizaciones WHERE id = :id");
-    if ($stmt === false) {
-        throw new Exception("Error al preparar la consulta: " . implode(" ", $conn->errorInfo()));
-    }
-    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt = $conn->prepare("DELETE FROM alquileres WHERE id = :id");
 
-    if ($stmt->execute()) {
+    if ($stmt->execute([':id' => $id])) {
         if ($stmt->rowCount() > 0) {
-            echo json_encode(['success' => true, 'message' => 'Cotización eliminada exitosamente!']);
+            echo json_encode(['success' => true, 'message' => 'Alquiler eliminado exitosamente!']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Cotización no encontrada.']);
+            echo json_encode(['success' => false, 'message' => 'Alquiler no encontrado.']);
         }
     } else {
-        throw new Exception("Error al ejecutar la consulta: " . implode(" ", $stmt->errorInfo()));
+        echo json_encode(['error' => 'Error al ejecutar la consulta.']);
     }
-
-    $stmt = null;
-    $conn = null;
-
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()]);
+    echo json_encode(['error' => 'Error del servidor: ' . $e->getMessage()]);
 }
 ?>

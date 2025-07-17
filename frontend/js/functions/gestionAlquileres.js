@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
         data.estado = document.querySelector('input[name="estado"]:checked').value;
         const result = await addAlquiler(data);
         if (result.success) {
-            showToast('success', 'Alquiler agregado exitosamente!');
+            showToast('success', '✅ Alquiler agregado exitosamente!');
             resetForm(formAgregarAlquiler);
             modalAgregar.hide();
             loadAlquileres();
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         data.estado = document.querySelector('input[name="editEstado"]:checked').value;
         const result = await updateAlquiler(data);
         if (result.success) {
-            showToast('success', 'Alquiler actualizado exitosamente!');
+            showToast('success', '✅ Alquiler actualizado exitosamente!');
             modalEditar.hide();
             loadAlquileres();
         }
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (alquilerIdToDelete) {
             const result = await deleteAlquiler(alquilerIdToDelete);
             if (result.success) {
-                showToast('success', 'Alquiler eliminado exitosamente!');
+                showToast('success', '✅ Alquiler eliminado exitosamente!');
                 modalEliminarConfirmacion.hide();
                 alquilerIdToDelete = null;
                 loadAlquileres();

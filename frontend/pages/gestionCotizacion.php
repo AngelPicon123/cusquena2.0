@@ -243,7 +243,7 @@ if (isset($_SESSION['rol'])) {
                                 </tr>
                             </thead>
                            <tbody id="tablaCotizaciones" class="align-middle">
-                                <!-- Los datos se cargarán dinámicamente con JavaScript -->
+                              
                             </tbody>
                         </table>
                     </div>
@@ -252,7 +252,7 @@ if (isset($_SESSION['rol'])) {
                     </div>
                     <nav aria-label="Page navigation example" class="d-flex justify-content-end">
                         <ul class="pagination" id="pagination">
-                            <!-- Los enlaces de paginación se cargarán dinámicamente con JavaScript -->
+                           
                         </ul>
                     </nav>
                 </div>
@@ -264,7 +264,7 @@ if (isset($_SESSION['rol'])) {
         <div id="toastSuccess" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body text-white bg-success" id="toastSuccessBody">
-                    <!-- Mensaje de éxito -->
+                
                 </div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
@@ -273,7 +273,7 @@ if (isset($_SESSION['rol'])) {
         <div id="toastError" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body text-white bg-danger" id="toastErrorBody">
-                    <!-- Mensaje de error -->
+                    
                 </div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>

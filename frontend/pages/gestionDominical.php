@@ -225,6 +225,26 @@ verificarPermiso(['Administrador', 'Secretaria']);
             </div>
           </div>
 
+          <div class="modal fade" id="modalEliminarDominicalConfirmacion" tabindex="-1" aria-labelledby="modalEliminarDominicalConfirmacionLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                  <h5 class="modal-title" id="modalEliminarDominicalConfirmacionLabel">¿Confirmar Eliminación?</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                  ¿Estás seguro de que deseas eliminar este coordinador? Esta acción no se puede deshacer.
+                  <input type="hidden" id="dominicalIdParaConfirmarEliminar">
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="button" class="btn btn-danger" id="btnConfirmarEliminarDominical">Eliminar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
           <!-- Modal Ver Pagos -->
           <div class="modal fade" id="modalVerPagos" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -318,6 +338,24 @@ verificarPermiso(['Administrador', 'Secretaria']);
       </main>
     </div>
   </div>
+
+      <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toastSuccess" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body text-white bg-success" id="toastSuccessBody">
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+
+        <div id="toastError" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body text-white bg-danger" id="toastErrorBody">
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
   <script src="../js/bootstrap.bundle.min.js"></script>
   <script src="../js/functions/gestionDominical.js"></script>
 </body>

@@ -91,12 +91,12 @@ verificarPermiso(['Administrador', 'Secretaria']);
           <div class="row">
             <div class="col-12 d-flex justify-content-between align-items-center">
               <div class="d-flex">
-                <input type="text" class="form-control me-2" id="buscarCoordinador" placeholder="Buscar por Nombre">
+                <input type="text" class="form-control me-2" id="buscarCoordinador" placeholder="Buscar por Nombre/Apellido">
                 <input type="date" class="form-control me-2" id="fechaFiltro" placeholder="Filtrar por Fecha">
                 <input type="text" class="form-control me-2" id="paraderoFiltro" placeholder="Filtrar por Paradero">
                 <button class="btn btn-primary" id="btnBuscar">Buscar</button>
-              </div>
-              <?php if ($_SESSION['rol'] === 'Administrador'): ?>
+            </div>
+            <?php if ($_SESSION['rol'] === 'Administrador'): ?>
               <div>
                 <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregarCoordinador">Agregar Coordinador</a>
               </div>
@@ -155,59 +155,55 @@ verificarPermiso(['Administrador', 'Secretaria']);
           </div>
 
           <!-- Modal Editar Coordinador -->
-          <div class="modal fade" id="modalEditarCoordinador">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h3 class="modal-title">Editar Coordinador</h3>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                  <form id="formEditarCoordinador">
-                    <input type="hidden" id="editCoordinadorId" name="coordinadorId">
+                  <div class="modal fade" id="modalEditarCoordinador">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3 class="modal-title">Editar Coordinador</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <form id="formEditarCoordinador">
+                  <input type="hidden" id="editCoordinadorId" name="id">
+                  <div class="mb-3">
+                    <label for="edit_nombre" class="form-label fw-bold">Nombre:</label>
+                    <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="edit_apellidos" class="form-label fw-bold">Apellidos:</label>
+                    <input type="text" class="form-control" id="edit_apellidos" name="apellidos" required>
+                  </div>
                     <div class="mb-3">
-                      <label for="edit_nombre" class="form-label fw-bold">Nombre:</label>
-                      <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
+                    <label for="edit_paradero" class="form-label fw-bold">Paradero:</label>
+                    <input type="text" class="form-control" id="edit_paradero" name="paradero" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="edit_montoDiario" class="form-label fw-bold">Monto Diario:</label>
+                    <input type="number" step="0.01" class="form-control" id="edit_montoDiario" name="monto_diario" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="edit_fecha" class="form-label fw-bold">Fecha:</label>
+                    <input type="date" class="form-control" id="edit_fecha" name="fecha" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="edit_estado" class="form-label fw-bold">Estado:</label>
+                    <select class="form-select" id="edit_estado" name="estado" required>
+                      <option value="Pendiente">Pendiente</option>
+                      <option value="Pagado">Pagado</option>
+                    </select>
+                  </div>
+                   <div class="mb-3">
+                    <label for="edit_contacto" class="form-label fw-bold">Contacto:</label>
+                    <input type="text" class="form-control" id="edit_contacto" name="contacto" required>
                     </div>
-                    <div class="mb-3">
-                      <label for="edit_apellidos" class="form-label fw-bold">Apellidos:</label>
-                      <input type="text" class="form-control" id="edit_apellidos" name="apellidos" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="edit_paradero" class="form-label fw-bold">Paradero:</label>
-                      <select class="form-select" id="edit_paradero" name="paradero" required>
-                        <option value="">Seleccione un paradero</option>
-                        <option value="San Pedro">San Pedro</option>
-                      </select>
-                    </div>
-                    <div class="mb-3">
-                      <label for="edit_montoDiario" class="form-label fw-bold">Monto Diario:</label>
-                      <input type="number" step="0.01" class="form-control" id="edit_montoDiario" name="montoDiario" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="edit_fecha" class="form-label fw-bold">Fecha:</label>
-                      <input type="date" class="form-control" id="edit_fecha" name="fecha" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="edit_estado" class="form-label fw-bold">Estado:</label>
-                      <select class="form-select" id="edit_estado" name="estado" required>
-                        <option value="Pendiente">Pendiente</option>
-                        <option value="Pagado">Pagado</option>
-                      </select>
-                    </div>
-                    <div class="mb-3">
-                      <label for="edit_contacto" class="form-label fw-bold">Contacto:</label>
-                      <input type="text" class="form-control" id="edit_contacto" name="contacto">
-                    </div>
-                    <div class="modal-footer d-flex justify-content-center">
-                      <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                    </div>
-                  </form>
-                </div>
+                  <div class="modal-footer d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
-
+        </div>
         <!-- Modal de Confirmación de Eliminación -->
       <div class="modal fade" id="modalEliminarConfirmacion" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">

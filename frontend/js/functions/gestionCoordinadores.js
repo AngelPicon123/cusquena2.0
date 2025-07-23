@@ -1,29 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
     const API_BASE_URL = 'http://localhost/cusquena/backend/api/controllers/vista_gestion_coordinadores/';
-
+    
+    // ... (Mantén tus otras constantes y funciones como showToast, resetForm, etc.) ...
     const tablaCoordinadores = document.getElementById('tablaCoordinadores');
     const formAgregar = document.getElementById('formAgregarCoordinador');
     const formEditar = document.getElementById('formEditarCoordinador');
     const modalAgregar = new bootstrap.Modal(document.getElementById('modalAgregarCoordinador'));
     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditarCoordinador'));
-    const modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminarConfirmacion')); // Tu modal de confirmación
+    const modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminarConfirmacion'));
     const btnEliminarConfirmado = document.getElementById('btnEliminarConfirmado');
 
-    // Elementos para los Toasts
     const toastSuccess = new bootstrap.Toast(document.getElementById('toastSuccess'));
     const toastError = new bootstrap.Toast(document.getElementById('toastError'));
     const toastSuccessBody = document.getElementById('toastSuccessBody');
     const toastErrorBody = document.getElementById('toastErrorBody');
 
-    let idAEliminar = null; // Variable para almacenar el ID del coordinador a eliminar
+    let idAEliminar = null;
+
+    // Elementos de filtro y paginación
+    const buscarCoordinadorInput = document.getElementById('buscarCoordinador');
+    const fechaFiltroInput = document.getElementById('fechaFiltro'); // ID ÚNICO para la fecha
+    const paraderoFiltroInput = document.getElementById('paraderoFiltro');
+    const btnBuscar = document.getElementById('btnBuscar');
+    const paginationContainer = document.querySelector('.pagination');
+
+    let currentPage = 1;
+    const recordsPerPage = 10;
 
     // --- Funciones de Utilidad ---
-
-    /**
-     * Muestra un mensaje de notificación (toast) en la esquina inferior derecha.
-     * @param {string} type - 'success' para éxito, 'error' para error.
-     * @param {string} message - El mensaje a mostrar.
-     */
     function showToast(type, message) {
         if (type === 'success') {
             toastSuccessBody.textContent = message;
@@ -34,39 +38,100 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * Resetea los campos de un formulario.
-     * @param {HTMLFormElement} form - El elemento del formulario a resetear.
-     */
     function resetForm(form) {
         form.reset();
         form.querySelectorAll('select').forEach(select => {
             if (select.options.length > 0) {
-                select.selectedIndex = 0; // Asegura que el select se restablezca a la primera opción
+                select.selectedIndex = 0;
             }
         });
     }
 
-    // --- Carga y Renderizado de la Tabla ---
+    // --- Paginación ---
+    function renderPagination(totalRecords, currentPage) {
+        paginationContainer.innerHTML = '';
+        const totalPages = Math.ceil(totalRecords / recordsPerPage);
 
-    async function cargarCoordinadores() {
+        const liPrev = document.createElement('li');
+        liPrev.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        liPrev.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">«</span></a>`;
+        liPrev.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentPage > 1) {
+                currentPage--;
+                cargarCoordinadores(currentPage, getCurrentFilters()); // Pasa los filtros actuales
+            }
+        });
+        paginationContainer.appendChild(liPrev);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+            li.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentPage = i;
+                cargarCoordinadores(currentPage, getCurrentFilters()); // Pasa los filtros actuales
+            });
+            paginationContainer.appendChild(li);
+        }
+
+        const liNext = document.createElement('li');
+        liNext.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+        liNext.innerHTML = `<a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">»</span></a>`;
+        liNext.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentPage < totalPages) {
+                currentPage++;
+                cargarCoordinadores(currentPage, getCurrentFilters()); // Pasa los filtros actuales
+            }
+        });
+        paginationContainer.appendChild(liNext);
+    }
+
+    // --- Carga y Renderizado de la Tabla ---
+    async function cargarCoordinadores(page = 1, filters = {}) {
+        let queryString = `page=${page}&limit=${recordsPerPage}`;
+
+        if (filters.nombre_apellido) {
+            queryString += `&nombre=${encodeURIComponent(filters.nombre_apellido)}`;
+        }
+        if (filters.fecha) { // Ahora solo 'fecha'
+            queryString += `&fecha=${encodeURIComponent(filters.fecha)}`;
+        }
+        if (filters.paradero) {
+            queryString += `&paradero=${encodeURIComponent(filters.paradero)}`;
+        }
+
         try {
-            const response = await fetch(`${API_BASE_URL}listar.php`);
+            const response = await fetch(`${API_BASE_URL}listar.php?${queryString}`);
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
             const data = await response.json();
-            // Asumiendo que 'listar.php' siempre devuelve un array 'coordinadores'
-            renderizarTabla(data.coordinadores || []);
+
+            if (data.error) {
+                console.error('Error del servidor al cargar coordinadores:', data.error);
+                showToast('error', `❌ Error al cargar los coordinadores: ${data.error}`);
+                renderizarTabla([]);
+                renderPagination(0, 1);
+            } else {
+                renderizarTabla(data.coordinadores || []);
+                renderPagination(data.total || 0, page);
+            }
         } catch (error) {
-            console.error('Error al cargar coordinadores:', error);
-            showToast('error', '❌ Error al cargar los coordinadores. Intenta de nuevo.');
+            console.error('Error de red o parsing al cargar coordinadores:', error);
+            showToast('error', '❌ Error de conexión al cargar los coordinadores. Intenta de nuevo.');
             renderizarTabla([]);
+            renderPagination(0, 1);
         }
     }
 
     function renderizarTabla(coordinadores) {
         tablaCoordinadores.innerHTML = '';
 
-        if (coordinadores.length === 0) {
-            tablaCoordinadores.innerHTML = '<tr><td colspan="8" class="text-center">No hay coordinadores registrados.</td></tr>';
+        if (!coordinadores || coordinadores.length === 0) {
+            tablaCoordinadores.innerHTML = '<tr><td colspan="8" class="text-center">No hay coordinadores registrados que coincidan con la búsqueda.</td></tr>';
             return;
         }
 
@@ -93,13 +158,12 @@ document.addEventListener('DOMContentLoaded', () => {
             btnEliminar.className = 'btn btn-danger btn-sm';
             btnEliminar.textContent = 'Eliminar';
             btnEliminar.addEventListener('click', () => {
-                idAEliminar = c.id; 
-                modalEliminar.show(); 
+                idAEliminar = c.id;
+                modalEliminar.show();
             });
             acciones.appendChild(btnEliminar);
         });
     }
-
 
     function llenarModalEditar(coordinador) {
         document.getElementById('editCoordinadorId').value = coordinador.id;
@@ -114,8 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
         modalEditar.show();
     }
 
-
-    // Evento para el formulario de Agregar Coordinador
     formAgregar.addEventListener('submit', async e => {
         e.preventDefault();
         const formData = new FormData(formAgregar);
@@ -134,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast('success', '✅ Coordinador registrado exitosamente!');
                 resetForm(formAgregar); 
                 modalAgregar.hide();
-                cargarCoordinadores();
+                cargarCoordinadores(currentPage, getCurrentFilters());
             } else {
                 showToast('error', `❌ Error al registrar: ${data.error || 'Mensaje de error desconocido.'}`);
             }
@@ -144,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Evento para el formulario de Editar Coordinador
     formEditar.addEventListener('submit', async e => {
         e.preventDefault();
         const formData = new FormData(formEditar);
@@ -162,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 showToast('success', '✅ Coordinador actualizado exitosamente!');
                 modalEditar.hide();
-                cargarCoordinadores();
+                cargarCoordinadores(currentPage, getCurrentFilters());
             } else {
                 showToast('error', `❌ Error al actualizar: ${data.error || 'Mensaje de error desconocido.'}`);
             }
@@ -172,7 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Evento para el botón de Confirmar Eliminación dentro del modal
     btnEliminarConfirmado.addEventListener('click', async () => {
         if (!idAEliminar) return; 
 
@@ -189,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 showToast('success', '✅ Coordinador eliminado exitosamente!');
                 idAEliminar = null; 
-                cargarCoordinadores();
+                cargarCoordinadores(currentPage, getCurrentFilters());
             } else {
                 showToast('error', `❌ Error al eliminar: ${data.error || 'Mensaje de error desconocido.'}`);
             }
@@ -199,39 +259,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Función para obtener los filtros actuales (simplificada) ---
+    function getCurrentFilters() {
+        return {
+            nombre_apellido: buscarCoordinadorInput.value.trim(),
+            fecha: fechaFiltroInput.value.trim(), // Solo un campo de fecha
+            paradero: paraderoFiltroInput.value.trim()
+        };
+    }
+
     // Evento para el botón de búsqueda
-    document.getElementById('btnBuscar').addEventListener('click', async () => {
-        const searchTerm = document.getElementById('buscarCoordinador').value;
-        const fechaFiltro = document.getElementById('fechaFiltro').value;
-        const paraderoFiltro = document.getElementById('paraderoFiltro').value;
-
-
-        let searchUrl = `${API_BASE_URL}listar.php?`;
-        if (searchTerm) searchUrl += `nombre=${encodeURIComponent(searchTerm)}&`;
-        if (fechaFiltro) searchUrl += `fecha=${encodeURIComponent(fechaFiltro)}&`;
-        if (paraderoFiltro) searchUrl += `paradero=${encodeURIComponent(paraderoFiltro)}&`;
-
-      
-        if (searchUrl.endsWith('&') || searchUrl.endsWith('?')) {
-            searchUrl = searchUrl.slice(0, -1);
-        }
-
-        try {
-            const response = await fetch(searchUrl);
-            const data = await response.json();
-            if (data.success) { 
-                renderizarTabla(data.coordinadores || []);
-            } else {
-                showToast('error', `❌ Error en la búsqueda: ${data.error || 'No se encontraron resultados.'}`);
-                renderizarTabla([]);
-            }
-        } catch (error) {
-            console.error('Error al buscar coordinadores:', error);
-            showToast('error', '❌ Hubo un problema de conexión al buscar coordinadores.');
-            renderizarTabla([]);
-        }
+    btnBuscar.addEventListener('click', () => {
+        currentPage = 1;
+        const filters = getCurrentFilters();
+        cargarCoordinadores(currentPage, filters);
     });
 
+    // Opcional: Búsqueda al presionar Enter en los campos de filtro
+    buscarCoordinadorInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') btnBuscar.click(); });
+    fechaFiltroInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') btnBuscar.click(); });
+    paraderoFiltroInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') btnBuscar.click(); });
+
+
     // --- Inicialización ---
-    cargarCoordinadores();
+    cargarCoordinadores(currentPage, getCurrentFilters()); 
 });

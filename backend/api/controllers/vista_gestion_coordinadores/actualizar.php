@@ -8,10 +8,11 @@ verificarPermiso(['Administrador', 'Secretaria']);
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-// Validar que todos los campos necesarios estén presentes, incluyendo 'contacto'
-if (!isset($data['id'], $data['nombre'], $data['apellidos'], $data['paradero'], $data['monto_diario'], $data['fecha'], $data['estado'], $data['contacto'])) {
+// Validate that all MANDATORY fields are present.
+// We've removed 'contacto' from this initial strict 'isset' check.
+if (!isset($data['id'], $data['nombre'], $data['apellidos'], $data['paradero'], $data['monto_diario'], $data['fecha'], $data['estado'])) {
     http_response_code(400);
-    echo json_encode(['error' => 'Datos incompletos para actualizar.']);
+    echo json_encode(['error' => 'Datos incompletos para actualizar: faltan campos obligatorios.']);
     exit();
 }
 
@@ -22,7 +23,10 @@ $paradero = $data['paradero'];
 $monto_diario = (float)$data['monto_diario'];
 $fecha = $data['fecha'];
 $estado = $data['estado'];
-$contacto = $data['contacto'];
+
+// Handle 'contacto' separately: if it's not set or empty, treat it as NULL for the database.
+// This assumes your database column for 'contacto' is nullable.
+$contacto = isset($data['contacto']) && !empty($data['contacto']) ? $data['contacto'] : null; 
 
 try {
     $stmt = $conn->prepare("UPDATE coordinadores 
@@ -33,10 +37,10 @@ try {
     $stmt->bindParam(':nombre', $nombre);
     $stmt->bindParam(':apellidos', $apellidos);
     $stmt->bindParam(':paradero', $paradero);
-    $stmt->bindParam(':monto_diario', $monto_diario, PDO::PARAM_STR);
+    $stmt->bindParam(':monto_diario', $monto_diario, PDO::PARAM_STR); // Use PARAM_STR for decimals
     $stmt->bindParam(':fecha', $fecha);
     $stmt->bindParam(':estado', $estado);
-    $stmt->bindParam(':contacto', $contacto);
+    $stmt->bindParam(':contacto', $contacto); // PDO handles NULL correctly for nullable columns
 
     $stmt->execute();
 

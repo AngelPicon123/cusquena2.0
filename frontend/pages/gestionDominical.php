@@ -162,7 +162,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
           </div>
 
           <!-- Modal Editar Dominical -->
-          <div class="modal fade" id="modalEditarDominical">
+                <div class="modal fade" id="modalEditarDominical">
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                 <div class="modal-header">
@@ -171,14 +171,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                 </div>
                 <div class="modal-body">
                   <form id="formEditarDominical">
-                    <input type="hidden" id="editDominicalId" name="dominicalId">
-                    <div class="mb-3">
-                      <label for="edit_cotizacionId" class="form-label fw-bold">Cotización:</label>
-                      <select class="form-select" id="edit_cotizacionId" name="cotizacionId" required>
-                        <!-- Opciones cargadas dinámicamente con JavaScript/PHP -->
-                      </select>
-                    </div>
-                    <div class="mb-3">
+                    <input type="hidden" id="editDominicalId" name="id"> <div class="mb-3">
                       <label for="edit_nombre" class="form-label fw-bold">Nombre:</label>
                       <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
                     </div>
@@ -188,22 +181,18 @@ verificarPermiso(['Administrador', 'Secretaria']);
                     </div>
                     <div class="mb-3">
                       <label for="edit_fechaDomingo" class="form-label fw-bold">Fecha Domingo:</label>
-                      <input type="date" class="form-control" id="edit_fechaDomingo" name="fechaDomingo" required>
-                    </div>
+                      <input type="date" class="form-control" id="edit_fechaDomingo" name="fecha_domingo" required> </div>
                     <div class="row">
                       <div class="col-md-6 mb-3">
                         <label for="edit_semanaInicio" class="form-label fw-bold">Semana Inicio:</label>
-                        <input type="date" class="form-control" id="edit_semanaInicio" name="semanaInicio" required>
-                      </div>
+                        <input type="date" class="form-control" id="edit_semanaInicio" name="semana_inicio" required> </div>
                       <div class="col-md-6 mb-3">
                         <label for="edit_semanaFin" class="form-label fw-bold">Semana Fin:</label>
-                        <input type="date" class="form-control" id="edit_semanaFin" name="semanaFin" required>
-                      </div>
+                        <input type="date" class="form-control" id="edit_semanaFin" name="semana_fin" required> </div>
                     </div>
                     <div class="mb-3">
                       <label for="edit_montoDominical" class="form-label fw-bold">Monto Dominical:</label>
-                      <input type="number" step="0.01" class="form-control" id="edit_montoDominical" name="montoDominical" required>
-                    </div>
+                      <input type="number" step="0.01" class="form-control" id="edit_montoDominical" name="monto_dominical" required> </div>
                     <div class="mb-3">
                       <label for="edit_estado" class="form-label fw-bold">Estado:</label>
                       <select class="form-select" id="edit_estado" name="estado" required>

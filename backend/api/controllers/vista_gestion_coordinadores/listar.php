@@ -6,16 +6,16 @@ require_once __DIR__ . '/../../../includes/auth.php';
 
 header('Content-Type: application/json');
 
-verificarPermiso(['Administrador', 'Secretaria']);
-
-$nombre_apellido = $_GET['nombre'] ?? '';
-$fecha_inicio = $_GET['fecha_inicio'] ?? '';
-$fecha_fin = $_GET['fecha_fin'] ?? '';
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
-$offset = ($page - 1) * $limit;
-
 try {
+    verificarPermiso(['Administrador', 'Secretaria']);
+
+    $nombre_apellido = $_GET['nombre'] ?? '';
+    $fecha = $_GET['fecha'] ?? ''; // Ahora solo 'fecha'
+    $paradero = $_GET['paradero'] ?? ''; // Agregamos paradero aquí
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+    $offset = ($page - 1) * $limit;
+
     $conditions = [];
     $params = [];
 
@@ -26,14 +26,16 @@ try {
         $params[] = "%" . $nombre_apellido . "%";
     }
 
-    if (!empty($fecha_inicio)) {
-        $conditions[] = "fecha >= ?";
-        $params[] = $fecha_inicio;
+    // Filtro por fecha exacta
+    if (!empty($fecha)) {
+        $conditions[] = "fecha = ?"; // Condición para fecha exacta
+        $params[] = $fecha;
     }
 
-    if (!empty($fecha_fin)) {
-        $conditions[] = "fecha <= ?";
-        $params[] = $fecha_fin;
+    // Filtro por paradero
+    if (!empty($paradero)) {
+        $conditions[] = "paradero LIKE ?";
+        $params[] = "%" . $paradero . "%";
     }
 
     $whereClause = "WHERE 1=1";
@@ -57,10 +59,10 @@ try {
     $stmtMonto = null;
 
     // Datos paginados
-   $sql = "SELECT id, nombre, apellidos, paradero, monto_diario, fecha, estado, contacto 
-        FROM coordinadores $whereClause 
-        ORDER BY fecha DESC, nombre ASC 
-        LIMIT ? OFFSET ?";
+    $sql = "SELECT id, nombre, apellidos, paradero, monto_diario, fecha, estado, contacto 
+            FROM coordinadores $whereClause 
+            ORDER BY fecha DESC, nombre ASC 
+            LIMIT ? OFFSET ?";
     $stmt = $conn->prepare($sql);
 
     // Bind dinámico

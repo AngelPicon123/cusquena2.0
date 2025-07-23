@@ -1,291 +1,281 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
     const tablaProductos = document.getElementById('tablaProductos');
     const formAgregarProducto = document.getElementById('formAgregarProducto');
     const formEditarProducto = document.getElementById('formEditarProducto');
     const formVenderProducto = document.getElementById('formVenderProducto');
-    const buscarProducto = document.getElementById('buscarProducto');
+    const buscarProductoInput = document.getElementById('buscarProducto');
     const btnBuscar = document.getElementById('btnBuscar');
 
-    let productos = [];
-    let categorias = [];
+    const modalAgregarProducto = new bootstrap.Modal(document.getElementById('modalAgregarProducto'));
+    const modalEditarProducto = new bootstrap.Modal(document.getElementById('modalEditarProducto'));
+    const modalVenderProducto = new bootstrap.Modal(document.getElementById('modalVenderProducto'));
 
-    // Función para cargar las categorías en los selects
-    async function cargarCategorias() {
+    // Función para cargar categorías en los selects
+    const cargarCategorias = async () => {
         try {
-            const res = await fetch('../../backend/api/controllers/gestionCategoria.php?accion=listar'); // Asume un endpoint para listar categorías
-            const data = await res.json();
-            if (data.success) {
-                categorias = data.data; // Asume que el JSON de categorías tiene una propiedad 'data'
-                const selectAgregar = document.getElementById('agregar_categoria');
-                const selectEditar = document.getElementById('editar_categoria');
-                
-                // Limpiar opciones existentes
-                selectAgregar.innerHTML = '<option value="">Seleccione</option>';
-                selectEditar.innerHTML = '<option value="">Seleccione</option>';
-
-                categorias.forEach(categoria => {
-                    const optionAgregar = document.createElement('option');
-                    optionAgregar.value = categoria.id; // Suponiendo que el ID de la categoría se llama 'id'
-                    optionAgregar.textContent = categoria.nombre; // Suponiendo que el nombre de la categoría se llama 'nombre'
-                    selectAgregar.appendChild(optionAgregar);
-
-                    const optionEditar = document.createElement('option');
-                    optionEditar.value = categoria.id;
-                    optionEditar.textContent = categoria.nombre;
-                    selectEditar.appendChild(optionEditar);
-                });
-            } else {
-                console.error('Error al cargar categorías:', data.message);
-                alert('Error al cargar categorías.');
+            // Ruta corregida para las categorías
+            const response = await fetch('../../backend/api/controllers/gestionCategoria.php');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        } catch (err) {
-            console.error('Error en la solicitud de categorías:', err);
-            alert('Error de conexión al cargar categorías.');
-        }
-    }
+            const categorias = await response.json();
 
-    // Función para cargar productos
-    async function cargarProductos(filtro = '') {
+            const selectAgregar = document.getElementById('agregar_categoria');
+            const selectEditar = document.getElementById('editar_categoria');
+
+            selectAgregar.innerHTML = '<option value="">Seleccione</option>';
+            selectEditar.innerHTML = '<option value="">Seleccione</option>';
+
+            categorias.forEach(categoria => {
+                const optionAgregar = document.createElement('option');
+                optionAgregar.value = categoria.id; // categoria_id de la BD
+                optionAgregar.textContent = categoria.nombre;
+                selectAgregar.appendChild(optionAgregar);
+
+                const optionEditar = document.createElement('option');
+                optionEditar.value = categoria.id; // categoria_id de la BD
+                optionEditar.textContent = categoria.nombre;
+                selectEditar.appendChild(optionEditar);
+            });
+        } catch (error) {
+            console.error('Error al cargar categorías:', error);
+            alert('No se pudieron cargar las categorías. Inténtalo de nuevo más tarde.');
+        }
+    };
+
+    // Función para cargar los productos
+    const cargarProductos = async (query = '') => {
         try {
-            const res = await fetch(`../../backend/api/controllers/gestionProducto.php?accion=listar&buscar=${encodeURIComponent(filtro)}`);
-            const data = await res.json();
-            if (data.success) {
-                productos = data.data; // Asume que el JSON de productos tiene una propiedad 'data'
-                renderTabla(productos);
-            } else {
-                console.error('Error al cargar productos:', data.message);
-                alert('Error al cargar productos.');
+            // Ruta corregida para los productos
+            const url = query ? `../../backend/api/controllers/gestionProducto.php?search=${encodeURIComponent(query)}` : '../../backend/api/controllers/gestionProducto.php';
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        } catch (err) {
-            console.error('Error en la solicitud de productos:', err);
-            alert('Error de conexión al cargar productos.');
+            const productos = await response.json();
+            mostrarProductos(productos);
+        } catch (error) {
+            console.error('Error al cargar productos:', error);
+            alert('No se pudieron cargar los productos. Inténtalo de nuevo más tarde.');
         }
-    }
+    };
 
-    // Función para renderizar la tabla de productos
-    function renderTabla(data) {
+    // Función para mostrar los productos en la tabla
+    const mostrarProductos = (productos) => {
         tablaProductos.innerHTML = '';
-        if (data.length === 0) {
-            tablaProductos.innerHTML = `<tr><td colspan="11">No se encontraron productos</td></tr>`;
+        if (productos.length === 0) {
+            tablaProductos.innerHTML = '<tr><td colspan="11">No se encontraron productos.</td></tr>';
             return;
         }
-
-        data.forEach(producto => {
-            const fila = document.createElement('tr');
-            const nombreCategoria = categorias.find(cat => cat.id == producto.categoria_id)?.nombre || 'N/A'; // Busca el nombre de la categoría
-
-            fila.innerHTML = `
-                <td>${producto.id}</td>
+        productos.forEach(producto => {
+            const row = document.createElement('tr');
+            // Asegúrate que los nombres de las propiedades coincidan con los alias en el SELECT de PHP
+            row.innerHTML = `
+                <td>${producto.idProducto}</td>
                 <td>${producto.descripcion}</td>
-                <td>S/ ${parseFloat(producto.precio_compra).toFixed(2)}</td>
-                <td>S/ ${parseFloat(producto.precio_venta).toFixed(2)}</td>
+                <td>${parseFloat(producto.precio_compra).toFixed(2)}</td>
+                <td>${parseFloat(producto.precio_venta).toFixed(2)}</td>
                 <td>${producto.inicial}</td>
                 <td>${producto.ingreso}</td>
                 <td>${producto.queda}</td>
                 <td>${producto.venta}</td>
-                <td>S/ ${parseFloat(producto.monto).toFixed(2)}</td>
-                <td>${nombreCategoria}</td>
+                <td>${parseFloat(producto.monto).toFixed(2)}</td>
+                <td>${producto.categoria_nombre}</td>
                 <td>
                     <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] === 'Administrador'): ?>
-                        <button class="btn btn-sm btn-warning me-1 btn-editar" 
-                                data-id="${producto.id}"
-                                data-descripcion="${producto.descripcion}"
-                                data-precio_compra="${producto.precio_compra}"
-                                data-precio_venta="${producto.precio_venta}"
-                                data-inicial="${producto.inicial}"
-                                data-ingreso="${producto.ingreso}"
-                                data-queda="${producto.queda}"
-                                data-venta="${producto.venta}"
-                                data-monto="${producto.monto}"
-                                data-categoria="${producto.categoria_id}"
-                                data-bs-toggle="modal" data-bs-target="#modalEditarProducto">
+                        <button class="btn btn-warning btn-sm btn-editar me-1" data-id="${producto.idProducto}">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger btn-eliminar" data-id="${producto.id}"><i class="fas fa-trash-alt"></i></button>
                     <?php endif; ?>
-                    <?php if (isset($_SESSION['rol']) && ($_SESSION['rol'] === 'Administrador' || $_SESSION['rol'] === 'Secretaria')): ?>
-                        <button class="btn btn-sm btn-primary btn-vender" 
-                                data-id="${producto.id}"
-                                data-descripcion="${producto.descripcion}"
-                                data-queda="${producto.queda}"
-                                data-bs-toggle="modal" data-bs-target="#modalVenderProducto">
-                            <i class="fas fa-cart-plus"></i>
-                        </button>
-                    <?php endif; ?>
+                    <button class="btn btn-primary btn-sm btn-vender" data-id="${producto.idProducto}">
+                        <i class="fas fa-shopping-cart"></i>
+                    </button>
                 </td>
             `;
-            tablaProductos.appendChild(fila);
+            tablaProductos.appendChild(row);
         });
-    }
 
-    // Event listener para el formulario de agregar producto
-    formAgregarProducto.addEventListener('submit', async function (e) {
+        // Solo agregar event listeners si el botón existe (para el rol de Administrador)
+        document.querySelectorAll('.btn-editar').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const idProducto = e.currentTarget.dataset.id;
+                abrirModalEditar(idProducto);
+            });
+        });
+
+        document.querySelectorAll('.btn-vender').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const idProducto = e.currentTarget.dataset.id;
+                abrirModalVender(idProducto);
+            });
+        });
+    };
+
+    // --- Funcionalidad de Agregar Producto ---
+    formAgregarProducto.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(formAgregarProducto);
-        formData.append('accion', 'registrar');
+        const data = Object.fromEntries(formData.entries());
 
         try {
-            const res = await fetch('../../backend/api/controllers/gestionProducto.php', {
+            const response = await fetch('../../backend/api/controllers/gestionProducto.php', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
             });
-            const data = await res.json();
-            if (data.success) {
-                formAgregarProducto.reset();
-                bootstrap.Modal.getInstance(document.getElementById('modalAgregarProducto')).hide();
-                cargarProductos();
-            } else {
-                alert('Error al registrar producto: ' + (data.message || ''));
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al agregar producto');
             }
-        } catch (err) {
-            console.error('Error en la solicitud de agregar producto:', err);
-            alert('Error de conexión al registrar producto.');
+
+            const result = await response.json();
+            alert(result.message);
+            modalAgregarProducto.hide();
+            formAgregarProducto.reset();
+            cargarProductos(); // Recargar la tabla
+        } catch (error) {
+            console.error('Error al agregar producto:', error);
+            alert(`Error al agregar producto: ${error.message}`);
         }
     });
 
-    // Event listener para el formulario de editar producto
-    formEditarProducto.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const formData = new FormData(formEditarProducto);
-        formData.append('accion', 'modificar');
-
-        try {
-            const res = await fetch('../../backend/api/controllers/gestionProducto.php', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
-            if (data.success) {
-                bootstrap.Modal.getInstance(document.getElementById('modalEditarProducto')).hide();
-                cargarProductos();
-            } else {
-                alert('Error al modificar producto: ' + (data.message || ''));
-            }
-        } catch (err) {
-            console.error('Error en la solicitud de modificar producto:', err);
-            alert('Error de conexión al modificar producto.');
-        }
-    });
-
-    // Event listener para el formulario de vender producto
-    formVenderProducto.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const formData = new FormData(formVenderProducto);
-        formData.append('accion', 'vender'); // Nueva acción para vender
-
-        const cantidadAVender = parseInt(formData.get('cantidad'));
-        const quedaDisponible = parseInt(document.getElementById('vender_queda').value);
-
-        if (cantidadAVender <= 0 || cantidadAVender > quedaDisponible) {
-            alert('La cantidad a vender debe ser mayor que 0 y no puede exceder la cantidad disponible.');
-            return;
-        }
-
-        try {
-            const res = await fetch('../../backend/api/controllers/gestionProducto.php', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
-            if (data.success) {
-                bootstrap.Modal.getInstance(document.getElementById('modalVenderProducto')).hide();
-                cargarProductos();
-            } else {
-                alert('Error al vender producto: ' + (data.message || ''));
-            }
-        } catch (err) {
-            console.error('Error en la solicitud de vender producto:', err);
-            alert('Error de conexión al vender producto.');
-        }
-    });
-
-    // Event listener para los botones de editar, eliminar y vender en la tabla
-    tablaProductos.addEventListener('click', async function (e) {
-        // Botón Editar
-        if (e.target.closest('.btn-editar')) {
-            const button = e.target.closest('.btn-editar');
-            llenarModalEditar(
-                button.dataset.id,
-                button.dataset.descripcion,
-                button.dataset.precio_compra,
-                button.dataset.precio_venta,
-                button.dataset.inicial,
-                button.dataset.ingreso,
-                button.dataset.queda,
-                button.dataset.venta,
-                button.dataset.monto,
-                button.dataset.categoria
-            );
-        }
-
-        // Botón Eliminar
-        if (e.target.closest('.btn-eliminar')) {
-            const id = e.target.closest('.btn-eliminar').dataset.id;
-            if (confirm('¿Está seguro de eliminar este producto? Esta acción no se puede deshacer.')) {
-                try {
-                    const res = await fetch(`../../backend/api/controllers/gestionProducto.php?accion=eliminar&id=${id}`, {
-                        method: 'GET' // O POST si prefieres enviar DELETE por POST
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        cargarProductos();
-                    } else {
-                        alert('Error al eliminar producto: ' + (data.message || ''));
-                    }
-                } catch (err) {
-                    console.error('Error en la solicitud de eliminar producto:', err);
-                    alert('Error de conexión al eliminar producto.');
-                }
-            }
-        }
-
-        // Botón Vender
-        if (e.target.closest('.btn-vender')) {
-            const button = e.target.closest('.btn-vender');
-            llenarModalVender(
-                button.dataset.id,
-                button.dataset.descripcion,
-                button.dataset.queda
-            );
-        }
-    });
-
-    // Event listener para el botón de búsqueda
+    // --- Funcionalidad de Buscar Producto ---
     btnBuscar.addEventListener('click', () => {
-        const filtro = buscarProducto.value.trim();
-        cargarProductos(filtro);
+        const query = buscarProductoInput.value.trim();
+        cargarProductos(query);
     });
 
-    // Event listener para la tecla Enter en el campo de búsqueda
-    buscarProducto.addEventListener('keyup', function (e) {
+    buscarProductoInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             btnBuscar.click();
         }
     });
 
-    // Carga inicial de productos y categorías
-    cargarCategorias(); // Cargar categorías primero para que los selects estén listos
-    cargarProductos(); // Luego cargar los productos
+    // --- Funcionalidad de Editar Producto ---
+    const abrirModalEditar = async (idProducto) => {
+        try {
+            const response = await fetch(`../../backend/api/controllers/gestionProducto.php?id=${idProducto}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const producto = await response.json();
+
+            // Asegúrate que los IDs de los campos HTML coincidan con las propiedades del objeto 'producto'
+            document.getElementById('editar_idProducto').value = producto.idProducto;
+            document.getElementById('editar_descripcion').value = producto.descripcion;
+            document.getElementById('editar_precio_compra').value = producto.precio_compra;
+            document.getElementById('editar_precio_venta').value = producto.precio_venta;
+            document.getElementById('editar_inicial').value = producto.inicial;
+            document.getElementById('editar_ingreso').value = producto.ingreso;
+            document.getElementById('editar_queda').value = producto.queda;
+            document.getElementById('editar_venta').value = producto.venta;
+            document.getElementById('editar_monto').value = producto.monto;
+            document.getElementById('editar_categoria').value = producto.idCategoria; // Usa idCategoria del backend
+
+            modalEditarProducto.show();
+        } catch (error) {
+            console.error('Error al cargar datos del producto para editar:', error);
+            alert('No se pudo cargar la información del producto. Inténtalo de nuevo.');
+        }
+    };
+
+    formEditarProducto.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(formEditarProducto);
+        const data = Object.fromEntries(formData.entries());
+        const idProducto = data.idProducto;
+
+        try {
+            const response = await fetch(`../../backend/api/controllers/gestionProducto.php?id=${idProducto}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al actualizar producto');
+            }
+
+            const result = await response.json();
+            alert(result.message);
+            modalEditarProducto.hide();
+            cargarProductos(); // Recargar la tabla
+        } catch (error) {
+            console.error('Error al actualizar producto:', error);
+            alert(`Error al actualizar producto: ${error.message}`);
+        }
+    });
+
+    // --- Funcionalidad de Vender Producto ---
+    const abrirModalVender = async (idProducto) => {
+        try {
+            const response = await fetch(`../../backend/api/controllers/gestionProducto.php?id=${idProducto}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const producto = await response.json();
+
+            document.getElementById('vender_idProducto').value = producto.idProducto;
+            document.getElementById('vender_descripcion').value = producto.descripcion;
+            document.getElementById('vender_queda').value = producto.queda;
+            document.getElementById('vender_cantidad').max = producto.queda; // Establecer el máximo para la cantidad a vender
+            document.getElementById('vender_cantidad').value = 1; // Valor por defecto
+
+            modalVenderProducto.show();
+        } catch (error) {
+            console.error('Error al cargar datos del producto para vender:', error);
+            alert('No se pudo cargar la información del producto para la venta. Inténtalo de nuevo.');
+        }
+    };
+
+    formVenderProducto.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(formVenderProducto);
+        const idProducto = formData.get('idProducto');
+        const cantidadVender = parseInt(formData.get('cantidad'));
+        const stockActual = parseInt(formData.get('queda'));
+
+        if (cantidadVender <= 0 || isNaN(cantidadVender)) {
+            alert('La cantidad a vender debe ser un número positivo.');
+            return;
+        }
+
+        if (cantidadVender > stockActual) {
+            alert(`No hay suficiente stock. Solo quedan ${stockActual} unidades.`);
+            return;
+        }
+
+        try {
+            const response = await fetch(`../../backend/api/controllers/gestionProducto.php?id=${idProducto}&action=sell`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ cantidad: cantidadVender })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al realizar la venta');
+            }
+
+            const result = await response.json();
+            alert(result.message);
+            modalVenderProducto.hide();
+            cargarProductos(); // Recargar la tabla
+        } catch (error) {
+            console.error('Error al vender producto:', error);
+            alert(`Error al vender producto: ${error.message}`);
+        }
+    });
+
+    // Cargar productos y categorías al iniciar la página
+    cargarCategorias();
+    cargarProductos();
 });
-
-// Las funciones llenarModalEditar y llenarModalVender son globales para que el PHP pueda llamarlas
-function llenarModalEditar(id, descripcion, precioCompra, precioVenta, inicial, ingreso, queda, venta, monto, categoria) {
-    document.getElementById('editar_idProducto').value = id;
-    document.getElementById('editar_descripcion').value = descripcion;
-    document.getElementById('editar_precio_compra').value = precioCompra;
-    document.getElementById('editar_precio_venta').value = precioVenta;
-    document.getElementById('editar_inicial').value = inicial;
-    document.getElementById('editar_ingreso').value = ingreso;
-    document.getElementById('editar_queda').value = queda;
-    document.getElementById('editar_venta').value = venta;
-    document.getElementById('editar_monto').value = monto;
-    document.getElementById('editar_categoria').value = categoria;
-}
-
-function llenarModalVender(id, descripcion, queda) {
-    document.getElementById('vender_idProducto').value = id;
-    document.getElementById('vender_descripcion').value = descripcion;
-    document.getElementById('vender_queda').value = queda;
-    document.getElementById('vender_cantidad').value = 1; // Establecer valor predeterminado de 1
-    document.getElementById('vender_cantidad').max = queda; // Establecer el máximo según la cantidad que queda
-}

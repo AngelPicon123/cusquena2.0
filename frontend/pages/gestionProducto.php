@@ -263,29 +263,6 @@ verificarPermiso(['Administrador', 'Secretaria']);
 
     <script src="../js/bootstrap.bundle.min.js"></script>
     <script src="../js/functions/gestionProducto.js"></script>
-    <script>
-        function llenarModalEditar(id, descripcion, precioCompra, precioVenta, inicial, ingreso, queda, venta, monto, categoria) {
-            document.getElementById('editar_idProducto').value = id;
-            document.getElementById('editar_descripcion').value = descripcion;
-            document.getElementById('editar_precio_compra').value = precioCompra;
-            document.getElementById('editar_precio_venta').value = precioVenta;
-            document.getElementById('editar_inicial').value = inicial;
-            document.getElementById('editar_ingreso').value = ingreso;
-            document.getElementById('editar_queda').value = queda;
-            document.getElementById('editar_venta').value = venta;
-            document.getElementById('editar_monto').value = monto;
-            document.getElementById('editar_categoria').value = categoria;
-        }
-
-        function llenarModalVender(id, descripcion, queda) {
-            document.getElementById('vender_idProducto').value = id;
-            document.getElementById('vender_descripcion').value = descripcion;
-            document.getElementById('vender_queda').value = queda;
-            document.getElementById('vender_cantidad').value = 1;
-            document.getElementById('vender_cantidad').max = queda;
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            listarProductos();
-        });
-    </script>
+</body>
+</html>
+    

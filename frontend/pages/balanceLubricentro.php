@@ -1,4 +1,3 @@
-```html
 <?php
 require_once '../../backend/includes/auth.php';
 verificarPermiso(['Administrador', 'Secretaria']);
@@ -18,6 +17,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
     .table {
       width: 100%;
       table-layout: auto;
+      border-collapse: collapse;
     }
     .table th,
     .table td {
@@ -26,6 +26,11 @@ verificarPermiso(['Administrador', 'Secretaria']);
       overflow-wrap: break-word;
       max-width: 200px;
       padding: 10px;
+      border: 1px solid #dee2e6;
+    }
+    .table th {
+      background-color: #343a40;
+      color: white;
     }
     .table td button {
       margin: 0 5px;
@@ -33,6 +38,21 @@ verificarPermiso(['Administrador', 'Secretaria']);
     }
     .table-responsive {
       overflow-x: auto;
+    }
+    @media print {
+      .no-exportar {
+        display: none; /* Oculta la columna Acciones al imprimir */
+      }
+      .table th,
+      .table td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+      }
+      .table th {
+        background-color: #343a40;
+        color: white;
+      }
     }
     @media (max-width: 576px) {
       .table th,
@@ -45,6 +65,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
       margin-bottom: 10px;
       font-weight: bold;
       text-align: right;
+      font-size: 16px;
     }
     .btn-custom {
       background-color: #f0f0f0;
@@ -113,18 +134,18 @@ verificarPermiso(['Administrador', 'Secretaria']);
                 <input type="text" class="form-control me-2" id="buscarNombre" placeholder="Nombre">
                 <select class="form-control me-2" id="buscarMes" style="width: 120px;">
                   <option value="">Mes</option>
-                  <option value="01">Enero</option>
-                  <option value="02">Febrero</option>
-                  <option value="03">Marzo</option>
-                  <option value="04">Abril</option>
-                  <option value="05">Mayo</option>
-                  <option value="06">Junio</option>
-                  <option value="07">Julio</option>
-                  <option value="08">Agosto</option>
-                  <option value="09">Septiembre</option>
-                  <option value="10">Octubre</option>
-                  <option value="11">Noviembre</option>
-                  <option value="12">Diciembre</option>
+                  <option value="Enero">Enero</option>
+                                <option value="Febrero">Febrero</option>
+                                <option value="Marzo">Marzo</option>
+                                <option value="Abril">Abril</option>
+                                <option value="Mayo">Mayo</option>
+                                <option value="Junio">Junio</option>
+                                <option value="Julio">Julio</option>
+                                <option value="Agosto">Agosto</option>
+                                <option value="Septiembre">Septiembre</option>
+                                <option value="Octubre">Octubre</option>
+                                <option value="Noviembre">Noviembre</option>
+                                <option value="Diciembre">Diciembre</option>
                 </select>
                 <input type="number" class="form-control me-2" id="buscarAnio" placeholder="Año" style="width: 100px;">
                 <button class="btn btn-primary" id="btnBuscar">Buscar</button>
@@ -153,19 +174,37 @@ verificarPermiso(['Administrador', 'Secretaria']);
                       <input type="text" class="form-control" id="nombre" name="nombre" required placeholder="Ej: Balance Mensual, Cierre de Caja">
                     </div>
                     <div class="mb-3">
-                      <label for="tipoBalance" class="form-label fw-bold">Tipo de Balance:</label>
-                      <select class="form-select" id="tipoBalance" name="tipoBalance" required>
-                        <option value="" disabled selected>Seleccione un tipo</option>
-                        <option value="servicios">Servicios</option>
-                        <option value="productos">Productos</option>
-                        <option value="deudas">Deudas</option>
-                        <option value="gastos">Gastos</option>
-                      </select>
-                    </div>
+                            <label class="form-label fw-bold">Tipo de Balance:</label>
+                            <select class="form-select" name="tipoBalance" required>
+                                <option value="">Seleccione un tipo</option>
+                                <option value="Servicios">Servicios</option>
+                                <option value="Productos">Productos</option>
+                                <option value="Deudas">Deudas</option>
+                                <option value="Gastos">Gastos</option>
+                            </select>
+                        </div>
                     <div class="mb-3">
-                      <label for="mes" class="form-label fw-bold">Mes:</label>
-                      <input type="month" class="form-control" id="mes" name="mes" required>
-                    </div>
+                            <label class="form-label fw-bold">Mes:</label>
+                            <select class="form-select" name="mes" required>
+                                <option value="">Mes</option>
+                                <option value="Enero">Enero</option>
+                                <option value="Febrero">Febrero</option>
+                                <option value="Marzo">Marzo</option>
+                                <option value="Abril">Abril</option>
+                                <option value="Mayo">Mayo</option>
+                                <option value="Junio">Junio</option>
+                                <option value="Julio">Julio</option>
+                                <option value="Agosto">Agosto</option>
+                                <option value="Septiembre">Septiembre</option>
+                                <option value="Octubre">Octubre</option>
+                                <option value="Noviembre">Noviembre</option>
+                                <option value="Diciembre">Diciembre</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Año:</label>
+                            <input type="number" class="form-control" name="anio" min="2000" max="2100" required>
+                        </div>
                     <div class="mb-3">
                       <label for="monto" class="form-label fw-bold">Monto:</label>
                       <input type="number" step="0.01" class="form-control" id="monto" name="monto" required>
@@ -193,18 +232,37 @@ verificarPermiso(['Administrador', 'Secretaria']);
                       <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
                     </div>
                     <div class="mb-3">
-                      <label for="edit_tipoBalance" class="form-label fw-bold">Tipo de Balance:</label>
-                      <select class="form-select" id="edit_tipoBalance" name="tipoBalance" required>
-                        <option value="servicios">Servicios</option>
-                        <option value="productos">Productos</option>
-                        <option value="deudas">Deudas</option>
-                        <option value="gastos">Gastos</option>
-                      </select>
-                    </div>
+                            <label class="form-label fw-bold">Tipo de Balance:</label>
+                            <select class="form-select" id="editarTipoBalance" name="tipoBalance" required>
+                                <option value="">Seleccione un tipo</option>
+                                <option value="Servicios">Servicios</option>
+                                <option value="Productos">Productos</option>
+                                <option value="Deudas">Deudas</option>
+                                <option value="Gastos">Gastos</option>
+                            </select>
+                        </div>
                     <div class="mb-3">
-                      <label for="edit_mes" class="form-label fw-bold">Mes:</label>
-                      <input type="month" class="form-control" id="edit_mes" name="mes" required>
-                    </div>
+                            <label class="form-label fw-bold">Mes:</label>
+                            <select class="form-select" name="mes" required>
+                                <option value="">Seleccione un mes</option>
+                                <option value="Enero">Enero</option>
+                                <option value="Febrero">Febrero</option>
+                                <option value="Marzo">Marzo</option>
+                                <option value="Abril">Abril</option>
+                                <option value="Mayo">Mayo</option>
+                                <option value="Junio">Junio</option>
+                                <option value="Julio">Julio</option>
+                                <option value="Agosto">Agosto</option>
+                                <option value="Septiembre">Septiembre</option>
+                                <option value="Octubre">Octubre</option>
+                                <option value="Noviembre">Noviembre</option>
+                                <option value="Diciembre">Diciembre</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Año:</label>
+                            <input type="number" class="form-control" name="anio" min="2000" max="2100" required>
+                        </div>
                     <div class="mb-3">
                       <label for="edit_monto" class="form-label fw-bold">Monto:</label>
                       <input type="number" step="0.01" class="form-control" id="edit_monto" name="monto" required>
@@ -217,42 +275,26 @@ verificarPermiso(['Administrador', 'Secretaria']);
               </div>
             </div>
           </div>
+          <div id="contenedorBalanceImprimir">
           <div class="table-responsive my-4">
-            <table class="table table-striped table-bordered">
+            <table class="table table-bordered table-hover text-center">
               <thead class="table-dark">
                 <tr>
-                  <th scope="col">Nombre / Descripción</th>
-                  <th scope="col">Tipo de Balance</th>
-                  <th scope="col">Mes</th>
-                  <th scope="col">Monto</th>
-                  <th scope="col">Acciones</th>
+                  <th>Nombre / Descripcion</th>
+                  <th>Tipo de Balance</th>
+                  <th>Mes</th>
+                  <th>Año</th>
+                  <th>Monto</th>
+                  <th class="no-exportar">Acciones</th>
                 </tr>
               </thead>
-              <tbody id="tablaBalance">
-                <tr>
-                  <td>Balance General Mensual</td>
-                  <td>Deudas</td>
-                  <td>Mayo 2025</td>
-                  <td>S/. 1270</td>
-                  <td>
-                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditarBalance" onclick="editarBalance(1)">Editar</button>
-                    <button class="btn btn-sm btn-danger" onclick="eliminarBalance(1)">Eliminar</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Total Ingresos</td>
-                  <td>Productos</td>
-                  <td>Abril 2025</td>
-                  <td>S/. 3500</td>
-                  <td>
-                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditarBalance" onclick="editarBalance(2)">Editar</button>
-                    <button class="btn btn-sm btn-danger" onclick="eliminarBalance(2)">Eliminar</button>
-                  </td>
-                </tr>
+              <tbody id="tablaBalance" class="align-middle">
               </tbody>
             </table>
           </div>
           <div class="total-container" id="totalGeneral">Total General: S/. 0.00</div>
+        </div>
+
           <nav aria-label="Page navigation example" class="d-flex justify-content-end">
             <ul class="pagination">
               <li class="page-item">
@@ -275,126 +317,123 @@ verificarPermiso(['Administrador', 'Secretaria']);
     </div>
   </div>
   <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/functions/balanceLubricentro.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const buscarNombre = document.getElementById('buscarNombre');
-      const buscarMes = document.getElementById('buscarMes');
-      const buscarAnio = document.getElementById('buscarAnio');
-      const btnBuscar = document.getElementById('btnBuscar');
+    document.addEventListener('DOMContentLoaded', function () {
       const btnImprimir = document.getElementById('btnImprimir');
       const btnExportarPDF = document.getElementById('btnExportarPDF');
-      const tablaBalance = document.getElementById('tablaBalance');
-      const totalGeneral = document.getElementById('totalGeneral');
-      const modalEditar = new bootstrap.Modal(document.getElementById('modalEditarBalance'));
+      const { jsPDF } = window.jspdf;
 
-      // Datos de ejemplo (simulados, reemplazar con datos reales de la base de datos)
-      let balances = [
-        { id: 1, nombre: 'Balance General Mensual', tipo: 'Deudas', mes: '2025-05', monto: 1270 },
-        { id: 2, nombre: 'Total Ingresos', tipo: 'Productos', mes: '2025-04', monto: 3500 }
-      ];
-
-      // Función para mostrar los balances en la tabla
-      function mostrarBalances(filtrados) {
-        tablaBalance.innerHTML = '';
-        let total = 0;
-
-        filtrados.forEach(balance => {
-          const [anio, mes] = balance.mes.split('-');
-          const mesNombre = new Date(anio, mes - 1).toLocaleString('es-ES', { month: 'long', year: 'numeric' });
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${balance.nombre}</td>
-            <td>${balance.tipo}</td>
-            <td>${mesNombre.charAt(0).toUpperCase() + mesNombre.slice(1)}</td>
-            <td>S/. ${balance.monto.toFixed(2)}</td>
-            <td>
-              <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditarBalance" onclick="editarBalance(${balance.id})">Editar</button>
-              <button class="btn btn-sm btn-danger" onclick="eliminarBalance(${balance.id})">Eliminar</button>
-            </td>
-          `;
-          tablaBalance.appendChild(row);
-          total += balance.monto;
-        });
-
-        totalGeneral.textContent = `Total General: S/. ${total.toFixed(2)}`;
-      }
-
-      // Función de búsqueda
-      function buscarBalances() {
-        const nombre = buscarNombre.value.toLowerCase();
-        const mes = buscarMes.value;
-        const anio = buscarAnio.value;
-
-        const filtrados = balances.filter(balance => {
-          const [balanceAnio, balanceMes] = balance.mes.split('-');
-          return (
-            (nombre === '' || balance.nombre.toLowerCase().includes(nombre)) &&
-            (mes === '' || balanceMes === mes) &&
-            (anio === '' || balanceAnio === anio)
-          );
-        });
-
-        mostrarBalances(filtrados);
-      }
-
-      // Función para abrir el modal y cargar datos
-      window.editarBalance = (id) => {
-        const balance = balances.find(b => b.id === id);
-        if (balance) {
-          document.getElementById('editBalanceId').value = balance.id;
-          document.getElementById('edit_nombre').value = balance.nombre;
-          document.getElementById('edit_tipoBalance').value = balance.tipo;
-          document.getElementById('edit_mes').value = balance.mes;
-          document.getElementById('edit_monto').value = balance.monto;
-          modalEditar.show(); // Abrir el modal manualmente
-        }
-      };
-
-      // Función para eliminar
-      window.eliminarBalance = (id) => {
-        if (confirm('¿Está seguro de eliminar este balance?')) {
-          balances = balances.filter(b => b.id !== id);
-          buscarBalances();
-        }
-      };
-
-      // Función para imprimir
+      // Impresión
       btnImprimir.addEventListener('click', () => {
-        window.print();
+        const table = document.getElementById('tablaBalance');
+        const total = document.getElementById('totalGeneral').textContent;
+        let tableHTML = '<table style="border-collapse: collapse; width: 100%;"><thead><tr>';
+
+        // Construir cabecera con los nombres de las columnas, excluyendo "Acciones"
+        tableHTML += `
+          <th style="background-color: #343a40; color: white; font-weight: bold; border: 1px solid #000; padding: 8px; text-align: center;">Nombre / Descripción</th>
+          <th style="background-color: #343a40; color: white; font-weight: bold; border: 1px solid #000; padding: 8px; text-align: center;">Tipo de Balance</th>
+          <th style="background-color: #343a40; color: white; font-weight: bold; border: 1px solid #000; padding: 8px; text-align: center;">Mes</th>
+          <th style="background-color: #343a40; color: white; font-weight: bold; border: 1px solid #000; padding: 8px; text-align: center;">Año</th>
+          <th style="background-color: #343a40; color: white; font-weight: bold; border: 1px solid #000; padding: 8px; text-align: center;">Monto</th>
+        `;
+        tableHTML += '</tr></thead><tbody>';
+
+        // Construir cuerpo sin "Acciones"
+        table.querySelectorAll('tr').forEach(row => {
+          tableHTML += '<tr>';
+          const cells = row.querySelectorAll('td');
+          cells.forEach((cell, index) => {
+            if (index < 5) {
+              tableHTML += `<td style="border: 1px solid #000; padding: 8px; text-align: center;">${cell.textContent}</td>`;
+            }
+          });
+          tableHTML += '</tr>';
+        });
+        tableHTML += '</tbody></table>';
+
+        const ventana = window.open('', '', 'height=700,width=900');
+        ventana.document.write('<html><head><title>Imprimir Balance</title>');
+        ventana.document.write(`
+          <style>
+            .total-container {
+              margin-top: 10px;
+              font-weight: bold;
+              text-align: right;
+              font-size: 16px;
+            }
+            h1 {
+              text-align: center;
+              font-size: 24px;
+              font-weight: bold;
+              margin-bottom: 20px;
+            }
+          </style>
+        `);
+        ventana.document.write('</head><body>');
+        ventana.document.write('<h1>Gestión de Balance - Lubricentro Cusqueña</h1>');
+        ventana.document.write(tableHTML);
+        ventana.document.write(`<div class="total-container">${total}</div>`);
+        ventana.document.write('</body></html>');
+        ventana.document.close();
+        ventana.print();
       });
 
-      // Función para exportar a PDF
+      // Exportación a PDF
       btnExportarPDF.addEventListener('click', () => {
-        const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.setFontSize(18);
-        doc.text('Gestión de Balance - Lubricentro Cusqueña', 14, 15);
-        doc.setFontSize(12);
-        doc.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, 14, 25);
+        const table = document.getElementById('tablaBalance');
+        const total = document.getElementById('totalGeneral').textContent;
 
-        const tableData = [];
-        const rows = tablaBalance.querySelectorAll('tr');
-        rows.forEach(row => {
+        // Obtener los datos de la tabla
+        const rows = [];
+        table.querySelectorAll('tr').forEach(row => {
           const rowData = [];
-          row.querySelectorAll('td').forEach(cell => rowData.push(cell.textContent));
-          if (rowData.length > 0) tableData.push(rowData.slice(0, 4)); // Excluir columna de acciones
+          row.querySelectorAll('td').forEach((cell, index) => {
+            if (index < 5) { // Excluir la columna de acciones (índice 5)
+              rowData.push(cell.textContent);
+            }
+          });
+          if (rowData.length > 0) {
+            rows.push(rowData);
+          }
         });
 
+        // Generar la tabla en el PDF
         doc.autoTable({
-          head: [['Nombre / Descripción', 'Tipo de Balance', 'Mes', 'Monto']],
-          body: tableData,
-          startY: 35
+          head: [['Nombre / Descripción', 'Tipo de Balance', 'Mes', 'Año', 'Monto']],
+          body: rows,
+          styles: {
+            fontSize: 10,
+            cellPadding: 2,
+            textColor: [0, 0, 0],
+            lineColor: [0, 0, 0],
+            lineWidth: 0.1
+          },
+          headStyles: {
+            fillColor: [52, 58, 64], // Color de fondo de la cabecera (#343a40)
+            textColor: [255, 255, 255], // Texto blanco
+            fontStyle: 'bold'
+          },
+          margin: { top: 30 },
+          didDrawPage: function (data) {
+            // Agregar título
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Gestión de Balance - Lubricentro Cusqueña', 105, 20, { align: 'center' });
+          }
         });
 
-        doc.text(totalGeneral.textContent, 14, doc.autoTable.previous.finalY + 10);
-        doc.save('balance.pdf');
+        // Agregar el total al final
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text(total, doc.internal.pageSize.width - 20, doc.autoTable.previous.finalY + 10, { align: 'right' });
+
+        // Guardar el PDF
+        doc.save('BalanceLubricentro.pdf');
       });
-
-      // Evento de búsqueda
-      btnBuscar.addEventListener('click', buscarBalances);
-
-      // Inicializar la tabla
-      mostrarBalances(balances);
     });
   </script>
 </body>

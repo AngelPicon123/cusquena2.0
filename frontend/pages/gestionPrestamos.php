@@ -182,52 +182,52 @@ verificarPermiso(['Administrador', 'Secretaria']);
 
           <!-- Modal Editar -->
           <div class="modal fade" id="modalEditarDeuda" tabindex="-1" aria-labelledby="modalEditarDeudaLabel" aria-hidden="true">
-            <div class="modal-dialog">
+          <div class="modal-dialog">
               <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="modalEditarDeudaLabel">Editar Deuda</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <form id="formEditarDeuda">
-                    <div class="mb-3">
-                      <label for="nombre" class="form-label fw-bold">Nombre:</label>
-                      <input type="text" class="form-control" id="nombre" name="nombre" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="tipoPersona" class="form-label fw-bold">Tipo de Persona:</label>
-                      <select class="form-select" id="tipoPersona" name="tipoPersona" required>
-                        <option value="natural">Natural</option>
-                        <option value="juridica">Jurídica</option>
-                      </select>
-                    </div>
-                    <div class="mb-3">
-                      <label for="montoDeuda" class="form-label fw-bold">Monto Deuda:</label>
-                      <input type="number" step="0.01" class="form-control" id="montoDeuda" name="montoDeuda" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="saldoPendiente" class="form-label fw-bold">Saldo Pendiente:</label>
-                      <input type="number" step="0.01" class="form-control" id="saldoPendiente" name="saldoPendiente" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="estado" class="form-label fw-bold">Estado:</label>
-                      <select class="form-select" id="estado" name="estado" required>
-                        <option value="activo">Activo</option>
-                        <option value="inactivo">Inactivo</option>
-                      </select>
-                    </div>
-                    <div class="mb-3">
-                      <label for="fechaInicio" class="form-label fw-bold">Fecha Inicio Deuda:</label>
-                      <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
-                    </div>
-                    <div class="modal-footer d-flex justify-content-center">
-                      <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                    </div>
-                  </form>
-                </div>
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="modalEditarDeudaLabel">Editar Deuda</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                      <form id="formEditarDeuda">
+                          <div class="mb-3">
+                              <label for="editNombre" class="form-label fw-bold">Nombre:</label>
+                              <input type="text" class="form-control" id="editNombre" name="nombre" required>
+                          </div>
+                          <div class="mb-3">
+                              <label for="editTipoPersona" class="form-label fw-bold">Tipo de Persona:</label>
+                              <select class="form-select" id="editTipoPersona" name="tipo_persona" required>
+                                  <option value="natural">Natural</option>
+                                  <option value="juridica">Jurídica</option>
+                              </select>
+                          </div>
+                          <div class="mb-3">
+                              <label for="editMontoDeuda" class="form-label fw-bold">Monto Deuda:</label>
+                              <input type="number" step="0.01" class="form-control" id="editMontoDeuda" name="monto_deuda" required>
+                          </div>
+                          <div class="mb-3">
+                              <label for="editSaldoPendiente" class="form-label fw-bold">Saldo Pendiente:</label>
+                              <input type="number" step="0.01" class="form-control" id="editSaldoPendiente" name="saldo_pendiente" required>
+                          </div>
+                          <div class="mb-3">
+                              <label for="editEstado" class="form-label fw-bold">Estado:</label>
+                              <select class="form-select" id="editEstado" name="estado" required>
+                                  <option value="activo">Activo</option>
+                                  <option value="inactivo">Inactivo</option>
+                              </select>
+                          </div>
+                          <div class="mb-3">
+                              <label for="editFechaInicioDeuda" class="form-label fw-bold">Fecha Inicio Deuda:</label>
+                              <input type="date" class="form-control" id="editFechaInicioDeuda" name="fecha_inicio_deuda" required>
+                          </div>
+                          <div class="modal-footer d-flex justify-content-center">
+                              <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                          </div>
+                      </form>
+                  </div>
+                  </div>
               </div>
             </div>
-          </div>
           <!-- Fin Modal Editar -->
 
         <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">

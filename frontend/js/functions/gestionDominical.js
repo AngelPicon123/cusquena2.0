@@ -6,16 +6,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Elementos de la tabla
     const tablaDominical = document.getElementById('tablaDominical');
+    // 'tablaPagosHistorial' se obtiene dentro de cargarPagosDominical ya que está en el modal
 
     // Elementos de formularios y modales
     const formAgregar = document.getElementById('formAgregarDominical');
     const formEditar = document.getElementById('formEditarDominical');
     const formAgregarPago = document.getElementById('formAgregarPago');
+    
+    // Referencias para el modal de edición de pago
+    const modalEditarPago = new bootstrap.Modal(document.getElementById('modalEditarPago'));
+    const formEditarPago = document.getElementById('formEditarPago');
 
     const modalAgregar = new bootstrap.Modal(document.getElementById('modalAgregarDominical'));
     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditarDominical'));
-    const modalEliminarConfirmacion = new bootstrap.Modal(document.getElementById('modalEliminarDominicalConfirmacion'));
+    const modalEliminarConfirmacion = new bootstrap.Modal(document.getElementById('modalEliminarDominicalConfirmacion')); 
     const modalVerPagos = new bootstrap.Modal(document.getElementById('modalVerPagos'));
+
+    // NUEVAS referencias para el modal de eliminación de PAGOS
+    const modalEliminarPagoConfirmacion = new bootstrap.Modal(document.getElementById('modalEliminarPagoConfirmacion'));
+    const btnConfirmarEliminarPago = document.getElementById('btnConfirmarEliminarPago'); 
 
     const btnConfirmarEliminarDominical = document.getElementById('btnConfirmarEliminarDominical');
 
@@ -30,12 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const toastSuccessBody = document.getElementById('toastSuccessBody');
     const toastErrorBody = document.getElementById('toastErrorBody');
 
-    let dominicalIdAEliminar = null; 
+    let dominicalIdAEliminar = null; // Para guardar el ID del dominical a eliminar (principal)
 
     // --- Funciones de Utilidad ---
 
     /**
-     * 
+     * Muestra un mensaje Toast de éxito o error.
      * @param {string} type 
      * @param {string} message 
      */
@@ -51,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Resetea los campos de un formulario.
-     * @param {HTMLFormElement} form - 
+     * @param {HTMLFormElement} form - El formulario a resetear.
      */
     function resetForm(form) {
         form.reset();
@@ -62,14 +71,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Carga y Renderizado de la Tabla ---
+    // --- Carga y Renderizado de la Tabla Principal (Dominicales) ---
 
     async function cargarDominicales(filtros = {}) {
         try {
             const params = new URLSearchParams(filtros);
             const response = await fetch(`${API_BASE_URL}listar.php?${params.toString()}`);
             const data = await response.json();
-            // Asumiendo que 'listar.php' siempre devuelve un array 'dominicales'
+            
             renderizarTabla(data.dominicales || []);
         } catch (error) {
             console.error('Error al cargar datos dominicales:', error);
@@ -99,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const accionesCell = row.insertCell();
 
-            // Botón Editar
+            // Botón Editar Dominical
             const btnEditar = document.createElement('button');
             btnEditar.className = 'btn btn-warning btn-sm me-1';
             btnEditar.innerHTML = '<i class="fas fa-edit"></i>';
@@ -107,20 +116,19 @@ document.addEventListener('DOMContentLoaded', () => {
             btnEditar.addEventListener('click', () => llenarModalEditar(d));
             accionesCell.appendChild(btnEditar);
 
-            // Botón Eliminar
+            // Botón Eliminar Dominical (principal)
             const btnEliminar = document.createElement('button');
             btnEliminar.className = 'btn btn-danger btn-sm me-1';
             btnEliminar.innerHTML = '<i class="fas fa-trash-alt"></i>';
             btnEliminar.title = 'Eliminar';
             btnEliminar.addEventListener('click', () => {
                 dominicalIdAEliminar = d.id;
-            
                 document.getElementById('dominicalIdParaConfirmarEliminar').value = d.id; 
                 modalEliminarConfirmacion.show(); 
             });
             accionesCell.appendChild(btnEliminar);
 
-            // Botón Ver Pagos
+            // Botón Ver Pagos del Dominical
             const btnVerPagos = document.createElement('button');
             btnVerPagos.className = 'btn btn-info btn-sm';
             btnVerPagos.innerHTML = '<i class="fas fa-eye"></i>';
@@ -129,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 dominicalIdAEliminar = d.id; 
                 document.getElementById('nombreDominical').textContent = `${d.nombre} ${d.apellidos}`;
                 document.getElementById('pagoDominicalId').value = d.id;
-                cargarPagosDominical(d.id);
+                cargarPagosDominical(d.id); 
                 modalVerPagos.show();
             });
             accionesCell.appendChild(btnVerPagos);
@@ -164,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Función para llenar el modal de edición
+    // Función para llenar el modal de edición de Dominical
     function llenarModalEditar(d) {
         document.getElementById('editDominicalId').value = d.id;
         document.getElementById('edit_nombre').value = d.nombre;
@@ -178,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modalEditar.show();
     }
 
-    // Manejo del formulario de editar dominical
+    // Manejo del formulario de editar Dominical
     formEditar.addEventListener('submit', async e => {
         e.preventDefault();
         const formData = new FormData(formEditar);
@@ -206,13 +214,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Evento para el botón de Confirmar Eliminación dentro del modal
+    // Evento para el botón de Confirmar Eliminación del Dominical principal (en su propio modal)
     btnConfirmarEliminarDominical.addEventListener('click', async () => {
         const idToDelete = document.getElementById('dominicalIdParaConfirmarEliminar').value; 
         if (!idToDelete) return;
 
         try {
-            const response = await fetch(`${API_BASE_URL}eliminar.php`, {
+            const response = await fetch(`${API_BASE_URL}eliminar.php`, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: idToDelete })
@@ -234,7 +242,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Función para cargar los pagos de un dominical específico
+    // --- Funciones de Gestión de Pagos Individuales ---
+
+    // Función para cargar los pagos de un dominical específico en el modal
     async function cargarPagosDominical(dominicalId) {
         const tablaPagosHistorial = document.getElementById('tablaPagosHistorial');
         tablaPagosHistorial.innerHTML = ''; 
@@ -250,11 +260,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     row.insertCell().textContent = `S/. ${parseFloat(pago.monto_pagado).toFixed(2)}`;
 
                     const accionesCell = row.insertCell();
+
+                    // Botón Editar Pago
+                    const btnEditarPago = document.createElement('button');
+                    btnEditarPago.className = 'btn btn-warning btn-sm me-1'; 
+                    btnEditarPago.innerHTML = '<i class="fas fa-edit"></i>';
+                    btnEditarPago.title = 'Editar Pago';
+                    // Al hacer clic, llena el modal de edición de pago con los datos actuales
+                    btnEditarPago.addEventListener('click', () => llenarModalEditarPago(pago, dominicalId)); 
+                    accionesCell.appendChild(btnEditarPago);
+
+                    // Botón Eliminar Pago (dentro del historial de pagos)
                     const btnEliminarPago = document.createElement('button');
                     btnEliminarPago.className = 'btn btn-danger btn-sm';
                     btnEliminarPago.innerHTML = '<i class="fas fa-trash-alt"></i>';
                     btnEliminarPago.title = 'Eliminar Pago';
-                    btnEliminarPago.addEventListener('click', () => eliminarPago(pago.id, dominicalId));
+                    btnEliminarPago.addEventListener('click', () => {
+                        // Pasamos los IDs al MODAL ESPECÍFICO DE ELIMINAR PAGO
+                        document.getElementById('pagoIdParaEliminarConfirmacion').value = pago.id;
+                        document.getElementById('dominicalIdParaPagoEliminarConfirmacion').value = dominicalId;
+                        modalEliminarPagoConfirmacion.show(); 
+                    });
                     accionesCell.appendChild(btnEliminarPago);
                 });
             } else {
@@ -265,6 +291,20 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('error', '❌ Error al cargar el historial de pagos.');
         }
     }
+
+    // Función para llenar el modal de edición de Pago Individual
+    
+        function llenarModalEditarPago(pago, dominicalId) {
+           
+            modalVerPagos.hide(); 
+
+            document.getElementById('editPagoId').value = pago.id;
+            document.getElementById('editPagoDominicalId').value = dominicalId; 
+            document.getElementById('editFechaPago').value = pago.fecha_pago;
+            document.getElementById('editMontoPago').value = parseFloat(pago.monto_pagado).toFixed(2);
+
+            modalEditarPago.show(); 
+        }
 
     // Manejo del formulario para agregar un nuevo pago
     formAgregarPago.addEventListener('submit', async e => {
@@ -295,10 +335,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Función para eliminar un pago
-    async function eliminarPago(pagoId, dominicalId) {
-        if (!confirm('¿Estás seguro de eliminar este pago?')) return; 
+            // Manejo del formulario de editar Pago Individual
+        formEditarPago.addEventListener('submit', async e => {
+            e.preventDefault();
+            const formData = new FormData(formEditarPago);
+            const datos = Object.fromEntries(formData.entries());
 
+            try {
+                const response = await fetch(`${API_BASE_URL}actualizar_pago.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    modalEditarPago.hide();
+                    showToast('success', '✅ Pago actualizado exitosamente.');
+                    cargarPagosDominical(datos.dominical_id); 
+                    cargarDominicales(); 
+
+                  
+                    modalVerPagos.show(); 
+
+                } else {
+                    showToast('error', data.error || '❌ Error al actualizar el pago.');
+                }
+            } catch (error) {
+                console.error('Error al actualizar pago:', error);
+                showToast('error', '❌ Error de conexión al actualizar el pago.');
+            }
+        });
+
+        modalEditarPago._element.addEventListener('hidden.bs.modal', () => {
+   
+         modalVerPagos.show();
+        });
+            
+  
+    // Se ha movido la lógica de confirmación al event listener de btnConfirmarEliminarPago
+    async function eliminarPago(pagoId, dominicalId) {
         try {
             const response = await fetch(`${API_BASE_URL}eliminar_pago.php`, {
                 method: 'POST',
@@ -306,6 +382,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ id: pagoId })
             });
             const data = await response.json();
+
+            
 
             if (data.success) {
                 showToast('success', '✅ Pago eliminado exitosamente.');
@@ -320,7 +398,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Manejo de filtros
+    // NUEVO Evento para el botón de Confirmar Eliminación del PAGO (en el modal de pago)
+    btnConfirmarEliminarPago.addEventListener('click', async () => {
+        const pagoIdToDelete = document.getElementById('pagoIdParaEliminarConfirmacion').value;
+        const dominicalIdAssociated = document.getElementById('dominicalIdParaPagoEliminarConfirmacion').value;
+
+        if (!pagoIdToDelete || !dominicalIdAssociated) {
+            showToast('error', '❌ No se encontró el ID del pago o dominical asociado para eliminar.');
+            modalEliminarPagoConfirmacion.hide();
+            return;
+        }
+
+     
+        await eliminarPago(pagoIdToDelete, dominicalIdAssociated);
+        modalEliminarPagoConfirmacion.hide(); 
+    });
+
+
+    // --- Manejo de Filtros ---
     btnBuscar.addEventListener('click', () => {
         const filtros = {
             nombre: buscarDominicalInput.value.trim(),
@@ -330,6 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cargarDominicales(filtros);
     });
 
+    // Carga inicial de datos
     cargarDominicales();
 
     // Inicializar el sidebar toggle (Bootstrap SB Admin template related)

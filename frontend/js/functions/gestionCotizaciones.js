@@ -1,4 +1,4 @@
-// C:\xampp\htdocs\cusquena\js\functions\gestionCotizaciones.js
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // Corrected API path from your PHP comments in listar.php (assuming this is the correct structure)
@@ -11,17 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
     const modalEliminarConfirmacion = new bootstrap.Modal(document.getElementById('modalEliminarConfirmacion'));
     const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminar');
-    const totalGeneralPago = document.getElementById('totalGeneral'); // Reference to your HTML element
+    const totalGeneralPago = document.getElementById('totalGeneral'); 
 
-    // References to the toasts
+    
     const toastSuccess = new bootstrap.Toast(document.getElementById('toastSuccess'));
     const toastError = new bootstrap.Toast(document.getElementById('toastError'));
     const toastSuccessBody = document.getElementById('toastSuccessBody');
     const toastErrorBody = document.getElementById('toastErrorBody');
 
-    let cotizacionIdToDelete = null; // To store the ID of the quotation to delete
+    let cotizacionIdToDelete = null; 
 
-    // Function to show toasts
+    
     function showToast(type, message) {
         if (type === 'success') {
             toastSuccessBody.textContent = message;
@@ -38,13 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             renderizarTabla(data.cotizaciones || []);
 
-            // --- IMPORTANT FIX: Use 'totalGlobal' to match your PHP backend ---
+       
             if (data.totalGlobal !== undefined) {
                 totalGeneralPago.textContent = `Total General: S/. ${parseFloat(data.totalGlobal).toFixed(2)}`;
             } else {
                 totalGeneralPago.textContent = 'Total General: S/. 0.00';
             }
-            // --- END OF FIX ---
+          
         } catch (error) {
             console.error('Error al cargar cotizaciones:', error);
             showToast('error', 'Error al cargar las cotizaciones. Inténtalo de nuevo.');
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     cargarCotizaciones();
 
-    // Logic for filtering quotations
+   
     const filterFechaInicio = document.getElementById('filterFechaInicio');
     const filterFechaFin = document.getElementById('filterFechaFin');
     const filterNombre = document.getElementById('filterNombre');
@@ -211,20 +211,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(url);
             const data = await response.json();
             renderizarTabla(data.cotizaciones || []);
-            // --- IMPORTANT FIX: Use 'totalGlobal' here too ---
+            
             if (data.totalGlobal !== undefined) {
                 totalGeneralPago.textContent = `Total General: S/. ${parseFloat(data.totalGlobal).toFixed(2)}`;
             } else {
                 totalGeneralPago.textContent = 'Total General: S/. 0.00';
             }
-            // --- END OF FIX ---
+           
         } catch (error) {
             console.error('Error al buscar cotizaciones:', error);
             showToast('error', 'Error al buscar cotizaciones. Inténtalo de nuevo.');
         }
     });
 
-    // Logic for printing table (basic example, may require more CSS for good printing)
+  
     document.getElementById('btnPrintTable').addEventListener('click', () => {
         const tableToPrint = document.getElementById('cotizacionesTable').outerHTML;
         const printWindow = window.open('', '', 'height=600,width=800');
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         printWindow.print();
     });
 
-    // --- CONTINUATION OF btnExportPdf from previous cut-off response ---
+    
     document.getElementById('btnExportPdf').addEventListener('click', () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -261,12 +261,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = rows.slice(1).map(row => {
             const cells = Array.from(row.querySelectorAll('td'));
             
-            // Exclude the last cell (actions) when exporting to PDF
-            // The slice(0, -1) correctly removes the last element (actions column)
+           
+            
             return cells.slice(0, -1).map(cell => cell.innerText);
         });
 
-        // Exclude the "Acciones" column from the PDF headers
+       
         const columns = headers.slice(0, -1); 
 
         doc.autoTable({
@@ -277,14 +277,12 @@ document.addEventListener('DOMContentLoaded', () => {
             styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
             headStyles: { fillColor: [33, 37, 41] },
             columnStyles: {
-                // You can add specific column styles here if needed.
-                // For example, to adjust width for a specific column:
-                // 3: { cellWidth: 20 }, // Assuming column index 3 (4th column) is 'Pago'
+                
+                
             }
         });
 
-        // Add the total general to the PDF
-        // `doc.autoTable.previous.finalY` gets the y-position after the table
+
         doc.text(totalGeneralPago.textContent, 14, doc.autoTable.previous.finalY + 10);
         doc.save("cotizaciones.pdf");
     });

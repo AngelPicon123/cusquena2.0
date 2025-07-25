@@ -213,7 +213,8 @@ verificarPermiso(['Administrador', 'Secretaria']);
               </div>
             </div>
           </div>
-
+                
+              <!-- Modal Eliminar -->
           <div class="modal fade" id="modalEliminarDominicalConfirmacion" tabindex="-1" aria-labelledby="modalEliminarDominicalConfirmacionLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
@@ -233,8 +234,38 @@ verificarPermiso(['Administrador', 'Secretaria']);
             </div>
           </div>
 
+                <!-- Modal Editar Historial de pagos -->
+           <div class="modal fade" id="modalEditarPago" tabindex="-1" aria-labelledby="modalEditarPagoLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h5 class="modal-title" id="modalEditarPagoLabel">Editar Pago de Dominical</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form id="formEditarPago">
+                          <div class="modal-body">
+                              <input type="hidden" id="editPagoId" name="id">
+                              <input type="hidden" id="editPagoDominicalId" name="dominical_id">
+                              <div class="mb-3">
+                                  <label for="editFechaPago" class="form-label">Fecha de Pago</label>
+                                  <input type="date" class="form-control" id="editFechaPago" name="fecha_pago" required>
+                              </div>
+                              <div class="mb-3">
+                                  <label for="editMontoPago" class="form-label">Monto Pagado</label>
+                                  <input type="number" step="0.01" class="form-control" id="editMontoPago" name="monto_pagado" required>
+                              </div>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                              <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
 
-          <!-- Modal Ver Pagos -->
+
+          <!-- Modal Ver historial de Pagos -->
           <div class="modal fade" id="modalVerPagos" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
               <div class="modal-content">
@@ -284,6 +315,27 @@ verificarPermiso(['Administrador', 'Secretaria']);
               </div>
             </div>
           </div>
+ 
+          <!-- Modal Eliminar Historial de pagos-->
+              <div class="modal fade" id="modalEliminarPagoConfirmacion" tabindex="-1" aria-labelledby="modalEliminarPagoConfirmacionLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                  <div class="modal-header bg-danger text-white">
+                      <h5 class="modal-title" id="modalEliminarPagoConfirmacionLabel">¿Confirmar Eliminación de Pago?</h5>
+                      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body">
+                      ¿Estás seguro de que deseas eliminar este **pago de dominical**? Esta acción no se puede deshacer y el monto del dominical será recalculado.
+                      <input type="hidden" id="pagoIdParaEliminarConfirmacion">
+                      <input type="hidden" id="dominicalIdParaPagoEliminarConfirmacion">
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <button type="button" class="btn btn-danger" id="btnConfirmarEliminarPago">Eliminar Pago</button>
+                  </div>
+              </div>
+          </div>
+      </div>
 
           <!-- Tabla de Dominical -->
           <div class="table-responsive my-4">

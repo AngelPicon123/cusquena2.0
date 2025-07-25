@@ -16,17 +16,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const tablaPagosHistorial = document.getElementById('tablaPagosHistorial');
     const nombreDeudorSpan = document.getElementById('nombreDeudor');
     const pagoDeudaIdInput = document.getElementById('pagoDeudaId');
-    const fechaPagoInput = document.getElementById('fechaPago'); // Añadido para facilitar el reset
+    const fechaPagoInput = document.getElementById('fechaPago'); 
 
-    // --- ESTADO DE LA APLICACIÓN ---
-    let deudas = []; // Almacena las deudas cargadas para fácil acceso
+   
+    let deudas = []; 
 
-    // --- FUNCIONES AUXILIARES ---
+ 
 
     /**
-     * Formatea una fecha en formato ISO (YYYY-MM-DD) a DD-MM-YYYY.
-     * @param {string} fechaISO La fecha en formato YYYY-MM-DD.
-     * @returns {string} La fecha formateada.
+   
+     * @param {string} fechaISO 
+     * @returns {string} 
      */
     function formatearFecha(fechaISO) {
         if (!fechaISO) return 'N/A';
@@ -35,23 +35,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /**
-     * Formatea un número como moneda local (S/.).
-     * @param {number|string} valor El valor numérico.
-     * @returns {string} El valor formateado como moneda.
+     * 
+     * @param {number|string} valor 
+     * @returns {string} 
      */
     function formatearMoneda(valor) {
-        // Asegurarse de que el valor sea un número y tenga 2 decimales
+        
         const num = parseFloat(valor);
         if (isNaN(num)) {
-            return 'S/ 0.00'; // O algún valor por defecto
+            return 'S/ 0.00'; 
         }
         return `S/. ${num.toFixed(2)}`;
     }
     
     /**
-     * Devuelve un badge de Bootstrap según el estado de la deuda.
-     * @param {string} estado El estado de la deuda ('pendiente', 'pagada', 'en_atraso').
-     * @returns {string} El HTML del badge.
+     * 
+     * @param {string} estado
+     * @returns {string} 
      */
     function getBadgeEstado(estado) {
         switch (estado) {
@@ -69,11 +69,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- FUNCIONES PRINCIPALES (LÓGICA DE DEUDAS) ---
 
     /**
-     * Carga las deudas desde el backend y las renderiza en la tabla.
-     * @param {string} filtro El término de búsqueda para filtrar por nombre.
+     * 
+     * @param {string} filtro 
      */
     function cargarDeudas(filtro = '') {
-        tablaDeudas.innerHTML = `<tr><td colspan="9" class="text-center">Cargando deudas...</td></tr>`; // Mensaje de carga
+        tablaDeudas.innerHTML = `<tr><td colspan="9" class="text-center">Cargando deudas...</td></tr>`; 
 
         fetch(`../../backend/api/controllers/gestionDeudas.php?accion=listar&buscar=${encodeURIComponent(filtro)}`)
             .then(res => res.json())
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.error) {
                     throw new Error(data.error);
                 }
-                deudas = data; // Guardar los datos para usarlos después
+                deudas = data; 
                 renderTablaDeudas(deudas);
             })
             .catch(err => {
@@ -91,8 +91,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /**
-     * Renderiza los datos de las deudas en la tabla HTML.
-     * @param {Array} data El array de objetos de deuda.
+     * 
+     * @param {Array} data 
      */
     function renderTablaDeudas(data) {
         tablaDeudas.innerHTML = '';
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- MANEJADORES DE EVENTOS DE DEUDAS ---
 
-    // Manejar el submit del formulario de agregar deuda
+    // 
     formAgregarDeuda.addEventListener('submit', function (event) {
         event.preventDefault();
         const formData = new FormData(formAgregarDeuda);
@@ -152,13 +152,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Manejar el submit del formulario de editar deuda
+    
     formEditarDeuda.addEventListener('submit', function (event) {
         event.preventDefault();
         const formData = new FormData(formEditarDeuda);
         formData.append('accion', 'modificar');
-        // El 'deudaId' ya está en el formData porque es un input hidden en el formulario
-
+        
         fetch('../../backend/api/controllers/gestionDeudas.php', {
             method: 'POST',
             body: formData
@@ -186,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (event.target.closest('.btn-editar')) {
             const button = event.target.closest('.btn-editar');
             const deudaId = button.dataset.id;
-            const deuda = deudas.find(d => d.id == deudaId); // Buscar la deuda en los datos cargados
+            const deuda = deudas.find(d => d.id == deudaId); 
 
             if (deuda) {
                 document.getElementById('editDeudaId').value = deuda.id;
@@ -210,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const deudaId = button.dataset.id;
             if (confirm('¿Estás seguro de que deseas eliminar esta deuda? También se eliminarán todos los pagos asociados.')) {
                 fetch(`../../backend/api/controllers/gestionDeudas.php?accion=eliminar&id=${deudaId}`, {
-                    method: 'GET' // O POST, si prefieres enviar el ID en el body
+                    method: 'GET' 
                 })
                 .then(res => res.json())
                 .then(data => {
@@ -235,23 +234,23 @@ document.addEventListener('DOMContentLoaded', function () {
             const deudaId = button.dataset.id;
             const nombreDeudor = button.dataset.nombre;
 
-            nombreDeudorSpan.textContent = nombreDeudor; // Mostrar el nombre en el modal
-            pagoDeudaIdInput.value = deudaId; // Establecer el ID de la deuda en el campo oculto del formulario de pago
+            nombreDeudorSpan.textContent = nombreDeudor; 
+            pagoDeudaIdInput.value = deudaId; 
             
-            // Establecer la fecha actual por defecto en el input de fechaPago
+            
             const today = new Date().toISOString().split('T')[0];
             fechaPagoInput.value = today;
 
-            cargarHistorialPagos(deudaId); // Cargar los pagos para esta deuda
-            modalPagos.show(); // Mostrar el modal de pagos
+            cargarHistorialPagos(deudaId); 
+            modalPagos.show(); 
         }
     });
 
     // --- FUNCIONES Y MANEJADORES DE EVENTOS DE PAGOS (NUEVOS) ---
 
     /**
-     * Carga el historial de pagos para una deuda específica y lo renderiza.
-     * @param {number} deudaId El ID de la deuda.
+     * 
+     * @param {number} deudaId 
      */
     function cargarHistorialPagos(deudaId) {
         tablaPagosHistorial.innerHTML = `<tr><td colspan="3" class="text-center">Cargando historial de pagos...</td></tr>`;
@@ -273,11 +272,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /**
-     * Renderiza los pagos en la tabla del modal de historial de pagos.
-     * @param {Array} pagos El array de objetos de pago.
+     * 
+     * @param {Array} pagos 
      */
     function renderTablaPagos(pagos) {
-        tablaPagosHistorial.innerHTML = ''; // Limpiar cualquier contenido previo
+        tablaPagosHistorial.innerHTML = ''; 
         if (pagos.length === 0) {
             tablaPagosHistorial.innerHTML = `<tr><td colspan="3" class="text-center">No hay pagos registrados para esta deuda.</td></tr>`;
             return;
@@ -323,11 +322,11 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             if (data.success) {
                 alert('Pago registrado con éxito.');
-                formAgregarPago.reset(); // Limpiar el formulario de pago
-                // Restablecer la fecha actual por si el usuario registra otro pago inmediatamente
+                formAgregarPago.reset(); 
+              
                 fechaPagoInput.value = new Date().toISOString().split('T')[0]; 
-                cargarHistorialPagos(deudaId); // Recargar el historial de pagos del modal
-                cargarDeudas(); // Recargar la tabla principal de deudas para actualizar el saldo y estado
+                cargarHistorialPagos(deudaId);
+                cargarDeudas(); 
             } else {
                 alert('Error al registrar pago: ' + data.error);
                 console.error('Error al registrar pago:', data.error);
@@ -355,8 +354,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(data => {
                     if (data.success) {
                         alert('Pago eliminado con éxito. Saldo de deuda actualizado.');
-                        cargarHistorialPagos(deudaId); // Recargar el historial de pagos del modal
-                        cargarDeudas(); // Recargar la tabla principal de deudas para actualizar el saldo y estado
+                        cargarHistorialPagos(deudaId); 
+                        cargarDeudas(); 
                     } else {
                         alert('Error al eliminar pago: ' + data.error);
                         console.error('Error al eliminar pago:', data.error);

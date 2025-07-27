@@ -138,21 +138,21 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                             <input type="number" step="0.01" class="form-control" name="monto" required>
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label">Categoría</label>
-                                            <select class="form-select" name="categoria_id" id="agregar_categoria" required>
-                                                <option value="">Seleccione</option>
-                                                <option value="1">Aceite</option>
-                                                <option value="2">Aditivo</option>
-                                                <option value="3">Bujía</option>
-                                                <option value="4">Filtro</option>
-                                                <option value="5">Foco</option>
-                                                <option value="6">Grasa</option>
-                                                <option value="7">Limpieza</option>
-                                                <option value="8">Refrigerante</option>
-                                                <option value="9">Repuesto</option>
-                                                <option value="10">Otro</option>
-                                            </select>
-                                        </div>
+                                        <label class="form-label">Categoría</label>
+                                        <select class="form-select" name="categoria" id="agregar_categoria" required>
+                                            <option value="">Seleccione</option>
+                                            <option value="Aceite">Aceite</option>
+                                            <option value="Aditivo">Aditivo</option>
+                                            <option value="Bujía">Bujía</option>
+                                            <option value="Filtro">Filtro</option>
+                                            <option value="Foco">Foco</option>
+                                            <option value="Grasa">Grasa</option>
+                                            <option value="Limpieza">Limpieza</option>
+                                            <option value="Refrigerante">Refrigerante</option>
+                                            <option value="Repuesto">Repuesto</option>
+                                            <option value="Otro">Otro</option>
+                                        </select>
+                                    </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="submit" class="btn btn-success">Guardar</button>
@@ -206,21 +206,21 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                             <input type="number" step="0.01" class="form-control" name="monto" id="editar_monto" required>
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label">Categoría</label>
-                                            <select class="form-select" name="categoria_id" id="editar_categoria" required>
-                                                <option value="">Seleccione</option>
-                                                <option value="1">Aceite</option>
-                                                <option value="2">Aditivo</option>
-                                                <option value="3">Bujía</option>
-                                                <option value="4">Filtro</option>
-                                                <option value="5">Foco</option>
-                                                <option value="6">Grasa</option>
-                                                <option value="7">Limpieza</option>
-                                                <option value="8">Refrigerante</option>
-                                                <option value="9">Repuesto</option>
-                                                <option value="10">Otro</option>
-                                            </select>
-                                        </div>
+                                        <label class="form-label">Categoría</label>
+                                        <select class="form-select" name="categoria" id="editar_categoria" required>
+                                            <option value="">Seleccione</option>
+                                            <option value="Aceite">Aceite</option>
+                                            <option value="Aditivo">Aditivo</option>
+                                            <option value="Bujía">Bujía</option>
+                                            <option value="Filtro">Filtro</option>
+                                            <option value="Foco">Foco</option>
+                                            <option value="Grasa">Grasa</option>
+                                            <option value="Limpieza">Limpieza</option>
+                                            <option value="Refrigerante">Refrigerante</option>
+                                            <option value="Repuesto">Repuesto</option>
+                                            <option value="Otro">Otro</option>
+                                        </select>
+                                    </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="submit" class="btn btn-warning">Actualizar</button>
@@ -264,44 +264,35 @@ verificarPermiso(['Administrador', 'Secretaria']);
                     </div>
 
                     <div class="modal fade" id="modalVerVentas" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-lg modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Historial de Ventas de: <span id="nombreProducto"></span></h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <h6>Historial</h6>
-                                    <div class="table-responsive">
-                                        <table class="table table-sm table-bordered">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>Fecha de Venta</th>
-                                                    <th>Cantidad Vendida</th>
-                                                    <th>Acciones</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="tablaVentasHistorial">
-                                                <!-- Sample data for preview -->
-                                                <tr>
-                                                    <td>05-06-2025</td>
-                                                    <td>10</td>
-                                                    <td>
-                                                        <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] === 'Administrador'): ?>
-                                                        <button class="btn btn-xs btn-danger">Eliminar</button>
-                                                        <?php endif; ?>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Historial de Ventas de: <span id="nombreProducto"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Historial</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha de Venta</th>
+                                <th>Cantidad Vendida</th>
+                                <th>Monto Venta</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaVentasHistorial">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover table-sm w-100 text-center align-middle" style="table-layout: auto;">

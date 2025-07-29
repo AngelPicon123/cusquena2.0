@@ -63,7 +63,7 @@ try {
     $stmtTotalMonto = null;
 
     // --- Obtener los gastos con paginación y filtros ---
-    $sqlGastos = "SELECT id, descripcion, tipo_gasto, monto, fecha, detalle FROM gastos_empresa " . $whereClause . " ORDER BY fecha DESC LIMIT ? OFFSET ?";
+    $sqlGastos = "SELECT id, descripcion, tipo_gasto, monto, fecha, detalle FROM gastos_empresa " . $whereClause . " ORDER BY fecha ASC LIMIT ? OFFSET ?";
     $stmtGastos = $conn->prepare($sqlGastos);
     if ($stmtGastos === false) {
         throw new Exception("Error al preparar la consulta de gastos: " . implode(" ", $conn->errorInfo()));

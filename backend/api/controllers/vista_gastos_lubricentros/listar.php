@@ -54,7 +54,7 @@ try {
     // --- Obtener los gastos con paginación y filtros ---
     // Consulta principal: todos los parámetros serán posicionales.
     // Usaremos '?' para todos los parámetros (filtros, LIMIT, OFFSET).
-    $sqlGastos = "SELECT id, descripcion, tipo_gasto, monto, fecha, detalle FROM gastos_lubricentros " . $whereClause . " ORDER BY fecha DESC LIMIT ? OFFSET ?";
+    $sqlGastos = "SELECT id, descripcion, tipo_gasto, monto, fecha, detalle FROM gastos_lubricentros " . $whereClause . " ORDER BY id ASC LIMIT ? OFFSET ?";
     $stmtGastos = $conn->prepare($sqlGastos);
     if ($stmtGastos === false) {
         throw new Exception("Error al preparar la consulta de gastos: " . implode(" ", $conn->errorInfo()));

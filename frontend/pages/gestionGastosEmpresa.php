@@ -67,6 +67,20 @@ if (isset($_SESSION['rol'])) {
         .form-label.fw-bold {
             margin-bottom: 0.5rem;
         }
+        /* Style for the total general text */
+        #totalGeneral {
+            font-size: 1.25rem; /* Larger font size */
+            font-weight: bold;  /* Bold text */
+            color: #111312ff;     /* Green color for emphasis (Bootstrap's success green) */
+            margin-top: 1rem;   /* Space above */
+            text-align: right;  /* Align to the right */
+            display: block;     /* Ensure it takes full width to align right */
+            padding-right: 15px; /* Adjust padding if needed to align with table/container */
+        }
+        #btnResetSearch {
+    display: none;
+}
+
     </style>
 </head>
 <body class="sb-nav-fixed">
@@ -108,13 +122,12 @@ if (isset($_SESSION['rol'])) {
                                 <input type="date" id="filterFechaFin" class="form-control me-2">
                                 <input type="text" class="form-control me-2" id="filterDescripcion" placeholder="Buscar por Descripción">
                                 <button class="btn btn-primary me-2" id="btnBuscarGastos">Buscar</button>
-                     
+                                <button class="btn btn-secondary" id="btnResetSearch">Restablecer</button>
                             </div>
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregar">Agregar Gasto</button>
                         </div>
                     </div>
 
-                    <!-- Modal Agregar -->
                     <div class="modal fade" id="modalAgregar" tabindex="-1" aria-labelledby="modalAgregarLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
@@ -126,7 +139,7 @@ if (isset($_SESSION['rol'])) {
                                     <form id="formAgregarGasto">
                                         <div class="mb-3">
                                             <label for="descripcion" class="form-label fw-bold">Descripción:</label>
-                                            <input type="text" class="form-control" id="descripcion" name="descripcion" required>
+                                            <input type="text" class="form-control" id="addDescripcion" name="descripcion" required>
                                         </div>
                                         <div class="mb-3">
                                             <label for="tipoGasto" class="form-label fw-bold">Tipo de Gasto:</label>
@@ -140,15 +153,15 @@ if (isset($_SESSION['rol'])) {
                                         </div>
                                         <div class="mb-3">
                                             <label for="monto" class="form-label fw-bold">Monto:</label>
-                                            <input type="number" step="0.01" class="form-control" id="monto" name="monto" required>
+                                            <input type="number" step="0.01" class="form-control" id="addMonto" name="monto" required>
                                         </div>
                                         <div class="mb-3">
                                             <label for="fecha" class="form-label fw-bold">Fecha:</label>
-                                            <input type="date" class="form-control" id="fecha" name="fecha" required>
+                                            <input type="date" class="form-control" id="addFecha" name="fecha" required>
                                         </div>
                                         <div class="mb-3">
                                             <label for="detalle" class="form-label fw-bold">Detalle:</label>
-                                            <textarea class="form-control" id="detalle" name="detalle" rows="3" required></textarea>
+                                            <textarea class="form-control" id="addDetalle" name="detalle" rows="3" required></textarea>
                                         </div>
                                         <div class="modal-footer d-flex justify-content-center">
                                             <button type="submit" class="btn btn-primary">Agregar</button>
@@ -158,9 +171,6 @@ if (isset($_SESSION['rol'])) {
                             </div>
                         </div>
                     </div>
-                    <!-- Fin Modal Agregar -->
-
-                    <!-- Modal Editar -->
                     <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
@@ -205,8 +215,6 @@ if (isset($_SESSION['rol'])) {
                             </div>
                         </div>
                     </div>
-                    <!-- Fin Modal Editar -->
-
                     <div class="table-responsive my-4">
                         <table class="table table-striped table-bordered table-hover text-center">
                             <thead class="table-dark">
@@ -221,30 +229,28 @@ if (isset($_SESSION['rol'])) {
                                 </tr>
                             </thead>
                             <tbody id="tablaGastos" class="align-middle">
-                                <!-- Los datos se cargarán dinámicamente con JavaScript -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
 
-                   
-
+                    <div class="d-flex justify-content-end mb-3">
+                        <span id="totalGeneral"></span>
+                    </div>
+                    
                     <nav aria-label="Page navigation example" class="d-flex justify-content-end">
                         <ul class="pagination" id="pagination">
-                            <!-- Los enlaces de paginación se cargarán dinámicamente con JavaScript -->
-                        </ul>
+                            </ul>
                     </nav>
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- Contenedores de Toasts personalizados -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="toastSuccess" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body text-white bg-success" id="toastSuccessBody">
-                    <!-- Mensaje de éxito -->
-                </div>
+                    </div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         </div>
@@ -252,14 +258,12 @@ if (isset($_SESSION['rol'])) {
         <div id="toastError" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body text-white bg-danger" id="toastErrorBody">
-                    <!-- Mensaje de error -->
-                </div>
+                    </div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Confirmación de Eliminación -->
     <div class="modal fade" id="modalEliminarConfirmacion" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -277,9 +281,8 @@ if (isset($_SESSION['rol'])) {
             </div>
         </div>
     </div>
-                
+        
     <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="../js/scripts.js"></script> <!-- Asegúrate de que este script maneje el sidebarToggle -->
-    <script src="../js/functions/gestionGastosEmpresa.js"></script>
+    <script src="../js/scripts.js"></script> <script src="../js/functions/gestionGastosEmpresa.js"></script>
 </body>
 </html>

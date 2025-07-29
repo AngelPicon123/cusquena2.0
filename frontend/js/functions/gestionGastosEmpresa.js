@@ -55,8 +55,20 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(`${API_BASE_URL}listar.php?${queryParams}`);
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Error HTTP: ${response.status}, ${errorText}`);
+                // Try to parse error as JSON first, then fall back to text
+                const errorBody = await response.text();
+                let errorMessage = `Error HTTP: ${response.status}`;
+                try {
+                    const errorJson = JSON.parse(errorBody);
+                    if (errorJson.error) {
+                        errorMessage += `, ${errorJson.error}`;
+                    } else {
+                        errorMessage += `, ${errorBody}`;
+                    }
+                } catch (jsonError) {
+                    errorMessage += `, ${errorBody}`;
+                }
+                throw new Error(errorMessage);
             }
             const data = await response.json();
             if (data.error) {
@@ -77,7 +89,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(gastoData)
             });
-            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+            // Improved error handling for non-2xx responses
+            if (!response.ok) {
+                const errorBody = await response.text(); // Get the raw error response
+                let errorMessage = `Error HTTP: ${response.status}`;
+                try {
+                    const errorJson = JSON.parse(errorBody);
+                    if (errorJson.error) {
+                        errorMessage = errorJson.error; // Use the backend's error message if available
+                    } else {
+                        errorMessage += `: ${errorBody}`;
+                    }
+                } catch (jsonError) {
+                    errorMessage += `: ${errorBody}`; // If not JSON, use raw text
+                }
+                throw new Error(errorMessage);
+            }
             return await response.json();
         } catch (error) {
             showToast('error', `Error al agregar gasto: ${error.message}`);
@@ -92,7 +119,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(gastoData)
             });
-            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+            // Improved error handling for non-2xx responses
+            if (!response.ok) {
+                const errorBody = await response.text(); // Get the raw error response
+                let errorMessage = `Error HTTP: ${response.status}`;
+                try {
+                    const errorJson = JSON.parse(errorBody);
+                    if (errorJson.error) {
+                        errorMessage = errorJson.error; // Use the backend's error message if available
+                    } else {
+                        errorMessage += `: ${errorBody}`;
+                    }
+                } catch (jsonError) {
+                    errorMessage += `: ${errorBody}`; // If not JSON, use raw text
+                }
+                throw new Error(errorMessage);
+            }
             return await response.json();
         } catch (error) {
             showToast('error', `Error al actualizar gasto: ${error.message}`);
@@ -107,7 +149,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: id })
             });
-            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+            if (!response.ok) {
+                const errorBody = await response.text();
+                let errorMessage = `Error HTTP: ${response.status}`;
+                try {
+                    const errorJson = JSON.parse(errorBody);
+                    if (errorJson.error) {
+                        errorMessage = errorJson.error;
+                    } else {
+                        errorMessage += `: ${errorBody}`;
+                    }
+                } catch (jsonError) {
+                    errorMessage += `: ${errorBody}`;
+                }
+                throw new Error(errorMessage);
+            }
             return await response.json();
         } catch (error) {
             showToast('error', `Error al eliminar gasto: ${error.message}`);
@@ -151,14 +207,14 @@ document.addEventListener('DOMContentLoaded', () => {
             actionsCell.appendChild(deleteButton);
         });
 
-        // ⭐ AQUÍ SE ACTUALIZA CORRECTAMENTE
         totalGeneralSpan.textContent = `Total General: S/. ${parseFloat(totalGeneralMonto || 0).toFixed(2)}`;
     }
 
     function populateEditModal(gasto) {
         document.getElementById('editGastoId').value = gasto.id;
         document.getElementById('editDescripcion').value = gasto.descripcion;
-        document.getElementById('editTipoGasto').value = gasto.tipo_gasto;
+        // Ensure the ID of your select element for tipo_gasto in the edit modal is 'editTipoGasto'
+        document.getElementById('editTipoGasto').value = gasto.tipo_gasto; 
         document.getElementById('editMonto').value = parseFloat(gasto.monto).toFixed(2);
         document.getElementById('editFecha').value = gasto.fecha;
         document.getElementById('editDetalle').value = gasto.detalle;
@@ -166,8 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     let currentPage = 1;
-    const recordsPerPage = 10;
-    
+    const recordsPerPage = 10; // This should ideally match the limit in your PHP listar.php
+
     function setupPagination(totalRecords, currentPageNum, recordsPerPageNum) {
         paginationContainer.innerHTML = '';
         const totalPages = Math.ceil(totalRecords / recordsPerPageNum);
@@ -192,13 +248,36 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         paginationContainer.appendChild(createPageItem('«', currentPageNum - 1, currentPageNum === 1));
-        for (let i = 1; i <= totalPages; i++) {
+        // Logic to show a limited number of page buttons around the current page
+        const maxPagesToShow = 5; // Example: show 5 page numbers
+        let startPage = Math.max(1, currentPageNum - Math.floor(maxPagesToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+        if (endPage - startPage + 1 < maxPagesToShow) {
+            startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        }
+
+        if (startPage > 1) {
+            paginationContainer.appendChild(createPageItem('1', 1));
+            if (startPage > 2) {
+                paginationContainer.appendChild(createPageItem('...', '...', true)); // Ellipsis
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
             paginationContainer.appendChild(createPageItem(i, i, false, currentPageNum === i));
         }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                paginationContainer.appendChild(createPageItem('...', '...', true)); // Ellipsis
+            }
+            paginationContainer.appendChild(createPageItem(totalPages, totalPages));
+        }
+        
         paginationContainer.appendChild(createPageItem('»', currentPageNum + 1, currentPageNum === totalPages));
     }
     
-    // ⭐ FUNCIÓN CLAVE MODIFICADA
     async function loadGastos() {
         const filters = {
             descripcion: filterDescripcion.value,
@@ -221,9 +300,12 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const formData = new FormData(formAgregarGasto);
         const gastoData = Object.fromEntries(formData.entries());
-        // Aseguramos que el nombre del campo coincida con la BD (tipo_gasto)
-        gastoData.tipo_gasto = gastoData.tipoGasto;
-        delete gastoData.tipoGasto; 
+        
+        // ⭐ IMPORTANT: Rename 'tipoGasto' from the form to 'tipo_gasto' for the backend
+        if (gastoData.tipoGasto) {
+            gastoData.tipo_gasto = gastoData.tipoGasto;
+            delete gastoData.tipoGasto; 
+        }
 
         const result = await addGasto(gastoData);
         if (result && result.success) {
@@ -240,9 +322,12 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const formData = new FormData(formEditarGasto);
         const gastoData = Object.fromEntries(formData.entries());
-        // Aseguramos que el nombre del campo coincida con la BD (tipo_gasto)
-        gastoData.tipo_gasto = gastoData.tipoGasto;
-        delete gastoData.tipoGasto;
+        
+        // ⭐ IMPORTANT: Rename 'tipoGasto' from the form to 'tipo_gasto' for the backend
+        if (gastoData.tipoGasto) {
+            gastoData.tipo_gasto = gastoData.tipoGasto;
+            delete gastoData.tipoGasto;
+        }
 
         const result = await updateGasto(gastoData);
         if (result && result.success) {
@@ -269,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnBuscarGastos.addEventListener('click', () => {
-        currentPage = 1;
+        currentPage = 1; // Reset to first page on new search
         loadGastos();
     });
 
@@ -277,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filterFechaInicio.value = '';
         filterFechaFin.value = '';
         filterDescripcion.value = '';
-        currentPage = 1;
+        currentPage = 1; // Reset to first page on search reset
         loadGastos();
     });
 

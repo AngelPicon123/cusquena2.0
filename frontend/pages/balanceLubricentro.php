@@ -68,18 +68,18 @@ verificarPermiso(['Administrador', 'Secretaria']);
       font-size: 16px;
     }
     .btn-custom {
-      background-color: #f0f0f0;
-      border: 1px solid #ccc;
-      color: #333;
+      background-color: #007bff; /* Color azul de Bootstrap btn-primary */
+      border: 1px solid #007bff;
+      color: #fff; /* Texto blanco */
       padding: 6px 12px;
       font-size: 14px;
       border-radius: 4px;
       text-decoration: none;
     }
     .btn-custom:hover {
-      background-color: #e0e0e0;
-      border-color: #999;
-      color: #000;
+      background-color: #0056b3; /* Azul más oscuro para hover, similar a btn-primary */
+      border-color: #0056b3;
+      color: #fff;
     }
   </style>
 </head>
@@ -127,7 +127,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
     <div id="layoutSidenav_content">
       <main class="container-xl my-2 col-10 mx-auto">
         <div class="container-fluid px-4">
-          <h1 class="mb-4 text-center">Gestión de Balance</h1>
+          <h1 class="mb-4 text-center">Gestión Balance de Lubricentro</h1>
           <div class="row">
             <div class="col-12 d-flex justify-content-between align-items-center">
               <div class="d-flex">
@@ -135,17 +135,17 @@ verificarPermiso(['Administrador', 'Secretaria']);
                 <select class="form-control me-2" id="buscarMes" style="width: 120px;">
                   <option value="">Mes</option>
                   <option value="Enero">Enero</option>
-                                <option value="Febrero">Febrero</option>
-                                <option value="Marzo">Marzo</option>
-                                <option value="Abril">Abril</option>
-                                <option value="Mayo">Mayo</option>
-                                <option value="Junio">Junio</option>
-                                <option value="Julio">Julio</option>
-                                <option value="Agosto">Agosto</option>
-                                <option value="Septiembre">Septiembre</option>
-                                <option value="Octubre">Octubre</option>
-                                <option value="Noviembre">Noviembre</option>
-                                <option value="Diciembre">Diciembre</option>
+                  <option value="Febrero">Febrero</option>
+                  <option value="Marzo">Marzo</option>
+                  <option value="Abril">Abril</option>
+                  <option value="Mayo">Mayo</option>
+                  <option value="Junio">Junio</option>
+                  <option value="Julio">Julio</option>
+                  <option value="Agosto">Agosto</option>
+                  <option value="Septiembre">Septiembre</option>
+                  <option value="Octubre">Octubre</option>
+                  <option value="Noviembre">Noviembre</option>
+                  <option value="Diciembre">Diciembre</option>
                 </select>
                 <input type="number" class="form-control me-2" id="buscarAnio" placeholder="Año" style="width: 100px;">
                 <button class="btn btn-primary" id="btnBuscar">Buscar</button>
@@ -174,37 +174,37 @@ verificarPermiso(['Administrador', 'Secretaria']);
                       <input type="text" class="form-control" id="nombre" name="nombre" required placeholder="Ej: Balance Mensual, Cierre de Caja">
                     </div>
                     <div class="mb-3">
-                            <label class="form-label fw-bold">Tipo de Balance:</label>
-                            <select class="form-select" name="tipoBalance" required>
-                                <option value="">Seleccione un tipo</option>
-                                <option value="Servicios">Servicios</option>
-                                <option value="Productos">Productos</option>
-                                <option value="Deudas">Deudas</option>
-                                <option value="Gastos">Gastos</option>
-                            </select>
-                        </div>
+                      <label class="form-label fw-bold">Tipo de Balance:</label>
+                      <select class="form-select" name="tipoBalance" required>
+                        <option value="">Seleccione un tipo</option>
+                        <option value="Servicios">Servicios</option>
+                        <option value="Productos">Productos</option>
+                        <option value="Deudas">Deudas</option>
+                        <option value="Gastos">Gastos</option>
+                      </select>
+                    </div>
                     <div class="mb-3">
-                            <label class="form-label fw-bold">Mes:</label>
-                            <select class="form-select" name="mes" required>
-                                <option value="">Mes</option>
-                                <option value="Enero">Enero</option>
-                                <option value="Febrero">Febrero</option>
-                                <option value="Marzo">Marzo</option>
-                                <option value="Abril">Abril</option>
-                                <option value="Mayo">Mayo</option>
-                                <option value="Junio">Junio</option>
-                                <option value="Julio">Julio</option>
-                                <option value="Agosto">Agosto</option>
-                                <option value="Septiembre">Septiembre</option>
-                                <option value="Octubre">Octubre</option>
-                                <option value="Noviembre">Noviembre</option>
-                                <option value="Diciembre">Diciembre</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Año:</label>
-                            <input type="number" class="form-control" name="anio" min="2000" max="2100" required>
-                        </div>
+                      <label class="form-label fw-bold">Mes:</label>
+                      <select class="form-select" name="mes" required>
+                        <option value="">Mes</option>
+                        <option value="Enero">Enero</option>
+                        <option value="Febrero">Febrero</option>
+                        <option value="Marzo">Marzo</option>
+                        <option value="Abril">Abril</option>
+                        <option value="Mayo">Mayo</option>
+                        <option value="Junio">Junio</option>
+                        <option value="Julio">Julio</option>
+                        <option value="Agosto">Agosto</option>
+                        <option value="Septiembre">Septiembre</option>
+                        <option value="Octubre">Octubre</option>
+                        <option value="Noviembre">Noviembre</option>
+                        <option value="Diciembre">Diciembre</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Año:</label>
+                      <input type="number" class="form-control" name="anio" min="2000" max="2100" required>
+                    </div>
                     <div class="mb-3">
                       <label for="monto" class="form-label fw-bold">Monto:</label>
                       <input type="number" step="0.01" class="form-control" id="monto" name="monto" required>
@@ -232,37 +232,37 @@ verificarPermiso(['Administrador', 'Secretaria']);
                       <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
                     </div>
                     <div class="mb-3">
-                            <label class="form-label fw-bold">Tipo de Balance:</label>
-                            <select class="form-select" id="editarTipoBalance" name="tipoBalance" required>
-                                <option value="">Seleccione un tipo</option>
-                                <option value="Servicios">Servicios</option>
-                                <option value="Productos">Productos</option>
-                                <option value="Deudas">Deudas</option>
-                                <option value="Gastos">Gastos</option>
-                            </select>
-                        </div>
+                      <label class="form-label fw-bold">Tipo de Balance:</label>
+                      <select class="form-select" id="editarTipoBalance" name="tipoBalance" required>
+                        <option value="">Seleccione un tipo</option>
+                        <option value="Servicios">Servicios</option>
+                        <option value="Productos">Productos</option>
+                        <option value="Deudas">Deudas</option>
+                        <option value="Gastos">Gastos</option>
+                      </select>
+                    </div>
                     <div class="mb-3">
-                            <label class="form-label fw-bold">Mes:</label>
-                            <select class="form-select" name="mes" required>
-                                <option value="">Seleccione un mes</option>
-                                <option value="Enero">Enero</option>
-                                <option value="Febrero">Febrero</option>
-                                <option value="Marzo">Marzo</option>
-                                <option value="Abril">Abril</option>
-                                <option value="Mayo">Mayo</option>
-                                <option value="Junio">Junio</option>
-                                <option value="Julio">Julio</option>
-                                <option value="Agosto">Agosto</option>
-                                <option value="Septiembre">Septiembre</option>
-                                <option value="Octubre">Octubre</option>
-                                <option value="Noviembre">Noviembre</option>
-                                <option value="Diciembre">Diciembre</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Año:</label>
-                            <input type="number" class="form-control" name="anio" min="2000" max="2100" required>
-                        </div>
+                      <label class="form-label fw-bold">Mes:</label>
+                      <select class="form-select" name="mes" required>
+                        <option value="">Seleccione un mes</option>
+                        <option value="Enero">Enero</option>
+                        <option value="Febrero">Febrero</option>
+                        <option value="Marzo">Marzo</option>
+                        <option value="Abril">Abril</option>
+                        <option value="Mayo">Mayo</option>
+                        <option value="Junio">Junio</option>
+                        <option value="Julio">Julio</option>
+                        <option value="Agosto">Agosto</option>
+                        <option value="Septiembre">Septiembre</option>
+                        <option value="Octubre">Octubre</option>
+                        <option value="Noviembre">Noviembre</option>
+                        <option value="Diciembre">Diciembre</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Año:</label>
+                      <input type="number" class="form-control" name="anio" min="2000" max="2100" required>
+                    </div>
                     <div class="mb-3">
                       <label for="edit_monto" class="form-label fw-bold">Monto:</label>
                       <input type="number" step="0.01" class="form-control" id="edit_monto" name="monto" required>
@@ -276,24 +276,24 @@ verificarPermiso(['Administrador', 'Secretaria']);
             </div>
           </div>
           <div id="contenedorBalanceImprimir">
-          <div class="table-responsive my-4">
-            <table class="table table-bordered table-hover text-center">
-              <thead class="table-dark">
-                <tr>
-                  <th>Nombre / Descripcion</th>
-                  <th>Tipo de Balance</th>
-                  <th>Mes</th>
-                  <th>Año</th>
-                  <th>Monto</th>
-                  <th class="no-exportar">Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="tablaBalance" class="align-middle">
-              </tbody>
-            </table>
+            <div class="table-responsive my-4">
+              <table class="table table-bordered table-hover text-center">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Nombre / Descripcion</th>
+                    <th>Tipo de Balance</th>
+                    <th>Mes</th>
+                    <th>Año</th>
+                    <th>Monto</th>
+                    <th class="no-exportar">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaBalance" class="align-middle">
+                </tbody>
+              </table>
+            </div>
+            <div class="total-container" id="totalGeneral">Total General: S/. 0.00</div>
           </div>
-          <div class="total-container" id="totalGeneral">Total General: S/. 0.00</div>
-        </div>
 
           <nav aria-label="Page navigation example" class="d-flex justify-content-end">
             <ul class="pagination">

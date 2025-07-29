@@ -176,7 +176,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
         <div id="layoutSidenav_content">
             <main class="container-xl my-2 col-10 mx-auto">
                 <div class="container-fluid px-4">
-                    <h1 class="mb-4 text-center">Gestión de Balance</h1>
+                    <h1 class="mb-4 text-center">Gestión Balance de Empresa</h1>
                     <div class="row">
                         <div class="col-12 d-flex justify-content-between align-items-center">
                             <div class="d-flex">

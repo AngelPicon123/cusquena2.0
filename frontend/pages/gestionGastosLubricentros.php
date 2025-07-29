@@ -68,6 +68,17 @@ if (isset($_SESSION['rol'])) {
         .form-label.fw-bold {
             margin-bottom: 0.5rem;
         }
+        
+        /* Style for the total general text */
+        #totalGeneral {
+            font-size: 1.25rem; /* Larger font size */
+            font-weight: bold;  /* Bold text */
+            color: #111312ff;     /* Green color for emphasis (Bootstrap's success green) */
+            margin-top: 1rem;   /* Space above */
+            text-align: right;  /* Align to the right */
+            display: block;     /* Ensure it takes full width to align right */
+            padding-right: 15px; /* Adjust padding if needed to align with table/container */
+        }
     </style>
 </head>
 <body class="sb-nav-fixed">
@@ -98,7 +109,7 @@ if (isset($_SESSION['rol'])) {
         <div id="layoutSidenav_content">
             <main class="container-xl my-2 col-11 mx-auto">
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4 text-center mb-4">Gestión de Gastos</h1>
+                    <h1 class="mt-4 text-center mb-4">Gestión de Gastos Lubricentro</h1>
 
                     <div class="row">
                         <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center">
@@ -221,21 +232,22 @@ if (isset($_SESSION['rol'])) {
                                 </tr>
                             </thead>
                             <tbody id="tablaGastos" class="align-middle">
-                                <!-- Los datos se cargarán dinámicamente con JavaScript -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
 
+                    <div class="d-flex justify-content-end mb-3">
+                        <span id="totalGeneral"></span>
+                    </div>
+                    
                     <nav aria-label="Page navigation example" class="d-flex justify-content-end">
                         <ul class="pagination" id="pagination">
-                            <!-- Los enlaces de paginación se cargarán dinámicamente con JavaScript -->
-                        </ul>
+                            </ul>
                     </nav>
                 </div>
             </main>
         </div>
     </div>
-
     <!-- Contenedores de Toasts personalizados -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="toastSuccess" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -278,6 +290,5 @@ if (isset($_SESSION['rol'])) {
 
     <script src="../js/bootstrap.bundle.min.js"></script>
     <script src="../js/functions/gestionGastoslubricentros.js"></script>
-    <script src="../js/scripts.js"></script> <!-- Asegúrate de que este script maneje el sidebarToggle -->
-</body>
+    <script src="../js/scripts.js"></script> 
 </html>

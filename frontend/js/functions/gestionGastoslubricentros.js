@@ -55,6 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
         textareas.forEach(textarea => textarea.value = '');
     }
 
+    /**
+     * Calculates and displays the total general of expenses.
+     * @param {Array<object>} gastos - Array of expense objects.
+     */
+    function updateTotalGeneral(gastos) {
+        const total = gastos.reduce((sum, gasto) => sum + parseFloat(gasto.monto || 0), 0);
+        document.getElementById('totalGeneral').textContent = `Total General: S/ ${total.toFixed(2)}`;
+    }
+
     // --- Funciones CRUD (Interfaz con el Backend) ---
 
     /**
@@ -180,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tablaGastos.innerHTML = ''; // Limpiar tabla antes de renderizar
         if (gastos.length === 0) {
             tablaGastos.innerHTML = '<tr><td colspan="7" class="text-center">No hay gastos para mostrar.</td></tr>';
+            updateTotalGeneral([]); // Reset total when no expenses
             return;
         }
 
@@ -210,6 +220,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             actionsCell.appendChild(deleteButton);
         });
+
+        // Update total general after rendering expenses
+        updateTotalGeneral(gastos);
     }
 
     /**
@@ -300,6 +313,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result && result.gastos) {
             renderGastos(result.gastos);
             setupPagination(result.total, currentPage, recordsPerPage);
+        } else {
+            updateTotalGeneral([]); // Reset total on error or no results
         }
     }
 

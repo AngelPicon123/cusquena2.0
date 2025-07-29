@@ -6,52 +6,93 @@ require_once __DIR__ . '/../../../includes/auth.php';
 
 header('Content-Type: application/json');
 
-verificarPermiso(['Administrador']); // Solo administradores pueden registrar gastos
+// Ensure the user has Administrator permissions
+verificarPermiso(['Administrador', 'Secretaria']); // Corrected based on your HTML, both roles can access this page
 
+// Decode the JSON input from the request body
 $data = json_decode(file_get_contents('php://input'), true);
 
-if (!isset($data['descripcion'], $data['tipoGasto'], $data['monto'], $data['fecha'], $data['detalle'])) {
+// --- Input Validation ---
+// Check if all required data fields are present
+// ⭐ CORRECTION: Changed 'tipoGasto' to 'tipo_gasto' to match JS payload
+if (!isset($data['descripcion'], $data['tipo_gasto'], $data['monto'], $data['fecha'], $data['detalle'])) {
     http_response_code(400);
-    echo json_encode(['error' => 'Datos incompletos para registrar el gasto.']);
+    echo json_encode(['error' => 'Datos incompletos para registrar el gasto. Faltan: descripcion, tipo_gasto, monto, fecha, o detalle.']);
     exit();
 }
 
-$descripcion = $data['descripcion'];
-$tipo_gasto = $data['tipoGasto'];
-$monto = (float)$data['monto'];
-$fecha = $data['fecha'];
-$detalle = $data['detalle'];
+// Sanitize and assign input variables
+$descripcion = trim($data['descripcion']); // Trim whitespace
+// ⭐ CORRECTION: Assign from 'tipo_gasto'
+$tipo_gasto = trim($data['tipo_gasto']);    // Trim whitespace
+$monto = (float)$data['monto'];             // Cast to float for numeric operations
+$fecha = trim($data['fecha']);              // Trim whitespace
+$detalle = trim($data['detalle']);          // Trim whitespace
 
-// Validar que el tipo de gasto sea uno de los permitidos por el ENUM
+// Validate that the expense type is one of the allowed values
+// IMPORTANT: These values MUST match the ENUM values defined in your database's `tipo_gasto` column.
 $allowed_types = ['operativo', 'administrativo', 'mantenimiento', 'otro'];
 if (!in_array($tipo_gasto, $allowed_types)) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Tipo de gasto inválido.']);
+    http_response_code(400); // Bad Request
+    echo json_encode(['error' => 'Tipo de gasto inválido. El tipo debe ser uno de: ' . implode(', ', $allowed_types) . '.']);
     exit();
 }
 
-try {
-    $stmt = $conn->prepare("INSERT INTO gastos_empresa (descripcion, tipo_gasto, monto, fecha, detalle) VALUES (:descripcion, :tipo_gasto, :monto, :fecha, :detalle)");
-    if ($stmt === false) {
-        throw new Exception("Error al preparar la consulta: " . implode(" ", $conn->errorInfo()));
-    }
-    $stmt->bindParam(':descripcion', $descripcion);
-    $stmt->bindParam(':tipo_gasto', $tipo_gasto);
-    $stmt->bindParam(':monto', $monto, PDO::PARAM_STR); // PDO::PARAM_STR para DECIMAL
-    $stmt->bindParam(':fecha', $fecha);
-    $stmt->bindParam(':detalle', $detalle);
+// Validate numeric value for monto
+if (!is_numeric($monto) || $monto <= 0) { // Changed $monto < 0 to $monto <= 0 to prevent zero monto
+    http_response_code(400);
+    echo json_encode(['error' => 'El monto debe ser un valor numérico positivo.']);
+    exit();
+}
 
+// Basic date format validation (you might want more robust validation based on your exact date format)
+if (!preg_match("/^\d{4}-\d{2}-\d{2}$/", $fecha)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'El formato de la fecha es inválido. Se espera YYYY-MM-DD.']);
+    exit();
+}
+
+
+try {
+    // Prepare the SQL INSERT statement
+    $stmt = $conn->prepare("INSERT INTO gastos_empresa (descripcion, tipo_gasto, monto, fecha, detalle) VALUES (:descripcion, :tipo_gasto, :monto, :fecha, :detalle)");
+
+    // Check if the statement preparation failed
+    if ($stmt === false) {
+        // Log the detailed error for debugging purposes (useful during development)
+        error_log("Error preparing statement for gastos_empresa: " . implode(" ", $conn->errorInfo()));
+        throw new Exception("Error al preparar la consulta."); // Generic message for client
+    }
+
+    // Bind parameters to the prepared statement
+    $stmt->bindParam(':descripcion', $descripcion, PDO::PARAM_STR);
+    $stmt->bindParam(':tipo_gasto', $tipo_gasto, PDO::PARAM_STR);
+    $stmt->bindParam(':monto', $monto, PDO::PARAM_STR); // Use PDO::PARAM_STR for DECIMAL/NUMERIC types to prevent precision issues
+    $stmt->bindParam(':fecha', $fecha, PDO::PARAM_STR);
+    $stmt->bindParam(':detalle', $detalle, PDO::PARAM_STR);
+
+    // Execute the prepared statement
     if ($stmt->execute()) {
+        // Respond with success message and the ID of the newly inserted record
         echo json_encode(['success' => true, 'message' => 'Gasto de empresa registrado exitosamente!', 'id' => $conn->lastInsertId()]);
     } else {
-        throw new Exception("Error al ejecutar la consulta: " . implode(" ", $stmt->errorInfo()));
+        // Log the detailed error for debugging purposes (useful during development)
+        error_log("Error executing statement for gastos_empresa: " . implode(" ", $stmt->errorInfo()));
+        throw new Exception("Error al ejecutar la consulta."); // Generic message for client
     }
 
-    $stmt = null;
-    $conn = null;
-
 } catch (Exception $e) {
+    // Set HTTP status code to 500 (Internal Server Error)
     http_response_code(500);
+    // Respond with the error message
     echo json_encode(['error' => $e->getMessage()]);
+} finally {
+    // Close the statement and connection in the finally block to ensure they are always closed
+    if (isset($stmt)) {
+        $stmt = null;
+    }
+    if (isset($conn)) {
+        $conn = null;
+    }
 }
 ?>

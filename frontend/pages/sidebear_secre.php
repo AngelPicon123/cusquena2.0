@@ -20,7 +20,7 @@
             <a class="nav-link" href="gestionServicio.php">Gestión de Servicios</a>
             <a class="nav-link" href="gestionProducto.php">Gestión de Productos</a>
             <a class="nav-link" href="gestionDeudas.php">Gestion de Deudas</a>
-            <a class="nav-link" href="gestionGastosLubricentro.php">Gestion de Gastos</a>
+            <a class="nav-link" href="gestionGastosLubricentros.php">Gestion de Gastos</a>
             <a class="nav-link" href="balanceLubricentro.php">Balances de Lubricentros</a>
           </nav>
         </div>

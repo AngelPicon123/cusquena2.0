@@ -51,41 +51,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderizarTabla(cotizaciones) {
-        tablaCotizaciones.innerHTML = '';
+   function renderizarTabla(cotizaciones) {
+    tablaCotizaciones.innerHTML = '';
 
-        if (cotizaciones.length === 0) {
-            tablaCotizaciones.innerHTML = '<tr><td colspan="8" class="text-center">No hay cotizaciones registradas.</td></tr>';
-            return;
-        }
-
-        cotizaciones.forEach(c => {
-            const row = tablaCotizaciones.insertRow();
-            row.insertCell().textContent = c.nombre;
-            row.insertCell().textContent = c.apellido;
-            row.insertCell().textContent = c.tipo_cotizacion;
-            row.insertCell().textContent = `S/. ${parseFloat(c.pago).toFixed(2)}`;
-            row.insertCell().textContent = c.fecha_inicio;
-            row.insertCell().textContent = c.fecha_fin;
-            row.insertCell().textContent = c.estado;
-
-            const acciones = row.insertCell();
-            const btnEditar = document.createElement('button');
-            btnEditar.className = 'btn btn-warning btn-sm me-1';
-            btnEditar.textContent = 'Editar';
-            btnEditar.onclick = () => llenarModalEditar(c);
-            acciones.appendChild(btnEditar);
-
-            const btnEliminar = document.createElement('button');
-            btnEliminar.className = 'btn btn-danger btn-sm';
-            btnEliminar.textContent = 'Eliminar';
-            btnEliminar.onclick = () => {
-                cotizacionIdToDelete = c.id;
-                modalEliminarConfirmacion.show();
-            };
-            acciones.appendChild(btnEliminar);
-        });
+    if (cotizaciones.length === 0) {
+        tablaCotizaciones.innerHTML = '<tr><td colspan="8" class="text-center">No hay cotizaciones registradas.</td></tr>';
+        return;
     }
+
+    cotizaciones.forEach(c => {
+        const row = tablaCotizaciones.insertRow();
+        row.insertCell().textContent = c.nombre;
+        row.insertCell().textContent = c.apellido;
+        row.insertCell().textContent = c.tipo_cotizacion;
+        row.insertCell().textContent = `S/. ${parseFloat(c.pago).toFixed(2)}`;
+        row.insertCell().textContent = c.fecha_inicio;
+        row.insertCell().textContent = c.fecha_fin;
+        row.insertCell().textContent = c.estado;
+
+        const acciones = row.insertCell();
+
+        // Botón Editar con icono
+        const btnEditar = document.createElement('button');
+        btnEditar.className = 'btn btn-warning btn-sm me-1';
+        btnEditar.innerHTML = '<i class="fas fa-edit"></i>'; // Icono de lápiz
+        btnEditar.title = 'Editar Cotización'; // Tooltip
+        btnEditar.onclick = () => llenarModalEditar(c);
+        acciones.appendChild(btnEditar);
+
+        // Botón Eliminar con icono
+        const btnEliminar = document.createElement('button');
+        btnEliminar.className = 'btn btn-danger btn-sm';
+        btnEliminar.innerHTML = '<i class="fas fa-trash-alt"></i>'; // Icono de bote de basura
+        btnEliminar.title = 'Eliminar Cotización'; // Tooltip
+        btnEliminar.onclick = () => {
+            cotizacionIdToDelete = c.id;
+            modalEliminarConfirmacion.show();
+        };
+        acciones.appendChild(btnEliminar);
+    });
+}
 
     formAgregar.addEventListener('submit', async e => {
         e.preventDefault();

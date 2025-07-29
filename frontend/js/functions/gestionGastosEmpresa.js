@@ -174,41 +174,47 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Renderizado y Paginación ---
 
     function renderGastos(gastos, totalGeneralMonto) {
-        tablaGastos.innerHTML = '';
-        if (gastos.length === 0) {
-            tablaGastos.innerHTML = '<tr><td colspan="7" class="text-center">No hay gastos para mostrar.</td></tr>';
-            totalGeneralSpan.textContent = `Total General: S/. 0.00`;
-            return;
-        }
-
-        gastos.forEach(gasto => {
-            const row = tablaGastos.insertRow();
-            row.insertCell().textContent = gasto.id;
-            row.insertCell().textContent = gasto.descripcion;
-            row.insertCell().textContent = gasto.tipo_gasto.charAt(0).toUpperCase() + gasto.tipo_gasto.slice(1);
-            row.insertCell().textContent = `S/. ${parseFloat(gasto.monto).toFixed(2)}`;
-            row.insertCell().textContent = gasto.fecha;
-            row.insertCell().textContent = gasto.detalle;
-
-            const actionsCell = row.insertCell();
-            const editButton = document.createElement('button');
-            editButton.className = 'btn btn-sm btn-warning me-2';
-            editButton.innerHTML = '<i class="fas fa-edit"></i> Editar';
-            editButton.addEventListener('click', () => populateEditModal(gasto));
-            actionsCell.appendChild(editButton);
-
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'btn btn-sm btn-danger';
-            deleteButton.innerHTML = '<i class="fas fa-trash"></i> Eliminar';
-            deleteButton.addEventListener('click', () => {
-                gastoIdToDelete = gasto.id;
-                modalEliminarConfirmacion.show();
-            });
-            actionsCell.appendChild(deleteButton);
-        });
-
-        totalGeneralSpan.textContent = `Total General: S/. ${parseFloat(totalGeneralMonto || 0).toFixed(2)}`;
+    tablaGastos.innerHTML = '';
+    if (gastos.length === 0) {
+        tablaGastos.innerHTML = '<tr><td colspan="7" class="text-center">No hay gastos para mostrar.</td></tr>';
+        totalGeneralSpan.textContent = `Total General: S/. 0.00`;
+        return;
     }
+
+    gastos.forEach(gasto => {
+        const row = tablaGastos.insertRow();
+        row.insertCell().textContent = gasto.id;
+        row.insertCell().textContent = gasto.descripcion;
+        // Capitaliza la primera letra del tipo de gasto
+        row.insertCell().textContent = gasto.tipo_gasto.charAt(0).toUpperCase() + gasto.tipo_gasto.slice(1);
+        row.insertCell().textContent = `S/. ${parseFloat(gasto.monto).toFixed(2)}`;
+        row.insertCell().textContent = gasto.fecha;
+        row.insertCell().textContent = gasto.detalle;
+
+        const actionsCell = row.insertCell();
+
+        // Botón Editar con icono
+        const editButton = document.createElement('button');
+        editButton.className = 'btn btn-sm btn-warning me-2';
+        editButton.innerHTML = '<i class="fas fa-edit"></i>'; 
+        editButton.title = 'Editar Gasto'; 
+        editButton.addEventListener('click', () => populateEditModal(gasto));
+        actionsCell.appendChild(editButton);
+
+        // Botón Eliminar con icono
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'btn btn-sm btn-danger';
+        deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>'; 
+        deleteButton.title = 'Eliminar Gasto'; 
+        deleteButton.addEventListener('click', () => {
+            gastoIdToDelete = gasto.id;
+            modalEliminarConfirmacion.show();
+        });
+        actionsCell.appendChild(deleteButton);
+    });
+
+    totalGeneralSpan.textContent = `Total General: S/. ${parseFloat(totalGeneralMonto || 0).toFixed(2)}`;
+}
 
     function populateEditModal(gasto) {
         document.getElementById('editGastoId').value = gasto.id;

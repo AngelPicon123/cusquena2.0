@@ -127,43 +127,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderizarTabla(coordinadores) {
-        tablaCoordinadores.innerHTML = '';
+function renderizarTabla(coordinadores) {
+    tablaCoordinadores.innerHTML = '';
 
-        if (!coordinadores || coordinadores.length === 0) {
-            tablaCoordinadores.innerHTML = '<tr><td colspan="8" class="text-center">No hay coordinadores registrados que coincidan con la búsqueda.</td></tr>';
-            return;
-        }
-
-        coordinadores.forEach(c => {
-            const row = tablaCoordinadores.insertRow();
-
-            row.insertCell().textContent = c.nombre;
-            row.insertCell().textContent = c.apellidos;
-            row.insertCell().textContent = c.paradero;
-            row.insertCell().textContent = `S/. ${parseFloat(c.monto_diario).toFixed(2)}`;
-            row.insertCell().textContent = c.fecha;
-            row.insertCell().textContent = c.estado;
-            row.insertCell().textContent = c.contacto || '';
-
-            const acciones = row.insertCell();
-
-            const btnEditar = document.createElement('button');
-            btnEditar.className = 'btn btn-warning btn-sm me-1';
-            btnEditar.textContent = 'Editar';
-            btnEditar.addEventListener('click', () => llenarModalEditar(c));
-            acciones.appendChild(btnEditar);
-
-            const btnEliminar = document.createElement('button');
-            btnEliminar.className = 'btn btn-danger btn-sm';
-            btnEliminar.textContent = 'Eliminar';
-            btnEliminar.addEventListener('click', () => {
-                idAEliminar = c.id;
-                modalEliminar.show();
-            });
-            acciones.appendChild(btnEliminar);
-        });
+    if (!coordinadores || coordinadores.length === 0) {
+        tablaCoordinadores.innerHTML = '<tr><td colspan="8" class="text-center">No hay coordinadores registrados que coincidan con la búsqueda.</td></tr>';
+        return;
     }
+
+    coordinadores.forEach(c => {
+        const row = tablaCoordinadores.insertRow();
+
+        row.insertCell().textContent = c.nombre;
+        row.insertCell().textContent = c.apellidos;
+        row.insertCell().textContent = c.paradero;
+        row.insertCell().textContent = `S/. ${parseFloat(c.monto_diario).toFixed(2)}`;
+        row.insertCell().textContent = c.fecha;
+        row.insertCell().textContent = c.estado;
+        row.insertCell().textContent = c.contacto || '';
+
+        const acciones = row.insertCell();
+
+        // Botón Editar con icono
+        const btnEditar = document.createElement('button');
+        btnEditar.className = 'btn btn-warning btn-sm me-1';
+        btnEditar.innerHTML = '<i class="fas fa-edit"></i>'; // Icono de lápiz
+        btnEditar.title = 'Editar Coordinador'; // Tooltip para accesibilidad
+        btnEditar.addEventListener('click', () => llenarModalEditar(c));
+        acciones.appendChild(btnEditar);
+
+        // Botón Eliminar con icono
+        const btnEliminar = document.createElement('button');
+        btnEliminar.className = 'btn btn-danger btn-sm';
+        btnEliminar.innerHTML = '<i class="fas fa-trash-alt"></i>'; // Icono de bote de basura
+        btnEliminar.title = 'Eliminar Coordinador'; // Tooltip para accesibilidad
+        btnEliminar.addEventListener('click', () => {
+            idAEliminar = c.id;
+            modalEliminar.show();
+        });
+        acciones.appendChild(btnEliminar);
+    });
+}
 
     function llenarModalEditar(coordinador) {
         document.getElementById('editCoordinadorId').value = coordinador.id;

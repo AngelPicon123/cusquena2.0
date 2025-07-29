@@ -97,38 +97,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderAlquileres(alquileres) {
-        tablaAlquileres.innerHTML = '';
-        if (!alquileres.length) {
-            tablaAlquileres.innerHTML = '<tr><td colspan="8">No hay alquileres para mostrar.</td></tr>';
-            return;
-        }
-
-        alquileres.forEach(alquiler => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${alquiler.id}</td>
-                <td>${alquiler.nombre}</td>
-                <td>${alquiler.tipo}</td>
-                <td>${alquiler.fecha_inicio}</td>
-                <td>${alquiler.periodicidad}</td>
-                <td>S/. ${parseFloat(alquiler.pago).toFixed(2)}</td>
-                <td>${alquiler.estado}</td>
-                <td>
-                    <button class="btn btn-sm btn-warning me-2" data-id="${alquiler.id}">Editar</button>
-                    <button class="btn btn-sm btn-danger" data-id="${alquiler.id}">Eliminar</button>
-                </td>`;
-
-            const [editBtn, deleteBtn] = row.querySelectorAll('button');
-
-            editBtn.addEventListener('click', () => populateEditModal(alquiler));
-            deleteBtn.addEventListener('click', () => {
-                alquilerIdToDelete = alquiler.id;
-                modalEliminarConfirmacion.show();
-            });
-
-            tablaAlquileres.appendChild(row);
-        });
+    tablaAlquileres.innerHTML = '';
+    if (!alquileres.length) {
+        tablaAlquileres.innerHTML = '<tr><td colspan="8" class="text-center">No hay alquileres para mostrar.</td></tr>'; // Agregado text-center para mejor UX
+        return;
     }
+
+    alquileres.forEach(alquiler => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${alquiler.id}</td>
+            <td>${alquiler.nombre}</td>
+            <td>${alquiler.tipo}</td>
+            <td>${alquiler.fecha_inicio}</td>
+            <td>${alquiler.periodicidad}</td>
+            <td>S/. ${parseFloat(alquiler.pago).toFixed(2)}</td>
+            <td>${alquiler.estado}</td>
+            <td>
+                <button class="btn btn-sm btn-warning me-2" data-id="${alquiler.id}" title="Editar">
+                    <i class="fas fa-edit"></i> </button>
+                <button class="btn btn-sm btn-danger" data-id="${alquiler.id}" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i> </button>
+            </td>`;
+
+        // Los selectores ahora deben ser más específicos si la estructura HTML cambia y no solo son botones
+        // Aunque en este caso sigue siendo el primer y segundo botón, es buena práctica ser explícito.
+        const editBtn = row.querySelector('.btn-warning');
+        const deleteBtn = row.querySelector('.btn-danger');
+
+        editBtn.addEventListener('click', () => populateEditModal(alquiler));
+        deleteBtn.addEventListener('click', () => {
+            alquilerIdToDelete = alquiler.id;
+            modalEliminarConfirmacion.show();
+        });
+
+        tablaAlquileres.appendChild(row);
+    });
+}
 
     function populateEditModal(alquiler) {
         document.getElementById('editAlquilerId').value = alquiler.id;

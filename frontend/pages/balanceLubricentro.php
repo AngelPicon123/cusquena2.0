@@ -151,10 +151,10 @@ verificarPermiso(['Administrador', 'Secretaria']);
                 <button class="btn btn-primary" id="btnBuscar">Buscar</button>
               </div>
               <div>
-                <button class="btn-custom me-2" id="btnImprimir">Imprimir</button>
-                <button class="btn-custom me-2" id="btnExportarPDF">Exportar PDF</button>
+                <button class="btn btn-secondary me-2" id="btnImprimir"> Imprimir</button>
+                <button class="btn btn-info text-white me-2" id="btnExportarPDF">Exportar PDF</button>
                 <?php if ($_SESSION['rol'] === 'Administrador'): ?>
-                <a href="#" class="btn-custom" data-bs-toggle="modal" data-bs-target="#modalAgregarBalance">Agregar Balance</a>
+                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregarBalance">Agregar Balance</a>
                 <?php endif; ?>
               </div>
             </div>

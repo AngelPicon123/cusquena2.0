@@ -1,7 +1,4 @@
-
-
 document.addEventListener('DOMContentLoaded', () => {
-    // Corrected API path from your PHP comments in listar.php (assuming this is the correct structure)
     const API_BASE_URL = 'http://localhost/cusquena/backend/api/controllers/vista_gestion_cotizaciones/';
 
     const tablaCotizaciones = document.getElementById('tablaCotizaciones');
@@ -11,17 +8,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
     const modalEliminarConfirmacion = new bootstrap.Modal(document.getElementById('modalEliminarConfirmacion'));
     const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminar');
-    const totalGeneralPago = document.getElementById('totalGeneral'); 
+    const totalGeneralPago = document.getElementById('totalGeneral');
 
-    
     const toastSuccess = new bootstrap.Toast(document.getElementById('toastSuccess'));
     const toastError = new bootstrap.Toast(document.getElementById('toastError'));
     const toastSuccessBody = document.getElementById('toastSuccessBody');
     const toastErrorBody = document.getElementById('toastErrorBody');
 
-    let cotizacionIdToDelete = null; 
+    // Filtros
+    const filterNombre = document.getElementById('filterNombre');
+    const filterTipoCotizacion = document.getElementById('filterTipoCotizacion');
+    const filterEstado = document.getElementById('filterEstado');
+    const filterFechaInicio = document.getElementById('filterFechaInicio');
+    const filterFechaFin = document.getElementById('filterFechaFin');
+    const btnBuscarCotizaciones = document.getElementById('btnBuscarCotizaciones');
 
-    
+    let cotizacionIdToDelete = null;
+
+    /**
+     * Muestra una notificación tipo "toast".
+     * @param {string} type - 'success' o 'error'.
+     * @param {string} message - El mensaje a mostrar.
+     */
     function showToast(type, message) {
         if (type === 'success') {
             toastSuccessBody.textContent = message;
@@ -32,65 +40,111 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function cargarCotizaciones() {
-        try {
-            const response = await fetch(`${API_BASE_URL}listar.php`);
-            const data = await response.json();
-            renderizarTabla(data.cotizaciones || []);
+    /**
+     * Devuelve el HTML para una etiqueta de estado con colores.
+     * @param {string} estado
+     * @returns {string}
+     */
+    function getBadgeEstado(estado) {
+        const estadoNormalizado = estado.toLowerCase().trim();
+        switch (estadoNormalizado) {
+            case 'aprobada':
+            case 'pagada':
+                return `<span class="badge bg-success">Pagada</span>`;
+            case 'pendiente':
+                return `<span class="badge bg-warning text-dark">Pendiente</span>`;
+            case 'rechazada':
+                return `<span class="badge bg-danger">Rechazada</span>`;
+            default:
+                return `<span class="badge bg-secondary">${estado}</span>`;
+        }
+    }
 
-       
-            if (data.totalGlobal !== undefined) {
-                totalGeneralPago.textContent = `Total General: S/. ${parseFloat(data.totalGlobal).toFixed(2)}`;
-            } else {
-                totalGeneralPago.textContent = 'Total General: S/. 0.00';
+    /**
+     * Carga y renderiza las cotizaciones desde la API, aplicando filtros si se especifican.
+     * @param {object} params - Objeto con los parámetros de filtro.
+     */
+    async function fetchAndRenderCotizaciones(params = {}) {
+        const query = new URLSearchParams(params).toString();
+        const url = `${API_BASE_URL}listar.php?${query}`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-          
+            const data = await response.json();
+            const cotizaciones = data.cotizaciones || [];
+
+            renderizarTabla(cotizaciones);
+            actualizarTotal(cotizaciones, params.estado);
         } catch (error) {
             console.error('Error al cargar cotizaciones:', error);
             showToast('error', 'Error al cargar las cotizaciones. Inténtalo de nuevo.');
         }
     }
 
-   function renderizarTabla(cotizaciones) {
-    tablaCotizaciones.innerHTML = '';
+    /**
+     * Renderiza la tabla con los datos de las cotizaciones.
+     * @param {Array} cotizaciones - Array de objetos de cotización.
+     */
+    function renderizarTabla(cotizaciones) {
+        tablaCotizaciones.innerHTML = '';
 
-    if (cotizaciones.length === 0) {
-        tablaCotizaciones.innerHTML = '<tr><td colspan="8" class="text-center">No hay cotizaciones registradas.</td></tr>';
-        return;
+        if (cotizaciones.length === 0) {
+            tablaCotizaciones.innerHTML = '<tr><td colspan="8" class="text-center">No hay cotizaciones registradas.</td></tr>';
+            return;
+        }
+
+        cotizaciones.forEach(c => {
+            const row = tablaCotizaciones.insertRow();
+            row.insertCell().textContent = c.nombre;
+            row.insertCell().textContent = c.apellido;
+            row.insertCell().textContent = c.tipo_cotizacion;
+            row.insertCell().textContent = `S/. ${parseFloat(c.pago).toFixed(2)}`;
+
+            row.insertCell().textContent = new Date(c.fecha_inicio).toLocaleDateString('es-ES');
+            row.insertCell().textContent = new Date(c.fecha_fin).toLocaleDateString('es-ES');
+
+            const estadoCell = row.insertCell();
+            estadoCell.innerHTML = getBadgeEstado(c.estado);
+
+            const acciones = row.insertCell();
+
+            const btnEditar = document.createElement('button');
+            btnEditar.className = 'btn btn-warning btn-sm me-1';
+            btnEditar.innerHTML = '<i class="fas fa-edit"></i>';
+            btnEditar.title = 'Editar Cotización';
+            btnEditar.onclick = () => llenarModalEditar(c);
+            acciones.appendChild(btnEditar);
+
+            const btnEliminar = document.createElement('button');
+            btnEliminar.className = 'btn btn-danger btn-sm';
+            btnEliminar.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            btnEliminar.title = 'Eliminar Cotización';
+            btnEliminar.onclick = () => {
+                cotizacionIdToDelete = c.id;
+                modalEliminarConfirmacion.show();
+            };
+            acciones.appendChild(btnEliminar);
+        });
     }
 
-    cotizaciones.forEach(c => {
-        const row = tablaCotizaciones.insertRow();
-        row.insertCell().textContent = c.nombre;
-        row.insertCell().textContent = c.apellido;
-        row.insertCell().textContent = c.tipo_cotizacion;
-        row.insertCell().textContent = `S/. ${parseFloat(c.pago).toFixed(2)}`;
-        row.insertCell().textContent = c.fecha_inicio;
-        row.insertCell().textContent = c.fecha_fin;
-        row.insertCell().textContent = c.estado;
+    /**
+     * Calcula y actualiza el total general de pagos de las cotizaciones.
+     * @param {Array} cotizaciones - Array de objetos de cotización.
+     * @param {string} estadoFiltrado - Estado por el cual se filtra (opcional).
+     */
+    function actualizarTotal(cotizaciones, estadoFiltrado) {
+        let total = 0;
 
-        const acciones = row.insertCell();
-
-        // Botón Editar con icono
-        const btnEditar = document.createElement('button');
-        btnEditar.className = 'btn btn-warning btn-sm me-1';
-        btnEditar.innerHTML = '<i class="fas fa-edit"></i>'; // Icono de lápiz
-        btnEditar.title = 'Editar Cotización'; // Tooltip
-        btnEditar.onclick = () => llenarModalEditar(c);
-        acciones.appendChild(btnEditar);
-
-        // Botón Eliminar con icono
-        const btnEliminar = document.createElement('button');
-        btnEliminar.className = 'btn btn-danger btn-sm';
-        btnEliminar.innerHTML = '<i class="fas fa-trash-alt"></i>'; // Icono de bote de basura
-        btnEliminar.title = 'Eliminar Cotización'; // Tooltip
-        btnEliminar.onclick = () => {
-            cotizacionIdToDelete = c.id;
-            modalEliminarConfirmacion.show();
-        };
-        acciones.appendChild(btnEliminar);
-    });
-}
+        cotizaciones.forEach(c => {
+            if (!estadoFiltrado || c.estado.toLowerCase().trim() === estadoFiltrado) {
+                total += parseFloat(c.pago);
+            }
+        });
+        totalGeneralPago.textContent = `Total General: S/. ${total.toFixed(2)}`;
+    }
 
     formAgregar.addEventListener('submit', async e => {
         e.preventDefault();
@@ -108,8 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 modalAgregar.hide();
                 formAgregar.reset();
-                cargarCotizaciones();
-                showToast('success', '✅Cotización registrada exitosamente.');
+                fetchAndRenderCotizaciones();
+                showToast('success', '✅ Cotización registrada exitosamente.');
             } else {
                 showToast('error', data.error || 'Error al registrar la cotización.');
             }
@@ -147,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (data.success) {
                 modalEditar.hide();
-                cargarCotizaciones();
+                fetchAndRenderCotizaciones();
                 showToast('success', '✅ Cotización actualizada exitosamente.');
             } else {
                 showToast('error', data.error || 'Error al actualizar la cotización.');
@@ -170,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 if (data.success) {
                     modalEliminarConfirmacion.hide();
-                    cargarCotizaciones();
+                    fetchAndRenderCotizaciones();
                     showToast('success', '✅ Cotización eliminada exitosamente.');
                 } else {
                     showToast('error', data.error || 'Error al eliminar la cotización.');
@@ -184,52 +238,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    cargarCotizaciones();
+    // Carga inicial de las cotizaciones
+    fetchAndRenderCotizaciones();
 
-   
-    const filterFechaInicio = document.getElementById('filterFechaInicio');
-    const filterFechaFin = document.getElementById('filterFechaFin');
-    const filterNombre = document.getElementById('filterNombre');
-    const btnBuscarCotizaciones = document.getElementById('btnBuscarCotizaciones');
+    // Event listener para el botón de búsqueda
+    btnBuscarCotizaciones.addEventListener('click', () => {
+        const params = {
+            nombre_apellido: filterNombre.value.trim(),
+            tipo_cotizacion: filterTipoCotizacion.value,
+            estado: filterEstado.value,
+            fecha_inicio: filterFechaInicio.value,
+            fecha_fin: filterFechaFin.value
+        };
 
-    btnBuscarCotizaciones.addEventListener('click', async () => {
-        const fechaInicio = filterFechaInicio.value;
-        const fechaFin = filterFechaFin.value;
-        const nombreApellido = filterNombre.value.trim();
-
-        let url = `${API_BASE_URL}listar.php?`;
-        const params = [];
-
-        if (fechaInicio) {
-            params.push(`fecha_inicio=${fechaInicio}`);
-        }
-        if (fechaFin) {
-            params.push(`fecha_fin=${fechaFin}`);
-        }
-        if (nombreApellido) {
-            params.push(`nombre_apellido=${encodeURIComponent(nombreApellido)}`);
-        }
-
-        url += params.join('&');
-
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            renderizarTabla(data.cotizaciones || []);
-            
-            if (data.totalGlobal !== undefined) {
-                totalGeneralPago.textContent = `Total General: S/. ${parseFloat(data.totalGlobal).toFixed(2)}`;
-            } else {
-                totalGeneralPago.textContent = 'Total General: S/. 0.00';
+        // Elimina los parámetros vacíos antes de enviar la solicitud
+        for (const key in params) {
+            if (!params[key]) {
+                delete params[key];
             }
-           
-        } catch (error) {
-            console.error('Error al buscar cotizaciones:', error);
-            showToast('error', 'Error al buscar cotizaciones. Inténtalo de nuevo.');
         }
+        fetchAndRenderCotizaciones(params);
     });
 
-  
+    // Event listeners para los selectores de filtro que recargan la tabla
+    filterTipoCotizacion.addEventListener('change', () => {
+        btnBuscarCotizaciones.click();
+    });
+
+    filterEstado.addEventListener('change', () => {
+        btnBuscarCotizaciones.click();
+    });
+
+
     document.getElementById('btnPrintTable').addEventListener('click', () => {
         const tableToPrint = document.getElementById('cotizacionesTable').outerHTML;
         const printWindow = window.open('', '', 'height=600,width=800');
@@ -246,13 +286,12 @@ document.addEventListener('DOMContentLoaded', () => {
         printWindow.document.write('</style></head><body>');
         printWindow.document.write('<h1 style="text-align: center;">Reporte de Cotizaciones</h1>');
         printWindow.document.write(tableToPrint);
-        printWindow.document.write(`<p style="text-align: right; margin-top: 20px;">Total General: ${totalGeneralPago.textContent.replace('Total General: ', '')}</p>`);
+        printWindow.document.write(`<p style="text-align: right; margin-top: 20px;">${totalGeneralPago.textContent}</p>`);
         printWindow.document.write('</body></html>');
         printWindow.document.close();
         printWindow.print();
     });
 
-    
     document.getElementById('btnExportPdf').addEventListener('click', () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -265,14 +304,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const data = rows.slice(1).map(row => {
             const cells = Array.from(row.querySelectorAll('td'));
-            
-           
-            
             return cells.slice(0, -1).map(cell => cell.innerText);
         });
 
-       
-        const columns = headers.slice(0, -1); 
+        const columns = headers.slice(0, -1);
 
         doc.autoTable({
             head: [columns],
@@ -281,12 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
             theme: 'striped',
             styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
             headStyles: { fillColor: [33, 37, 41] },
-            columnStyles: {
-                
-                
-            }
+            columnStyles: {}
         });
-
 
         doc.text(totalGeneralPago.textContent, 14, doc.autoTable.previous.finalY + 10);
         doc.save("cotizaciones.pdf");

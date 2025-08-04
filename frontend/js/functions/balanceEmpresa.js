@@ -6,36 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_BASE_URL = 'http://localhost/cusquena/backend/api/controllers/vista_balance_empresa/';
 
     // --- Elementos del DOM ---
-
-    // Tabla principal de balance (le agregamos el ID en el HTML anterior)
     const tablaBalance = document.getElementById('tablaBalance').querySelector('tbody');
-    if (!tablaBalance) {
-        console.error("Error: No se encontró el tbody de la tabla con ID 'tablaBalance'.");
-        return;
-    }
-
-    // Elementos de formularios y modales
     const formAgregarBalance = document.getElementById('formAgregarBalance');
-    const formEditarBalance = document.getElementById('formEditarBalance'); // Asegúrate de que este ID existe en tu HTML
-    if (!formEditarBalance) {
-        console.error("Error: No se encontró el formulario de edición con ID 'formEditarBalance'.");
-        return;
-    }
-
-    // Instancias de modales de Bootstrap
+    const formEditarBalance = document.getElementById('formEditarBalance');
     const modalAgregarBalance = new bootstrap.Modal(document.getElementById('modalAgregarBalance'));
     const modalEditarBalance = new bootstrap.Modal(document.getElementById('modalEditarBalance'));
     const eliminarModalBalance = new bootstrap.Modal(document.getElementById('eliminarModalBalance'));
-
-    // Botones de confirmación de eliminación
     const btnConfirmarEliminarBalance = document.getElementById('confirmarEliminarBalance');
 
     // Elementos de búsqueda/filtrado
     const buscarNombreInput = document.getElementById('buscarNombre');
     const buscarMesSelect = document.getElementById('buscarMes');
-    const buscarAnioInput = document.getElementById('buscarAnio'); // Asumo que tienes un input para el año en tus filtros
+    const buscarAnioInput = document.getElementById('buscarAnio');
+    const filterTipoBalanceSelect = document.getElementById('filterTipoBalance'); // Nuevo selector para el tipo de balance
     const btnBuscar = document.getElementById('btnBuscar');
 
+    // Elementos para notificaciones
     const toastSuccess = new bootstrap.Toast(document.getElementById('toastSuccess') || {});
     const toastError = new bootstrap.Toast(document.getElementById('toastError') || {});
     const toastSuccessBody = document.getElementById('toastSuccessBody');
@@ -44,11 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Elemento para el total general
     const totalGeneralElement = document.getElementById('totalGeneral');
 
-    // Variable para almacenar el ID del balance a eliminar
     let balanceIdAEliminar = null;
 
     // --- Funciones de Utilidad ---
-
     function showToast(type, message) {
         if (type === 'success' && toastSuccessBody) {
             toastSuccessBody.textContent = message;
@@ -64,21 +48,34 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetForm(form) {
         form.reset();
         form.querySelectorAll('select').forEach(select => {
-            if (select.options.length > 0) {
-                select.selectedIndex = Array.from(select.options).findIndex(option => option.value === "") !== -1 ?
-                                            Array.from(select.options).findIndex(option => option.value === "") :
-                                            0;
-            }
+            select.selectedIndex = 0;
         });
     }
 
-    // --- Carga y Renderizado de la Tabla de Balance ---
+    function actualizarTotalGeneral(total) {
+        if (totalGeneralElement) {
+            totalGeneralElement.textContent = `Total General: S/. ${parseFloat(total).toFixed(2)}`;
+        }
+    }
 
+    // --- Carga y Renderizado de la Tabla de Balance ---
     async function cargarBalances(filtros = {}) {
         try {
             const params = new URLSearchParams(filtros);
-            const response = await fetch(`${API_BASE_URL}listar.php?${params.toString()}`);
+            
+            // Construir la URL de forma segura, agregando solo los filtros que tienen valor
+            let queryString = '';
+            const filtroArray = [];
+            for (const key in filtros) {
+                if (filtros[key] && filtros[key].trim() !== '') {
+                    filtroArray.push(`${encodeURIComponent(key)}=${encodeURIComponent(filtros[key])}`);
+                }
+            }
+            if (filtroArray.length > 0) {
+                queryString = `?${filtroArray.join('&')}`;
+            }
 
+            const response = await fetch(`${API_BASE_URL}listar.php${queryString}`);
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Error HTTP: ${response.status} - ${errorText}`);
@@ -88,8 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.success) {
                 renderizarTablaBalance(data.balances || []);
-                // CAMBIO AQUÍ: Usar 'total_general_monto' si es lo que devuelve listar.php
-                actualizarTotalGeneral(data.total_general_monto || 0); 
+                actualizarTotalGeneral(data.total_general_monto || 0);
             } else {
                 showToast('error', data.error || '❌ Error al obtener los balances.');
                 renderizarTablaBalance([]);
@@ -116,14 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = tablaBalance.insertRow();
             row.insertCell().textContent = b.nombre_descripcion;
             row.insertCell().textContent = b.tipo_balance;
-
-            const mesAnioDisplay = `${b.mes || ''} ${b.anio || ''}`.trim();
-            row.insertCell().textContent = mesAnioDisplay;
-
+            row.insertCell().textContent = `${b.mes || ''} ${b.anio || ''}`.trim();
             row.insertCell().textContent = `S/. ${parseFloat(b.monto).toFixed(2)}`;
 
             const accionesCell = row.insertCell();
 
+            // Botones de acción
             const btnEditar = document.createElement('button');
             btnEditar.className = 'btn btn-warning btn-sm me-1';
             btnEditar.innerHTML = '<i class="fas fa-edit"></i>';
@@ -143,13 +137,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function actualizarTotalGeneral(total) {
-        if (totalGeneralElement) {
-            totalGeneralElement.textContent = `Total General: S/. ${parseFloat(total).toFixed(2)}`;
-        }
+    // Función unificada para aplicar filtros
+    function aplicarFiltros() {
+        const filtros = {
+            nombre: buscarNombreInput.value.trim(),
+            mes: buscarMesSelect.value,
+            anio: buscarAnioInput.value,
+            tipo_balance: filterTipoBalanceSelect.value // Incluimos el nuevo filtro
+        };
+        cargarBalances(filtros);
     }
 
-    // --- Manejo de Formularios ---
+    // --- Manejo de Eventos ---
 
     // Manejo del formulario de agregar balance
     formAgregarBalance.addEventListener('submit', async e => {
@@ -169,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalAgregarBalance.hide();
                 resetForm(formAgregarBalance);
                 showToast('success', '✅ Balance registrado exitosamente.');
-                cargarBalances();
+                aplicarFiltros(); // Recargamos la tabla con los filtros actuales
             } else {
                 showToast('error', data.error || '❌ Error al registrar el balance.');
             }
@@ -195,11 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         const mesNumerico = mesesNumericos[balance.mes];
         
-        // Asumiendo que `balance.anio` ahora viene de la BD
         if (mesNumerico && balance.anio) {
             document.getElementById('edit_mes').value = `${balance.anio}-${mesNumerico}`;
         } else {
-            // Si falta el mes o el año, inicializa con una cadena vacía o un valor por defecto
             document.getElementById('edit_mes').value = ''; 
             console.warn("Mes o año no disponibles para pre-llenar el input de edición.", balance);
         }
@@ -208,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modalEditarBalance.show();
     }
 
-    // AÑADIDO: Manejo del formulario de editar balance
+    // Manejo del formulario de editar balance
     formEditarBalance.addEventListener('submit', async e => {
         e.preventDefault();
         const formData = new FormData(formEditarBalance);
@@ -225,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 modalEditarBalance.hide();
                 showToast('success', '✅ Balance actualizado exitosamente.');
-                cargarBalances(); // Recargar la tabla para ver los cambios
+                aplicarFiltros(); // Recargar la tabla para ver los cambios
             } else {
                 showToast('error', data.error || '❌ Error al actualizar el balance.');
             }
@@ -235,8 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Resto del código (sin cambios importantes para la actualización) ---
-
+    // Manejo del botón de confirmación de eliminación
     btnConfirmarEliminarBalance.addEventListener('click', async () => {
         if (!balanceIdAEliminar) {
             showToast('error', '❌ No se encontró el ID del balance a eliminar.');
@@ -257,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 showToast('success', '✅ Balance eliminado exitosamente!');
                 balanceIdAEliminar = null;
-                cargarBalances();
+                aplicarFiltros();
             } else {
                 showToast('error', data.error || '❌ Error al eliminar el balance.');
             }
@@ -267,29 +263,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    btnBuscar.addEventListener('click', () => {
-        const filtros = {
-            nombre: buscarNombreInput.value.trim(),
-            mes: buscarMesSelect.value,
-            anio: buscarAnioInput.value
-        };
-        cargarBalances(filtros);
-    });
+    // Eventos de los filtros para que la tabla se actualice dinámicamente
+    btnBuscar.addEventListener('click', aplicarFiltros);
+    buscarNombreInput.addEventListener('input', aplicarFiltros);
+    buscarMesSelect.addEventListener('change', aplicarFiltros);
+    buscarAnioInput.addEventListener('input', aplicarFiltros);
+    filterTipoBalanceSelect.addEventListener('change', aplicarFiltros); // Escucha el cambio en el nuevo filtro
 
-    buscarMesSelect.addEventListener('change', () => cargarBalances({
-        nombre: buscarNombreInput.value.trim(),
-        mes: buscarMesSelect.value,
-        anio: buscarAnioInput.value
-    }));
-    buscarAnioInput.addEventListener('change', () => cargarBalances({
-        nombre: buscarNombreInput.value.trim(),
-        mes: buscarMesSelect.value,
-        anio: buscarAnioInput.value
-    }));
-
-
+    // Carga inicial de la tabla al cargar la página
     cargarBalances();
 
+    // Lógica del sidebar de bootstrap
     const sidebarToggle = document.body.querySelector('#sidebarToggle');
     if (sidebarToggle) {
         sidebarToggle.addEventListener('click', event => {
@@ -298,25 +282,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Funcionalidad de impresión y exportar a PDF
     const btnImprimir = document.getElementById('btnImprimir');
     const btnExportarPDF = document.getElementById('btnExportarPDF');
 
     if (btnImprimir) {
         btnImprimir.addEventListener('click', () => {
-            // Se quitó el showToast que decía "Función de Imprimir aún no implementada."
-            window.print(); // Esta es la función clave para imprimir
-            console.log("Imprimiendo balance...");
+            window.print();
         });
     }
 
     if (btnExportarPDF) {
         btnExportarPDF.addEventListener('click', () => {
-            showToast('info', 'Función de Exportar PDF aún no implementada.');
-            console.log("Exportar balance a PDF...");
             exportarBalanceAPDF();
         });
     }
-
+    
     function exportarBalanceAPDF() {
         if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
             showToast('error', 'Error: jspdf library not loaded. Make sure the script is included.');
@@ -326,15 +307,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-
+        
+        doc.setFontSize(18);
         doc.text("Reporte de Balance de Empresa", 14, 20);
 
         const head = [['Nombre / Descripción', 'Tipo de Balance', 'Mes', 'Monto']];
-
         const body = [];
         const rows = tablaBalance.querySelectorAll('tr');
         rows.forEach(row => {
-            if (row.cells.length > 1) { // Asegúrate de que no estás seleccionando la fila de "No hay balances"
+            if (row.cells.length > 1) {
                 const rowData = [];
                 rowData.push(row.cells[0].textContent);
                 rowData.push(row.cells[1].textContent);

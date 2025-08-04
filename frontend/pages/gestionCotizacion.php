@@ -105,22 +105,40 @@ if (isset($_SESSION['rol'])) {
                     <h1 class="mt-4 text-center mb-4">Gestión de Cotizaciones</h1>
                     <div class="row">
                         <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center">
-                            <div class="d-flex flex-column flex-md-row align-items-center mb-3 mb-md-0">
-                                <label for="filterFechaInicio" class="me-2">Inicio:</label>
-                                <input type="date" id="filterFechaInicio" class="form-control me-2">
-                                <label for="filterFechaFin" class="me-2">Fin:</label>
-                                <input type="date" id="filterFechaFin" class="form-control me-2">
-                                <input type="text" class="form-control me-2" id="filterNombre" placeholder="Buscar por Nombre/Apellido">
-                                <button class="btn btn-primary" id="btnBuscarCotizaciones">Buscar</button>
+                            <div class="d-flex flex-column flex-md-row align-items-center mb-2 mb-md-0 gap-2">
+                                <input type="text" class="form-control form-control-sm" id="filterNombre" placeholder="Buscar por Nombre/Apellido">
+                                
+                                <select class="form-select form-select-sm" id="filterTipoCotizacion">
+                                    <option value="">Tipo de Cotización</option>
+                                    <option value="servicios">Servicios</option>
+                                    <option value="producto">Producto</option>
+                                </select>
+                                
+                                <select class="form-select form-select-sm" id="filterEstado">
+                                    <option value="">Estado</option>
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="pagada">Pagada</option>
+                                </select>
+                                
+                                <div class="d-flex align-items-center gap-2">
+                                    <label for="filterFechaInicio">Inicio:</label>
+                                    <input type="date" id="filterFechaInicio" class="form-control form-control-sm">
+                                    
+                                    <label for="filterFechaFin">Fin:</label>
+                                    <input type="date" id="filterFechaFin" class="form-control form-control-sm">
+                                </div>
+
+                                <button class="btn btn-primary btn-sm" id="btnBuscarCotizaciones">Buscar</button>
                             </div>
+                            
                             <div class="d-flex flex-column flex-md-row gap-2">
-                                <button class="btn btn-secondary" id="btnPrintTable">Imprimir</button>
-                                <button class="btn btn-info text-white" id="btnExportPdf">Exportar PDF</button>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregar">Agregar Cotización</button>
+                                <button class="btn btn-secondary btn-sm" id="btnPrintTable">Imprimir</button>
+                                <button class="btn btn-info btn-sm text-white" id="btnExportPdf">Exportar PDF</button>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalAgregar">Agregar</button>
                             </div>
                         </div>
                     </div>
-                    <!-- Modal Agregar -->
+                        <!-- Modal Agregar -->
                     <div class="modal fade" id="modalAgregar" tabindex="-1" aria-labelledby="modalAgregarLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">

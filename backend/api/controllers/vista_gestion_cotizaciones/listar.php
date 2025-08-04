@@ -1,5 +1,5 @@
 <?php
-// C:\xampp\htdocs\cusquena\backend\api\controllers\gestion_cotizaciones\listar.php
+// C:\xampp\htdocs\cusquena\backend\api\controllers\vista_gestion_cotizaciones\listar.php
 
 require_once __DIR__ . '/../../../includes/db.php';
 require_once __DIR__ . '/../../../includes/auth.php';
@@ -10,7 +10,9 @@ header('Content-Type: application/json');
 verificarPermiso(['Administrador', 'Secretaria']);
 
 // Obtener parámetros de filtro y paginación de la URL
-$nombre_apellido = $_GET['nombre_apellido'] ?? ''; // Ahora buscará en nombre O apellido
+$nombre_apellido = $_GET['nombre_apellido'] ?? '';
+$tipo_cotizacion = $_GET['tipo_cotizacion'] ?? ''; 
+$estado = $_GET['estado'] ?? '';                   
 $fecha_inicio = $_GET['fecha_inicio'] ?? '';
 $fecha_fin = $_GET['fecha_fin'] ?? '';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -18,14 +20,26 @@ $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
 $offset = ($page - 1) * $limit;
 
 try {
-    $conditions = []; // Array para almacenar las condiciones SQL
-    $params = [];     // Array para almacenar los parámetros de la consulta
+    $conditions = []; 
+    $params = [];     
 
     // Filtro por nombre o apellido
     if (!empty($nombre_apellido)) {
         $conditions[] = "(nombre LIKE ? OR apellido LIKE ?)";
         $params[] = "%" . $nombre_apellido . "%";
         $params[] = "%" . $nombre_apellido . "%";
+    }
+
+    // Filtro por tipo de cotización 
+    if (!empty($tipo_cotizacion)) {
+        $conditions[] = "tipo_cotizacion = ?";
+        $params[] = $tipo_cotizacion;
+    }
+
+    // Filtro por estado 
+    if (!empty($estado)) {
+        $conditions[] = "estado = ?";
+        $params[] = $estado;
     }
 
     // Filtro por fecha de inicio
@@ -41,7 +55,7 @@ try {
     }
 
     // Construir la cláusula WHERE
-    $whereClause = "WHERE 1=1"; // Siempre true para facilitar la adición de condiciones
+    $whereClause = "WHERE 1=1";
     if (!empty($conditions)) {
         $whereClause .= " AND " . implode(" AND ", $conditions);
     }
@@ -50,7 +64,7 @@ try {
     $sqlTotal = "SELECT COUNT(*) FROM cotizaciones $whereClause";
     $stmtTotal = $conn->prepare($sqlTotal);
     $stmtTotal->execute($params);
-    $totalRecords = $stmtTotal->fetchColumn(); // Número total de cotizaciones que cumplen los filtros
+    $totalRecords = $stmtTotal->fetchColumn();
     $stmtTotal = null;
 
     // --- Obtener el Total General de Pagos de los Registros Filtrados ---
@@ -58,24 +72,21 @@ try {
     $stmtPago = $conn->prepare($sqlTotalPago);
     $stmtPago->execute($params);
     $totalGeneralPago = $stmtPago->fetchColumn();
-    // Asegurarse de que el total sea un flotante y no null
     $totalGeneralPago = $totalGeneralPago !== null ? (float)$totalGeneralPago : 0.00;
     $stmtPago = null;
 
     // --- Obtener los Datos de Cotizaciones Paginados y Filtrados ---
     $sql = "SELECT id, nombre, apellido, tipo_cotizacion, pago, fecha_inicio, fecha_fin, estado
-            FROM cotizaciones $whereClause
-            ORDER BY fecha_inicio DESC, apellido ASC
-            LIMIT ? OFFSET ?";
+             FROM cotizaciones $whereClause
+             ORDER BY fecha_inicio DESC, apellido ASC
+             LIMIT ? OFFSET ?";
     $stmt = $conn->prepare($sql);
 
     // VINCULAR PARÁMETROS DINÁMICAMENTE:
-    // Primero, los parámetros de las condiciones de filtro
     $paramIndex = 1;
     foreach ($params as $val) {
         $stmt->bindValue($paramIndex++, $val);
     }
-    // Luego, los parámetros de LIMIT y OFFSET
     $stmt->bindValue($paramIndex++, $limit, PDO::PARAM_INT);
     $stmt->bindValue($paramIndex++, $offset, PDO::PARAM_INT);
 
@@ -95,7 +106,7 @@ try {
         'totalRecords' => $totalRecords,
         'totalPages' => $totalPages,
         'currentPage' => $page,
-        'totalGlobal' => $totalGeneralPago // Renombrado para coincidir con tu JS
+        'totalGlobal' => $totalGeneralPago
     ]);
 
 } catch (Exception $e) {

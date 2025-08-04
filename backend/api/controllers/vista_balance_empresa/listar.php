@@ -8,7 +8,8 @@ verificarPermiso(['Administrador', 'Secretaria']);
 
 $nombre_filtro = $_GET['nombre'] ?? '';
 $mes_filtro_num = $_GET['mes'] ?? '';
-$anio_filtro = $_GET['anio'] ?? ''; // AÑADIDO: Para filtrar por año
+$anio_filtro = $_GET['anio'] ?? '';
+$tipo_balance_filtro = $_GET['tipo_balance'] ?? ''; // CORRECCIÓN: Agregado para obtener el tipo de balance
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
 $offset = ($page - 1) * $limit;
@@ -37,17 +38,22 @@ try {
         $params[] = $mes_filtro_nombre;
     }
 
-    // AÑADIDO: Filtro por la nueva columna 'anio'
     if (!empty($anio_filtro) && is_numeric($anio_filtro)) {
         $conditions[] = "anio = ?";
         $params[] = (int)$anio_filtro;
+    }
+    
+    if (!empty($tipo_balance_filtro)) {
+        $conditions[] = "tipo_balance = ?";
+        $params[] = $tipo_balance_filtro;
     }
 
     $whereClause = "WHERE 1=1";
     if (!empty($conditions)) {
         $whereClause .= " AND " . implode(" AND ", $conditions);
     }
-
+    
+    // La paginación y el cálculo del total se deben hacer con todas las condiciones aplicadas
     $sqlTotal = "SELECT COUNT(*) FROM balances_empresa $whereClause";
     $stmtTotal = $conn->prepare($sqlTotal);
     $stmtTotal->execute($params);
@@ -61,7 +67,6 @@ try {
     $totalGeneralMonto = $totalGeneralMonto !== null ? (float)$totalGeneralMonto : 0.00;
     $stmtMonto = null;
 
-    // AÑADIDO: Seleccionar la nueva columna 'anio'
     $sql = "SELECT id, nombre_descripcion, tipo_balance, mes, monto, anio, fecha_creacion
             FROM balances_empresa
             $whereClause

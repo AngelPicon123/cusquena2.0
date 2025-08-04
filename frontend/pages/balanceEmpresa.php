@@ -197,6 +197,13 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                     <option value="12">Diciembre</option>
                                 </select>
                                 <input type="number" class="form-control me-2" id="buscarAnio" placeholder="Año" style="width: 100px;">
+                                <select class="form-select form-select-sm" id="filterTipoBalance">
+                                    <option value="">Tipo de Balance</option>
+                                    <option value="Cotizaciones">Cotizaciones</option>
+                                    <option value="Prestamos">Prestamos</option>
+                                    <option value="Alquileres">Alquileres</option>
+                                    <option value="Gastos">Gastos</option>
+                                </select>
                                 <button class="btn btn-primary" id="btnBuscar">Buscar</button>
                             </div>
                             <div>

@@ -263,7 +263,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                         </div>
                     </div>
 
-                    <div class="modal fade" id="modalVerVentas" tabindex="-1" aria-hidden="true">
+   <div class="modal fade" id="modalVerVentas" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -271,6 +271,32 @@ verificarPermiso(['Administrador', 'Secretaria']);
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+
+                <!-- INICIO: Filtros del Historial -->
+                <div class="row g-3 align-items-end mb-3 p-3 border rounded bg-light">
+                    <div class="col-md-4">
+                        <label for="filtroFechaDesde" class="form-label">Desde</label>
+                        <input type="date" class="form-control form-control-sm" id="filtroFechaDesde">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="filtroFechaHasta" class="form-label">Hasta</label>
+                        <input type="date" class="form-control form-control-sm" id="filtroFechaHasta">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="filtroCantidad" class="form-label">Cantidad (mín.)</label>
+                        <input type="number" class="form-control form-control-sm" id="filtroCantidad" placeholder="Ej: 5">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="filtroMonto" class="form-label">Monto (mín.)</label>
+                        <input type="number" class="form-control form-control-sm" id="filtroMonto" placeholder="Ej: 100">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label invisible">Limpiar</label>
+                        <button class="btn btn-secondary btn-sm w-100" id="btnLimpiarFiltrosHistorial">Limpiar Filtros</button>
+                    </div>
+                </div>
+                <!-- FIN: Filtros del Historial -->
+
                 <h6>Historial</h6>
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered">
@@ -283,7 +309,8 @@ verificarPermiso(['Administrador', 'Secretaria']);
                             </tr>
                         </thead>
                         <tbody id="tablaVentasHistorial">
-                            </tbody>
+                            <!-- El historial se cargará aquí -->
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -292,8 +319,10 @@ verificarPermiso(['Administrador', 'Secretaria']);
             </div>
         </div>
     </div>
-</div>
 
+
+
+                            </div>
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover table-sm w-100 text-center align-middle" style="table-layout: auto;">
                             <thead>
@@ -328,13 +357,27 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                         <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#modalVerVentas" title="Ver Ventas"><i class="fas fa-eye"></i></button>
                                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalVenderProducto" title="Vender"><i class="fas fa-cart-plus"></i></button>
                                         <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] === 'Administrador'): ?>
-                                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" title="Editar"><i class="fas fa-edit"></i></button>
+                                       
                                         <button class="btn btn-sm btn-danger" title="Eliminar"><i class="fas fa-trash"></i></button>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
+                          </tbody>
+                    </table>
+               <div class="d-flex flex-column align-items-end mt-3">
+                    <h4 class="fw-bold mb-1">Monto Total de Ventas: 
+                        <span class="text-success" id="montoTotalGeneral">S/. 0.00</span>
+                    </h4>
+                    <h4 class="fw-bold mb-0">Monto Total Gastado: 
+                        <span class="text-danger" id="montoTotalGastado">S/. 0.00</span>
+                    </h4>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <ul class="pagination" id="pagination">
+                         </ul>
+                </div>
                     </div>
 
                     <div class="d-flex justify-content-end">

@@ -68,16 +68,32 @@ switch ($action) {
 function listarProductos() {
     global $conn;
 
-    $sql = "SELECT * FROM productos";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    $productos = [];
+    $sql_productos = "SELECT * FROM productos ORDER BY id DESC";
+    $stmt_productos = $conn->prepare($sql_productos);
+    $stmt_productos->execute();
+    $productos = $stmt_productos->fetchAll(PDO::FETCH_ASSOC);
 
-    while ($fila = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $productos[] = $fila;
-    }
+    // Consulta para obtener la suma total del monto de ventas
+    $sql_total_ventas = "SELECT SUM(monto) AS total_monto FROM productos";
+    $stmt_total_ventas = $conn->prepare($sql_total_ventas);
+    $stmt_total_ventas->execute();
+    $total_monto = $stmt_total_ventas->fetch(PDO::FETCH_ASSOC)['total_monto'] ?? 0;
+    
+    // NUEVO: Consulta para calcular el monto total gastado
+    // Suma la inversión inicial (inicial * precio_compra) y la inversión por ingresos (ingreso * precio_compra)
+    $sql_total_gastado = "SELECT SUM((inicial + ingreso) * precio_compra) AS total_gastado FROM productos";
+    $stmt_total_gastado = $conn->prepare($sql_total_gastado);
+    $stmt_total_gastado->execute();
+    $total_gastado = $stmt_total_gastado->fetch(PDO::FETCH_ASSOC)['total_gastado'] ?? 0;
 
-    echo json_encode($productos);
+    $respuesta = [
+        'productos' => $productos,
+        'total_monto' => $total_monto,
+        // NUEVO: Agrega el monto total gastado al array de respuesta
+        'total_gastado' => $total_gastado 
+    ];
+
+    echo json_encode($respuesta);
 }
 
 function agregarProducto($data) {

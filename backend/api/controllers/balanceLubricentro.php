@@ -43,7 +43,8 @@ function listarBalances($conn) {
     $parametros = [];
 
     if ($nombre !== '') {
-        $condiciones[] = "nombre_descripcion LIKE ?";
+        $condiciones[] = "(nombre_descripcion LIKE ? OR tipo_balance LIKE ?)";
+        $parametros[] = "%" . $nombre . "%";
         $parametros[] = "%" . $nombre . "%";
     }
     if ($mes !== '') {

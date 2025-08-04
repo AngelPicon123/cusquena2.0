@@ -131,7 +131,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
           <div class="row">
             <div class="col-12 d-flex justify-content-between align-items-center">
               <div class="d-flex">
-                <input type="text" class="form-control me-2" id="buscarNombre" placeholder="Nombre">
+                <input type="text" class="form-control me-2" id="buscarNombre" placeholder="Buscar Balance">
                 <select class="form-control me-2" id="buscarMes" style="width: 120px;">
                   <option value="">Mes</option>
                   <option value="Enero">Enero</option>

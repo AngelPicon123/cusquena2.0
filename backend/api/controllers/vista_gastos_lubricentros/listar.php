@@ -22,9 +22,15 @@ try {
 
     // Construir dinámicamente las condiciones WHERE y los parámetros de filtro
     if (!empty($descripcion)) {
-        $conditions[] = "descripcion LIKE ?";
-        $filterParams[] = "%" . $descripcion . "%";
+    $conditions[] = "(descripcion LIKE ? OR tipo_gasto LIKE ?)";
+    $filterParams[] = "%" . $descripcion . "%";
+    $filterParams[] = "%" . $descripcion . "%";
     }
+    $sql = "SELECT * FROM gastos";
+    if (!empty($conditions)) {
+        $sql .= " WHERE " . implode(" AND ", $conditions);
+    }
+
     if (!empty($fecha_inicio)) {
         $conditions[] = "fecha >= ?";
         $filterParams[] = $fecha_inicio;
@@ -52,8 +58,7 @@ try {
     $stmtTotal = null; // Liberar el statement
 
     // --- Obtener los gastos con paginación y filtros ---
-    // Consulta principal: todos los parámetros serán posicionales.
-    // Usaremos '?' para todos los parámetros (filtros, LIMIT, OFFSET).
+  
     $sqlGastos = "SELECT id, descripcion, tipo_gasto, monto, fecha, detalle FROM gastos_lubricentros " . $whereClause . " ORDER BY id ASC LIMIT ? OFFSET ?";
     $stmtGastos = $conn->prepare($sqlGastos);
     if ($stmtGastos === false) {

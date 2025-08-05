@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const buscarDominicalInput = document.getElementById('buscarDominical');
     const semanaInicioFiltroInput = document.getElementById('semanaInicioFiltro');
     const semanaFinFiltroInput = document.getElementById('semanaFinFiltro');
+    const filterEstadoDominicalInput = document.getElementById('filterEstadoDominical');
     const btnBuscar = document.getElementById('btnBuscar');
 
     // Elementos para los Toasts
@@ -39,7 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const toastSuccessBody = document.getElementById('toastSuccessBody');
     const toastErrorBody = document.getElementById('toastErrorBody');
 
-    let dominicalIdAEliminar = null; // Para guardar el ID del dominical a eliminar (principal)
+    // Elementos para mostrar los montos totales
+    // --- CAMBIO AQUI: Nueva constante para el monto dominical ---
+    const totalGeneralMontoDisplay = document.getElementById('totalGeneralMontoDisplay');
+    const totalDiferenciaDisplay = document.getElementById('totalDiferenciaDisplay');
+
+    let dominicalIdAEliminar = null; 
 
     // --- Funciones de Utilidad ---
 
@@ -71,6 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Función para obtener el badge de estado
+    function getBadgeEstado(estado) {
+        const estadoNormalizado = estado.toLowerCase().trim();
+        switch (estadoNormalizado) {
+            case 'pagado':
+                return `<span class="badge bg-success">Pagado</span>`;
+            case 'pendiente':
+                return `<span class="badge bg-warning text-dark">Pendiente</span>`;
+            case 'exento':
+                return `<span class="badge bg-danger">Exento</span>`;
+            default:
+                return `<span class="badge bg-secondary">${estado}</span>`;
+        }
+    }
+
     // --- Carga y Renderizado de la Tabla Principal (Dominicales) ---
 
     async function cargarDominicales(filtros = {}) {
@@ -80,10 +101,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             renderizarTabla(data.dominicales || []);
+            
+            // --- CAMBIO AQUI: Actualiza el monto total dominical ---
+            const totalGeneralMonto = data.total_general_monto || 0.00;
+            totalGeneralMontoDisplay.textContent = `S/. ${parseFloat(totalGeneralMonto).toFixed(2)}`;
+
+            // Actualiza el monto total de la diferencia
+            const totalDiferencia = data.total_diferencia || 0.00;
+            totalDiferenciaDisplay.textContent = `S/. ${parseFloat(totalDiferencia).toFixed(2)}`;
+            
         } catch (error) {
             console.error('Error al cargar datos dominicales:', error);
             showToast('error', '❌ Error al cargar los dominicales. Intenta de nuevo.');
             renderizarTabla([]);
+            // --- CAMBIO AQUI: Resetear el monto dominical en caso de error ---
+            totalGeneralMontoDisplay.textContent = 'S/. 0.00'; 
+            totalDiferenciaDisplay.textContent = 'S/. 0.00'; 
         }
     }
 
@@ -99,11 +132,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = tablaDominical.insertRow();
             row.insertCell().textContent = d.nombre;
             row.insertCell().textContent = d.apellidos;
-            row.insertCell().textContent = d.fecha_domingo;
-            row.insertCell().textContent = d.semana_inicio;
-            row.insertCell().textContent = d.semana_fin;
+
+            // --- CORRECCIÓN AQUÍ: Usamos 'd' en lugar de 'c' para formatear la fecha
+            row.insertCell().textContent = new Date(d.fecha_domingo).toLocaleDateString('es-ES');
+            row.insertCell().textContent = new Date(d.semana_inicio).toLocaleDateString('es-ES');
+            row.insertCell().textContent = new Date(d.semana_fin).toLocaleDateString('es-ES');
+            // --- FIN DE LA CORRECCIÓN ---
+
             row.insertCell().textContent = `S/. ${parseFloat(d.monto_dominical).toFixed(2)}`;
-            row.insertCell().textContent = d.estado;
+
+            // Celda para el estado con badge
+            const estadoCell = row.insertCell();
+            estadoCell.innerHTML = getBadgeEstado(d.estado);
+
             row.insertCell().textContent = `S/. ${parseFloat(d.diferencia).toFixed(2)}`;
 
             const accionesCell = row.insertCell();
@@ -256,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success && data.pagos.length > 0) {
                 data.pagos.forEach(pago => {
                     const row = tablaPagosHistorial.insertRow();
-                    row.insertCell().textContent = pago.fecha_pago;
+                    row.insertCell().textContent = new Date(pago.fecha_pago).toLocaleDateString('es-ES');
                     row.insertCell().textContent = `S/. ${parseFloat(pago.monto_pagado).toFixed(2)}`;
 
                     const accionesCell = row.insertCell();
@@ -294,17 +335,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función para llenar el modal de edición de Pago Individual
     
-        function llenarModalEditarPago(pago, dominicalId) {
-           
-            modalVerPagos.hide(); 
+    function llenarModalEditarPago(pago, dominicalId) {
+        
+        modalVerPagos.hide(); 
 
-            document.getElementById('editPagoId').value = pago.id;
-            document.getElementById('editPagoDominicalId').value = dominicalId; 
-            document.getElementById('editFechaPago').value = pago.fecha_pago;
-            document.getElementById('editMontoPago').value = parseFloat(pago.monto_pagado).toFixed(2);
+        document.getElementById('editPagoId').value = pago.id;
+        document.getElementById('editPagoDominicalId').value = dominicalId; 
+        document.getElementById('editFechaPago').value = pago.fecha_pago;
+        document.getElementById('editMontoPago').value = parseFloat(pago.monto_pagado).toFixed(2);
 
-            modalEditarPago.show(); 
-        }
+        modalEditarPago.show(); 
+    }
 
     // Manejo del formulario para agregar un nuevo pago
     formAgregarPago.addEventListener('submit', async e => {
@@ -335,44 +376,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-            // Manejo del formulario de editar Pago Individual
-        formEditarPago.addEventListener('submit', async e => {
-            e.preventDefault();
-            const formData = new FormData(formEditarPago);
-            const datos = Object.fromEntries(formData.entries());
+    // Manejo del formulario de editar Pago Individual
+    formEditarPago.addEventListener('submit', async e => {
+        e.preventDefault();
+        const formData = new FormData(formEditarPago);
+        const datos = Object.fromEntries(formData.entries());
 
-            try {
-                const response = await fetch(`${API_BASE_URL}actualizar_pago.php`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(datos)
-                });
-                const data = await response.json();
+        try {
+            const response = await fetch(`${API_BASE_URL}actualizar_pago.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            const data = await response.json();
 
-                if (data.success) {
-                    modalEditarPago.hide();
-                    showToast('success', '✅ Pago actualizado exitosamente.');
-                    cargarPagosDominical(datos.dominical_id); 
-                    cargarDominicales(); 
-
-                  
-                    modalVerPagos.show(); 
-
-                } else {
-                    showToast('error', data.error || '❌ Error al actualizar el pago.');
-                }
-            } catch (error) {
-                console.error('Error al actualizar pago:', error);
-                showToast('error', '❌ Error de conexión al actualizar el pago.');
+            if (data.success) {
+                modalEditarPago.hide();
+                showToast('success', '✅ Pago actualizado exitosamente.');
+                cargarPagosDominical(datos.dominical_id); 
+                cargarDominicales(); 
+                
+                modalVerPagos.show(); 
+            } else {
+                showToast('error', data.error || '❌ Error al actualizar el pago.');
             }
-        });
+        } catch (error) {
+            console.error('Error al actualizar pago:', error);
+            showToast('error', '❌ Error de conexión al actualizar el pago.');
+        }
+    });
 
-        modalEditarPago._element.addEventListener('hidden.bs.modal', () => {
-   
-         modalVerPagos.show();
-        });
-            
-  
+    modalEditarPago._element.addEventListener('hidden.bs.modal', () => {
+        
+        modalVerPagos.show();
+    });
+        
     // Se ha movido la lógica de confirmación al event listener de btnConfirmarEliminarPago
     async function eliminarPago(pagoId, dominicalId) {
         try {
@@ -384,7 +422,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             
-
             if (data.success) {
                 showToast('success', '✅ Pago eliminado exitosamente.');
                 cargarPagosDominical(dominicalId); 
@@ -409,22 +446,28 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-     
         await eliminarPago(pagoIdToDelete, dominicalIdAssociated);
         modalEliminarPagoConfirmacion.hide(); 
     });
 
 
     // --- Manejo de Filtros ---
-    btnBuscar.addEventListener('click', () => {
+    function aplicarFiltros() {
         const filtros = {
             nombre: buscarDominicalInput.value.trim(),
             semana_inicio: semanaInicioFiltroInput.value,
-            semana_fin: semanaFinFiltroInput.value
+            semana_fin: semanaFinFiltroInput.value,
+            estado: filterEstadoDominicalInput.value
         };
         cargarDominicales(filtros);
-    });
+    }
+    
+    // Evento para el botón de buscar (mantiene la funcionalidad)
+    btnBuscar.addEventListener('click', aplicarFiltros);
 
+    // NUEVO: Evento para el cambio en el select de estado
+    filterEstadoDominicalInput.addEventListener('change', aplicarFiltros);
+    
     // Carga inicial de datos
     cargarDominicales();
 

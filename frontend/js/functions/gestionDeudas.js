@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const tablaDeudas = document.getElementById('tablaDeudas');
     const formAgregarDeuda = document.getElementById('formAgregarDeuda');
     const formEditarDeuda = document.getElementById('formEditarDeuda');
-    const buscarDeudaInput = document.getElementById('buscarDeuda');
     const btnBuscar = document.getElementById('btnBuscar');
 
     // Modales
@@ -17,7 +16,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const nombreDeudorSpan = document.getElementById('nombreDeudor');
     const pagoDeudaIdInput = document.getElementById('pagoDeudaId');
     const fechaPagoInput = document.getElementById('fechaPago'); 
+    
+    // Elementos de los totales
+    const totalDeudaGeneral = document.getElementById('totalDeudaGeneral');
+    const totalPendienteGeneral = document.getElementById('totalPendienteGeneral');
 
+    //filtros de busqueda 
+
+    const buscarDeudaInput = document.getElementById('buscarDeuda');
+    const filtroTipoDeudaSelect = document.getElementById('filtroTipoDeuda');
+    const filtroTipoPersonaSelect = document.getElementById('filtroTipoPersona');
+    const filtroEstadoSelect = document.getElementById('filtroEstado');
+    const btnLimpiar = document.getElementById('btnLimpiar');
    
     let deudas = []; 
 
@@ -33,7 +43,21 @@ document.addEventListener('DOMContentLoaded', function () {
         const [anio, mes, dia] = fechaISO.split("-");
         return `${dia}-${mes}-${anio}`;
     }
+    function aplicarFiltros() {
+    const buscar = buscarDeudaInput.value;
+    const tipoDeuda = filtroTipoDeudaSelect.value;
+    const tipoPersona = filtroTipoPersonaSelect.value;
+    const estado = filtroEstadoSelect.value;
 
+    // Construir la URL de forma dinámica
+    let url = `../../backend/api/controllers/gestionDeudas.php?accion=listar`;
+    if (buscar) url += `&buscar=${encodeURIComponent(buscar)}`;
+    if (tipoDeuda) url += `&filtroTipoDeuda=${encodeURIComponent(tipoDeuda)}`;
+    if (tipoPersona) url += `&filtroTipoPersona=${encodeURIComponent(tipoPersona)}`;
+    if (estado) url += `&filtroEstado=${encodeURIComponent(estado)}`;
+
+    cargarDeudas(url);
+}
     /**
      * 
      * @param {number|string} valor 
@@ -72,23 +96,24 @@ document.addEventListener('DOMContentLoaded', function () {
      * 
      * @param {string} filtro 
      */
-    function cargarDeudas(filtro = '') {
-        tablaDeudas.innerHTML = `<tr><td colspan="9" class="text-center">Cargando deudas...</td></tr>`; 
+        function cargarDeudas(url = `../../backend/api/controllers/gestionDeudas.php?accion=listar`) {
+            tablaDeudas.innerHTML = `<tr><td colspan="9" class="text-center">Cargando deudas...</td></tr>`; 
 
-        fetch(`../../backend/api/controllers/gestionDeudas.php?accion=listar&buscar=${encodeURIComponent(filtro)}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                deudas = data; 
-                renderTablaDeudas(deudas);
-            })
-            .catch(err => {
-                console.error('Error al cargar deudas:', err);
-                tablaDeudas.innerHTML = `<tr><td colspan="9" class="text-center text-danger">Error al cargar deudas: ${err.message || err}. Recarga la página.</td></tr>`;
-            });
-    }
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    deudas = data; 
+                    renderTablaDeudas(deudas);
+                    actualizarTotales();
+                })
+                .catch(err => {
+                    console.error('Error al cargar deudas:', err);
+                    tablaDeudas.innerHTML = `<tr><td colspan="9" class="text-center text-danger">Error al cargar deudas: ${err.message || err}. Recarga la página.</td></tr>`;
+                });
+        }
 
     /**
      * 
@@ -141,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 modalAgregar.hide();
                 formAgregarDeuda.reset();
                 cargarDeudas();
+                actualizarTotales();
             } else {
                 alert('Error al registrar deuda: ' + data.error);
                 console.error('Error al registrar deuda:', data.error);
@@ -168,6 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Deuda modificada con éxito.');
                 modalEditar.hide();
                 cargarDeudas();
+                actualizarTotales();
             } else {
                 alert('Error al modificar deuda: ' + data.error);
                 console.error('Error al modificar deuda:', data.error);
@@ -216,6 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.success) {
                         alert('Deuda eliminada con éxito.');
                         cargarDeudas();
+                        actualizarTotales();
                     } else {
                         alert('Error al eliminar deuda: ' + data.error);
                         console.error('Error al eliminar deuda:', data.error);
@@ -275,6 +303,26 @@ document.addEventListener('DOMContentLoaded', function () {
      * 
      * @param {Array} pagos 
      */
+    function actualizarTotales() {
+    fetch('../../backend/api/controllers/gestionDeudas.php?accion=obtenerTotales')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                totalDeudaGeneral.textContent = formatearMoneda(data.total_prestado);
+                totalPendienteGeneral.textContent = formatearMoneda(data.total_pendiente);
+            } else {
+                console.error('Error al obtener los totales:', data.error);
+                totalDeudaGeneral.textContent = 'Error';
+                totalPendienteGeneral.textContent = 'Error';
+            }
+        })
+        .catch(err => {
+            console.error('Error de red al obtener los totales:', err);
+            totalDeudaGeneral.textContent = 'Error';
+            totalPendienteGeneral.textContent = 'Error';
+        });
+}
+
     function renderTablaPagos(pagos) {
         tablaPagosHistorial.innerHTML = ''; 
         if (pagos.length === 0) {
@@ -327,6 +375,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 fechaPagoInput.value = new Date().toISOString().split('T')[0]; 
                 cargarHistorialPagos(deudaId);
                 cargarDeudas(); 
+                actualizarTotales();
             } else {
                 alert('Error al registrar pago: ' + data.error);
                 console.error('Error al registrar pago:', data.error);
@@ -356,6 +405,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         alert('Pago eliminado con éxito. Saldo de deuda actualizado.');
                         cargarHistorialPagos(deudaId); 
                         cargarDeudas(); 
+                        actualizarTotales();
                     } else {
                         alert('Error al eliminar pago: ' + data.error);
                         console.error('Error al eliminar pago:', data.error);
@@ -370,11 +420,23 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Manejar botón de búsqueda
-    btnBuscar.addEventListener('click', function() {
-        const filtro = buscarDeudaInput.value;
-        cargarDeudas(filtro);
-    });
+   btnBuscar.addEventListener('click', function() {
+    aplicarFiltros();
+});
+
+// Añadir el manejador de btnLimpiar
+btnLimpiar.addEventListener('click', function() {
+    // Limpiar los campos de búsqueda y filtros
+    buscarDeudaInput.value = '';
+    filtroTipoDeudaSelect.value = '';
+    filtroTipoPersonaSelect.value = '';
+    filtroEstadoSelect.value = '';
+
+    // Cargar todas las deudas de nuevo
+    cargarDeudas();
+});
 
     // Cargar deudas al inicio
     cargarDeudas();
+    actualizarTotales();
 });

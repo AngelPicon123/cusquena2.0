@@ -89,19 +89,53 @@ verificarPermiso(['Administrador', 'Secretaria']);
       <main class="container-xl my-2 col-11 mx-auto">
         <div class="container-fluid px-4">
           <h1 class="mb-4 text-center">Gestión de Deudas</h1>
-          <div class="row">
-            <div class="col-12 d-flex justify-content-between align-items-center">
-              <div class="d-flex">
-                <input type="text" class="form-control me-2" id="buscarDeuda" placeholder="Buscar por Nombre">
-                <button class="btn btn-primary" id="btnBuscar">Buscar</button>
-              </div>
-              <?php if ($_SESSION['rol'] === 'Administrador'): ?>
-              <div>
-                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregarDeuda">Agregar Deuda</a>
-              </div>
-              <?php endif; ?>
-            </div>
-          </div>
+         <!-- INICIO: Filtros de Búsqueda -->
+<div class="card card-body mb-4 shadow-sm">
+    <div class="row g-3 align-items-end">
+        <div class="col-lg-3 col-md-6">
+            <label for="buscarDeuda" class="form-label">Buscar por Nombre</label>
+            <input type="text" class="form-control" id="buscarDeuda" placeholder="Nombre del deudor...">
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <label for="filtroTipoDeuda" class="form-label">Tipo de Deuda</label>
+            <select id="filtroTipoDeuda" class="form-select">
+                <option value="">Todos</option>
+                <option value="credito_cliente">Crédito a Cliente</option>
+                <option value="prestamo_personal">Préstamo Personal</option>
+                <option value="adelanto_sueldo">Adelanto de Sueldo</option>
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <label for="filtroTipoPersona" class="form-label">Tipo de Persona</label>
+            <select id="filtroTipoPersona" class="form-select">
+                <option value="">Todos</option>
+                <option value="cliente">Cliente</option>
+                <option value="empleado">Empleado</option>
+                <option value="proveedor">Proveedor</option>
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <label for="filtroEstado" class="form-label">Estado</label>
+            <select id="filtroEstado" class="form-select">
+                <option value="">Todos</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="pagada">Pagada</option>
+                <option value="en_atraso">En Atraso</option>
+            </select>
+        </div>
+        <div class="col-lg-3 col-md-12 d-flex mt-3 mt-lg-auto">
+            <button class="btn btn-primary w-50 me-2" id="btnBuscar"><i class="fas fa-search"></i> Filtrar</button>
+            <button class="btn btn-secondary w-50" id="btnLimpiar"><i class="fas fa-eraser"></i> Limpiar</button>
+        </div>
+    </div>
+</div>
+<!-- FIN: Filtros de Búsqueda -->
+
+<?php if ($_SESSION['rol'] === 'Administrador'): ?>
+<div class="d-flex justify-content-end mb-3">
+    <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAgregarDeuda"><i class="fas fa-plus"></i> Agregar Deuda</a>
+</div>
+<?php endif; ?>
 
           <div class="modal fade" id="modalAgregarDeuda">
             <div class="modal-dialog modal-dialog-centered">
@@ -338,6 +372,25 @@ verificarPermiso(['Administrador', 'Secretaria']);
               </tbody>
             </table>
           </div>
+                  <!-- INICIO: Totales Generales -->
+        <div class="row justify-content-end text-end mt-4">
+            <div class="col-md-6 col-lg-5">
+                <div class="card card-body shadow-sm">
+             
+                    <div class="d-flex justify-content-between fs-5">
+                        <span>Monto Total Prestado:</span>
+                        <strong class="text-primary" id="totalDeudaGeneral">S/. 0.00</strong>
+                    </div>
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between fs-5">
+                        <span>Saldo Total Pendiente:</span>
+                        <strong class="text-danger" id="totalPendienteGeneral">S/. 0.00</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- FIN: Totales Generales -->
+
           <nav aria-label="Page navigation">
             <ul class="pagination justify-content-end">
               <li class="page-item disabled">

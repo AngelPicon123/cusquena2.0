@@ -46,6 +46,9 @@ switch ($accion) {
     case 'eliminarPago':
         eliminarPago($conn);
         break;
+    case 'obtenerTotales': // <-- NUEVA ACCIÓN
+        obtenerTotales($conn);
+        break;
     default:
         http_response_code(400);
         echo json_encode(["success" => false, "error" => "Acción no válida."]);
@@ -54,13 +57,39 @@ switch ($accion) {
 // --- FUNCIONES PARA GESTIÓN DE DEUDAS ---
 
 function listarDeudas($conn) {
+    // Recoger todos los parámetros de filtrado de GET
     $buscar = $_GET['buscar'] ?? '';
-    $filtro = "%$buscar%";
-    
+    $filtroTipoDeuda = $_GET['filtroTipoDeuda'] ?? '';
+    $filtroTipoPersona = $_GET['filtroTipoPersona'] ?? '';
+    $filtroEstado = $_GET['filtroEstado'] ?? '';
+
+    // Iniciar la consulta base
+    $sql = "SELECT * FROM deudas WHERE 1=1"; // '1=1' es una cláusula para facilitar la adición de condiciones
+    $params = [];
+
+    // Construir la consulta dinámicamente
+    if (!empty($buscar)) {
+        $sql .= " AND nombre LIKE ?";
+        $params[] = "%$buscar%";
+    }
+    if (!empty($filtroTipoDeuda)) {
+        $sql .= " AND tipo_deuda = ?";
+        $params[] = $filtroTipoDeuda;
+    }
+    if (!empty($filtroTipoPersona)) {
+        $sql .= " AND tipo_persona = ?";
+        $params[] = $filtroTipoPersona;
+    }
+    if (!empty($filtroEstado)) {
+        $sql .= " AND estado = ?";
+        $params[] = $filtroEstado;
+    }
+
+    $sql .= " ORDER BY fecha_inicio DESC";
+
     try {
-        $sql = "SELECT * FROM deudas WHERE nombre LIKE ? ORDER BY fecha_inicio DESC";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$filtro]);
+        $stmt->execute($params);
         $deudas = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($deudas);
     } catch (PDOException $e) {
@@ -282,5 +311,22 @@ function eliminarPago($conn) {
         $conn->rollBack();
         http_response_code(500);
         echo json_encode(["success" => false, "error" => "Error al eliminar el pago: " . $e->getMessage()]);
+    }
+}
+function obtenerTotales($conn) {
+    try {
+        $sql = "SELECT SUM(monto_deuda) AS total_prestado, SUM(saldo_pendiente) AS total_pendiente FROM deudas";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $totales = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $total_prestado = $totales['total_prestado'] ?? 0.00;
+        $total_pendiente = $totales['total_pendiente'] ?? 0.00;
+
+        echo json_encode(["success" => true, "total_prestado" => $total_prestado, "total_pendiente" => $total_pendiente]);
+
+    } catch (PDOException $e) {
+        http_response_code(500);
+        echo json_encode(["success" => false, "error" => "Error al obtener los totales: " . $e->getMessage()]);
     }
 }

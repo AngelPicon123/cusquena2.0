@@ -41,11 +41,16 @@ function listarServicios($conn) {
     $buscar = $_GET['buscar'] ?? '';
     $buscar = "%$buscar%";
 
-    $sql = "SELECT * FROM servicios WHERE nombre_servicio LIKE ? OR tipo_servicio LIKE ? ORDER BY id_servicio ASC";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([$buscar, $buscar]);
-    $servicios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $sql = "SELECT * FROM servicios 
+            WHERE nombre_servicio LIKE ? 
+               OR tipo_servicio LIKE ? 
+               OR estado LIKE ?
+            ORDER BY id_servicio ASC";
 
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$buscar, $buscar, $buscar]);
+
+    $servicios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode($servicios);
 }
 

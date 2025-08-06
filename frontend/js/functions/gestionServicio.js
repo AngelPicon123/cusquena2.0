@@ -24,32 +24,44 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderTabla(data) {
-        tablaServicios.innerHTML = '';
-        if (data.length === 0) {
-            tablaServicios.innerHTML = `<tr><td colspan="8">No se encontraron servicios</td></tr>`;
-            return;
-        }
+    tablaServicios.innerHTML = '';
+    let total = 0;
 
-        data.forEach(servicio => {
-            const fila = document.createElement('tr');
-            fila.innerHTML = `
-                <td>${servicio.id_servicio}</td>
-                <td>${servicio.nombre_servicio}</td>
-                <td>${servicio.tipo_servicio}</td>
-                <td>S/ ${parseFloat(servicio.precio_unitario).toFixed(2)}</td>
-                <td>${servicio.cantidad}</td>
-                <td>${formatearFecha(servicio.fecha_registro)}</td>
-                <td>
-                    <span class="badge ${servicio.estado === 'Activo' ? 'bg-success' : 'bg-secondary'}">${servicio.estado}</span>
-                </td>
-                <td>
-                    <button class="btn btn-sm btn-warning me-1 btn-editar" data-id="${servicio.id_servicio}"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-sm btn-danger btn-eliminar" data-id="${servicio.id_servicio}"><i class="fas fa-trash-alt"></i></button>
-                </td>
-            `;
-            tablaServicios.appendChild(fila);
-        });
+    if (data.length === 0) {
+        tablaServicios.innerHTML = `<tr><td colspan="8">No se encontraron servicios</td></tr>`;
+        document.getElementById('totalGeneral').textContent = 'Total: S/ 0.00';
+        return;
     }
+
+    data.forEach(servicio => {
+        const fila = document.createElement('tr');
+        const subtotal = parseFloat(servicio.precio_unitario) * parseFloat(servicio.cantidad);
+        total += subtotal;
+
+        fila.innerHTML = `
+            <td>${servicio.id_servicio}</td>
+            <td>${servicio.nombre_servicio}</td>
+            <td>${servicio.tipo_servicio}</td>
+            <td>S/ ${parseFloat(servicio.precio_unitario).toFixed(2)}</td>
+            <td>${servicio.cantidad}</td>
+            <td>${formatearFecha(servicio.fecha_registro)}</td>
+            <td>
+                <span class="badge ${servicio.estado === 'Activo' ? 'bg-success' : 'bg-secondary'}">${servicio.estado}</span>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-warning me-1 btn-editar" data-id="${servicio.id_servicio}"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-danger btn-eliminar" data-id="${servicio.id_servicio}"><i class="fas fa-trash-alt"></i></button>
+            </td>
+        `;
+        tablaServicios.appendChild(fila);
+    });
+
+    // Mostrar total general
+    const totalGeneralElement = document.getElementById('totalGeneral');
+    if (totalGeneralElement) {
+        totalGeneralElement.textContent = `Total: S/ ${total.toFixed(2)}`;
+    }
+}
 
     formAgregar.addEventListener('submit', function (e) {
         e.preventDefault();

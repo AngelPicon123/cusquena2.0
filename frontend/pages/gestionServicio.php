@@ -47,16 +47,19 @@ verificarPermiso(['Administrador', 'Secretaria']);
                 <div class="container-fluid px-4">
                     <h1 class="mt-4 text-center mb-4">Gestión de Servicios</h1>
                     <div class="row mb-3">
-                        <div class="col-12 d-flex justify-content-between align-items-center">
-                            <div class="d-flex">
-                                <input type="text" id="buscarServicio" class="form-control me-2" placeholder="Buscar servicio">
-                                <button class="btn btn-primary" id="btnBuscar">Buscar</button>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregar">Agregar</button>
-                            </div>
-                        </div>
-                    </div>
+    <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center">
+        <div class="d-flex flex-column flex-md-row align-items-center mb-3 mb-md-0">
+            <label for="fechaInicio" class="me-2">Fecha:</label>
+            <input type="date" id="fechaInicio" class="form-control me-2">
+
+            <input type="text" id="buscarServicio" class="form-control me-2" placeholder="Buscar servicio">
+
+            <button class="btn btn-primary" id="btnBuscar">Buscar</button>
+        </div>
+
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregar">Agregar</button>
+    </div>
+</div>
 
                     <div class="table-responsive my-4">
                         <table class="table table-bordered table-hover text-center">
@@ -76,7 +79,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                 </tbody>
                         </table>
                     </div>
-
+                    <p id="totalGeneral" class="fw-bold mt-3">Total: S/ 0.00</p>
                     <nav aria-label="Paginación" class="d-flex justify-content-end">
                         <ul class="pagination" id="paginacionServicios">
                             </ul>
@@ -168,7 +171,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Precio Unitario:</label>
-                            <input type="number" step="0.01" class="form-control" name="precioUnitario" id="editarPrecioUnitario" required>
+                            <input type="number" step="0.01" class="form-control" name="precioUnitario" id="editarPrecioUnitario" required disabled>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Cantidad:</label>

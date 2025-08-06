@@ -99,29 +99,43 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderAlquileres(alquileres) {
     tablaAlquileres.innerHTML = '';
     if (!alquileres.length) {
-        tablaAlquileres.innerHTML = '<tr><td colspan="8" class="text-center">No hay alquileres para mostrar.</td></tr>'; // Agregado text-center para mejor UX
+        tablaAlquileres.innerHTML = '<tr><td colspan="8" class="text-center">No hay alquileres para mostrar.</td></tr>';
+        document.getElementById('totalGeneral').textContent = 'Total General: S/ 0.00';
         return;
     }
 
+    let totalPagos = 0;
+
     alquileres.forEach(alquiler => {
         const row = document.createElement('tr');
+        const pago = parseFloat(alquiler.pago);
+
+        // Solo sumar si el estado es "Activo"
+        if (alquiler.estado === 'Activo') {
+            totalPagos += pago;
+        }
+
         row.innerHTML = `
             <td>${alquiler.id}</td>
             <td>${alquiler.nombre}</td>
             <td>${alquiler.tipo}</td>
             <td>${alquiler.fecha_inicio}</td>
             <td>${alquiler.periodicidad}</td>
-            <td>S/. ${parseFloat(alquiler.pago).toFixed(2)}</td>
-            <td>${alquiler.estado}</td>
+            <td>S/. ${pago.toFixed(2)}</td>
+            <td>
+                <span class="badge ${alquiler.estado === 'Activo' ? 'bg-success' : 'bg-secondary'}">
+                    ${alquiler.estado}
+                </span>
+            </td>
             <td>
                 <button class="btn btn-sm btn-warning me-2" data-id="${alquiler.id}" title="Editar">
-                    <i class="fas fa-edit"></i> </button>
+                    <i class="fas fa-edit"></i>
+                </button>
                 <button class="btn btn-sm btn-danger" data-id="${alquiler.id}" title="Eliminar">
-                    <i class="fas fa-trash-alt"></i> </button>
+                    <i class="fas fa-trash-alt"></i>
+                </button>
             </td>`;
 
-        // Los selectores ahora deben ser más específicos si la estructura HTML cambia y no solo son botones
-        // Aunque en este caso sigue siendo el primer y segundo botón, es buena práctica ser explícito.
         const editBtn = row.querySelector('.btn-warning');
         const deleteBtn = row.querySelector('.btn-danger');
 
@@ -133,6 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         tablaAlquileres.appendChild(row);
     });
+
+    // Mostrar total solo de los alquileres activos
+    document.getElementById('totalGeneral').textContent = `Total General: S/ ${totalPagos.toFixed(2)}`;
 }
 
     function populateEditModal(alquiler) {

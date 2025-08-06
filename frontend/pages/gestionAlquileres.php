@@ -107,6 +107,8 @@ if (isset($_SESSION['rol'])) {
                     <div class="row">
                         <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center">
                             <div class="d-flex flex-column flex-md-row align-items-center mb-3 mb-md-0">
+                                <label for="fechaInicio" class="me-2">Fecha:</label>
+                                <input type="date" id="fechaInicio" class="form-control me-2">
                                 <input type="text" class="form-control me-2" id="filterNombre" placeholder="Buscar por Nombre">
                                 <button class="btn btn-primary" id="btnBuscarAlquileres">Buscar</button>
                             </div>
@@ -253,7 +255,7 @@ if (isset($_SESSION['rol'])) {
                             </tbody>
                         </table>
                     </div>
-
+                    <p id="totalGeneral" class="fw-bold mt-3">Total General: S/ 0.00</p>
                     <nav aria-label="Page navigation example" class="d-flex justify-content-end">
                         <ul class="pagination" id="pagination">
                             <!-- Los enlaces de paginación se cargarán dinámicamente con JavaScript -->

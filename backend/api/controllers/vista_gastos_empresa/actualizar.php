@@ -35,9 +35,9 @@ if (!in_array($tipo_gasto, $allowed_types)) {
 }
 
 // Validar numeric value for monto
-if (!is_numeric($monto) || $monto < 0) {
+if (!is_numeric($monto)) {
     http_response_code(400);
-    echo json_encode(['error' => 'El monto debe ser un valor numérico positivo.']);
+    echo json_encode(['error' => 'El monto debe ser un valor numérico.']);
     exit();
 }
 

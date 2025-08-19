@@ -1,5 +1,3 @@
-js:
-
 // gestionDominical.js
 
 // Espera a que el DOM esté completamente cargado
@@ -44,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Elementos para mostrar los montos totales
     const totalGeneralMontoDisplay = document.getElementById('totalGeneralMontoDisplay');
-    const totalDiferenciaDisplay = document.getElementById('totalDiferenciaDisplay');
+    // const totalDiferenciaDisplay = document.getElementById('totalDiferenciaDisplay');  // Se eliminó la referencia
 
     let dominicalIdAEliminar = null; 
 
@@ -98,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-     /**
+      /**
      * Genera y actualiza los botones de paginación.
      * @param {number} totalPages - Número total de páginas.
      */
@@ -198,8 +196,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const totalGeneralMonto = data.total_general_monto || 0.00;
             totalGeneralMontoDisplay.textContent = `S/. ${parseFloat(totalGeneralMonto).toFixed(2)}`;
 
-            const totalDiferencia = data.total_diferencia || 0.00;
-            totalDiferenciaDisplay.textContent = `S/. ${parseFloat(totalDiferencia).toFixed(2)}`;
+            // Se eliminó la línea que intentaba acceder a totalDiferenciaDisplay
+            // const totalDiferencia = data.total_diferencia || 0.00;
+            // totalDiferenciaDisplay.textContent = `S/. ${parseFloat(totalDiferencia).toFixed(2)}`;
 
             const totalPages = Math.ceil((data.total_registros || 0) / itemsPerPage);
             renderPagination(totalPages);
@@ -209,7 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('error', '❌ Error al cargar los dominicales. Intenta de nuevo.');
             renderizarTabla([]);
             totalGeneralMontoDisplay.textContent = 'S/. 0.00'; 
-            totalDiferenciaDisplay.textContent = 'S/. 0.00'; 
+            // Se eliminó la línea que intentaba acceder a totalDiferenciaDisplay
+            // totalDiferenciaDisplay.textContent = 'S/. 0.00'; 
             renderPagination(0);
         }
     }
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tablaDominical.innerHTML = ''; 
 
         if (!lista || lista.length === 0) {
-            tablaDominical.innerHTML = '<tr><td colspan="9" class="text-center">No hay datos registrados.</td></tr>';
+            tablaDominical.innerHTML = '<tr><td colspan="7" class="text-center">No hay datos registrados.</td></tr>';
             return;
         }
 
@@ -232,7 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
             row.insertCell().textContent = `S/. ${parseFloat(d.monto_dominical).toFixed(2)}`;
             const estadoCell = row.insertCell();
             estadoCell.innerHTML = getBadgeEstado(d.estado);
-            row.insertCell().textContent = `S/. ${parseFloat(d.diferencia).toFixed(2)}`;
             const accionesCell = row.insertCell();
 
             const btnEditar = document.createElement('button');
@@ -274,6 +273,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData(formAgregar);
         const datos = Object.fromEntries(formData.entries());
 
+        // Se eliminó la propiedad "diferencia" de los datos a enviar
+        delete datos.diferencia;
+
         try {
             const response = await fetch(`${API_BASE_URL}registrar.php`, {
                 method: 'POST',
@@ -307,7 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit_semanaFin').value = d.semana_fin;
         document.getElementById('edit_montoDominical').value = parseFloat(d.monto_dominical).toFixed(2);
         document.getElementById('edit_estado').value = d.estado;
-        document.getElementById('edit_diferencia').value = parseFloat(d.diferencia).toFixed(2);
         modalEditar.show();
     }
 
@@ -317,6 +318,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData(formEditar);
         const datos = Object.fromEntries(formData.entries());
         datos.id = document.getElementById('editDominicalId').value; 
+
+        // Se eliminó la propiedad "diferencia" de los datos a enviar
+        delete datos.diferencia;
 
         try {
             const response = await fetch(`${API_BASE_URL}actualizar.php`, {
@@ -405,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     accionesCell.appendChild(btnEliminarPago);
                 });
             } else {
-                tablaPagosHistorial.innerHTML = '<tr><td colspan="3" class="text-center">No hay pagos registrados para este dominical.</td></tr>';
+                tablaPagosHistorial.innerHTML = '<tr><td colspan="2" class="text-center">No hay pagos registrados para este dominical.</td></tr>';
             }
         } catch (error) {
             console.error('Error al cargar pagos del dominical:', error);

@@ -66,16 +66,8 @@ try {
     $totalGeneralMonto = $totalGeneralMonto !== null ? (float)$totalGeneralMonto : 0.00;
     $stmtMonto = null;
 
-    // Consulta para el total de la diferencia
-    $sqlTotalDiferencia = "SELECT SUM(diferencia) FROM dominical $whereClause";
-    $stmtTotalDiferencia = $conn->prepare($sqlTotalDiferencia);
-    $stmtTotalDiferencia->execute($params);
-    $totalDiferencia = $stmtTotalDiferencia->fetchColumn();
-    $totalDiferencia = $totalDiferencia !== null ? (float)$totalDiferencia : 0.00;
-    $stmtTotalDiferencia = null;
-
     // Consulta principal con paginación
-    $sql = "SELECT id, nombre, apellidos, fecha_domingo, semana_inicio, semana_fin, monto_dominical, estado, diferencia
+    $sql = "SELECT id, nombre, apellidos, fecha_domingo, semana_inicio, semana_fin, monto_dominical, estado
             FROM dominical
             $whereClause
             ORDER BY fecha_domingo DESC
@@ -99,7 +91,6 @@ try {
         'dominicales' => $dominicales,
         'total_registros' => $totalRecords,
         'total_general_monto' => $totalGeneralMonto,
-        'total_diferencia' => $totalDiferencia
     ]);
 
 } catch (Exception $e) {
@@ -109,4 +100,3 @@ try {
         'error' => 'Error al listar dominicales: ' . $e->getMessage()
     ]);
 }
-?>

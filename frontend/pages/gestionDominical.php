@@ -177,10 +177,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                                 <option value="Exento">Exento</option>
                                             </select>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="diferencia" class="form-label fw-bold">Diferencia:</label>
-                                            <input type="number" step="0.01" class="form-control" id="diferencia" name="diferencia" value="0.00">
-                                        </div>
+                                        
                                         <div class="modal-footer d-flex justify-content-center">
                                             <button type="submit" class="btn btn-primary">Agregar Dominical</button>
                                         </div>
@@ -229,10 +226,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                                 <option value="Exento">Exento</option>
                                             </select>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="edit_diferencia" class="form-label fw-bold">Diferencia:</label>
-                                            <input type="number" step="0.01" class="form-control" id="edit_diferencia" name="diferencia" value="0.00">
-                                        </div>
+                                        
                                         <div class="modal-footer d-flex justify-content-center">
                                             <button type="submit" class="btn btn-primary">Guardar Cambios</button>
                                         </div>
@@ -338,7 +332,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                             </div>
                         </div>
                     </div>
-    
+                
                     <div class="modal fade" id="modalEliminarPagoConfirmacion" tabindex="-1" aria-labelledby="modalEliminarPagoConfirmacionLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
@@ -370,7 +364,6 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                     <th scope="col">Semana Fin</th>
                                     <th scope="col">Monto Dominical</th>
                                     <th scope="col">Estado</th>
-                                    <th scope="col">Diferencia</th>
                                     <th scope="col">Acciones</th>
                                 </tr>
                             </thead>
@@ -384,10 +377,6 @@ verificarPermiso(['Administrador', 'Secretaria']);
                         <span id="totalGeneralMontoDisplay" class="fw-bold">S/. 0.00</span>
                     </div>
 
-                    <div class="card-footer text-end mb-4">
-                        <strong>Total de Diferencia:</strong>
-                        <span id="totalDiferenciaDisplay" class="fw-bold">S/. 0.00</span>
-                    </div>
                     
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-end">

@@ -16,8 +16,7 @@ if (
     empty($data['semana_inicio']) ||
     empty($data['semana_fin']) ||
     !isset($data['monto_dominical']) || // puede ser 0.00
-    empty($data['estado']) ||
-    !isset($data['diferencia']) // también puede ser 0.00
+    empty($data['estado'])
 ) {
     http_response_code(400);
     echo json_encode(['error' => 'Datos incompletos para registrar el dominical.']);
@@ -32,12 +31,11 @@ $semana_inicio = $data['semana_inicio'];
 $semana_fin = $data['semana_fin'];
 $monto_dominical = (float)$data['monto_dominical'];
 $estado = $data['estado'];
-$diferencia = (float)$data['diferencia'];
 
 try {
     $stmt = $conn->prepare("INSERT INTO dominical 
-        (nombre, apellidos, fecha_domingo, semana_inicio, semana_fin, monto_dominical, estado, diferencia) 
-        VALUES (:nombre, :apellidos, :fecha_domingo, :semana_inicio, :semana_fin, :monto_dominical, :estado, :diferencia)");
+        (nombre, apellidos, fecha_domingo, semana_inicio, semana_fin, monto_dominical, estado) 
+        VALUES (:nombre, :apellidos, :fecha_domingo, :semana_inicio, :semana_fin, :monto_dominical, :estado)");
 
     $stmt->bindParam(':nombre', $nombre);
     $stmt->bindParam(':apellidos', $apellidos);
@@ -46,7 +44,6 @@ try {
     $stmt->bindParam(':semana_fin', $semana_fin);
     $stmt->bindParam(':monto_dominical', $monto_dominical);
     $stmt->bindParam(':estado', $estado);
-    $stmt->bindParam(':diferencia', $diferencia);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Dominical registrado exitosamente!', 'id' => $conn->lastInsertId()]);

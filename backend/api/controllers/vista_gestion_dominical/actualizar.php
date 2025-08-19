@@ -8,7 +8,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-// Validar que todos los campos necesarios estén presentes
+// Validar que los campos necesarios estén presentes
 if (
     !isset(
         $data['id'],
@@ -18,8 +18,7 @@ if (
         $data['semana_inicio'],
         $data['semana_fin'],
         $data['monto_dominical'],
-        $data['estado'],
-        $data['diferencia']
+        $data['estado'] 
     )
 ) {
     http_response_code(400);
@@ -36,7 +35,6 @@ $semana_inicio = $data['semana_inicio'];
 $semana_fin = $data['semana_fin'];
 $monto_dominical = (float)$data['monto_dominical'];
 $estado = $data['estado'];
-$diferencia = (float)$data['diferencia'];
 
 try {
     $stmt = $conn->prepare("UPDATE dominical 
@@ -46,8 +44,7 @@ try {
             semana_inicio = :semana_inicio, 
             semana_fin = :semana_fin, 
             monto_dominical = :monto_dominical, 
-            estado = :estado, 
-            diferencia = :diferencia 
+            estado = :estado
         WHERE id = :id");
 
     $stmt->bindParam(':nombre', $nombre);
@@ -57,7 +54,6 @@ try {
     $stmt->bindParam(':semana_fin', $semana_fin);
     $stmt->bindParam(':monto_dominical', $monto_dominical);
     $stmt->bindParam(':estado', $estado);
-    $stmt->bindParam(':diferencia', $diferencia);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 
     $stmt->execute();

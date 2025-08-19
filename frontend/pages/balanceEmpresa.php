@@ -1,4 +1,3 @@
-
 <?php
 require_once '../../backend/includes/auth.php';
 verificarPermiso(['Administrador', 'Secretaria']);
@@ -63,73 +62,73 @@ verificarPermiso(['Administrador', 'Secretaria']);
             border-color: #999;
             color: #000;
         }
-           /* Estilos específicos para impresión */
-    @media print {
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #fff;
-        }
-        /* Oculta elementos que no queremos imprimir */
-        .sb-topnav,
-        #layoutSidenav_nav,
-        .btn,
-        .form-control,
-        .modal,
-        .toast-container,
-        .pagination,
-        .col-12.d-flex.justify-content-between.align-items-center,
-        h1
-         {
-            display: none !important;
-        }
+        /* Estilos específicos para impresión */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #fff;
+            }
+            /* Oculta elementos que no queremos imprimir */
+            .sb-topnav,
+            #layoutSidenav_nav,
+            .btn,
+            .form-control,
+            .modal,
+            .toast-container,
+            .pagination,
+            .col-12.d-flex.justify-content-between.align-items-center,
+            h1
+            {
+                display: none !important;
+            }
 
-        /* Muestra solo el contenido principal de la tabla */
-        #layoutSidenav_content {
-            margin-left: 0 !important;
-            width: 100% !important;
-        }
+            /* Muestra solo el contenido principal de la tabla */
+            #layoutSidenav_content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
 
-        main.container-xl {
-            margin: 0 !important;
-            padding: 20px !important;
-            width: 100% !important;
-            max-width: none !important;
-        }
+            main.container-xl {
+                margin: 0 !important;
+                padding: 20px !important;
+                width: 100% !important;
+                max-width: none !important;
+            }
 
-        .table-responsive {
-            overflow: visible !important;
-        }
+            .table-responsive {
+                overflow: visible !important;
+            }
 
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            /* font-size: 12px; */ /* <-- Comentado o eliminado */
-            font-size: 14px; /* <--- Aumentado el tamaño de la fuente para toda la tabla */
-        }
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+                /* font-size: 12px; */ /* <-- Comentado o eliminado */
+                font-size: 14px; /* <--- Aumentado el tamaño de la fuente para toda la tabla */
+            }
 
-        .table th,
-        .table td {
-            border: 1px solid #dee2e6;
-            /* padding: 8px; */ /* <-- Comentado o eliminado */
-            padding: 10px; /* <--- Aumentado el padding para más espacio en las celdas */
-            text-align: left;
-            max-width: none;
-        }
+            .table th,
+            .table td {
+                border: 1px solid #dee2e6;
+                /* padding: 8px; */ /* <-- Comentado o eliminado */
+                padding: 10px; /* <--- Aumentado el padding para más espacio en las celdas */
+                text-align: left;
+                max-width: none;
+            }
 
-        /* Asegura que las acciones de la tabla no aparezcan en la impresión */
-        .table td:nth-child(5) {
-            display: none !important;
-        }
+            /* Asegura que las acciones de la tabla no aparezcan en la impresión */
+            .table td:nth-child(5) {
+                display: none !important;
+            }
 
-        /* Asegura que el contenedor del total se vea bien */
-        .total-container {
-            text-align: right !important;
-            margin-top: 20px !important;
-            padding-right: 0 !important;
-            font-size: 18px; /* <--- También puedes hacer el total más grande */
+            /* Asegura que el contenedor del total se vea bien */
+            .total-container {
+                text-align: right !important;
+                margin-top: 20px !important;
+                padding-right: 0 !important;
+                font-size: 18px; /* <--- También puedes hacer el total más grande */
+            }
         }
-    }
     </style>
 </head>
 <body class="sb-nav-fixed">
@@ -203,14 +202,16 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                     <option value="Prestamos">Prestamos</option>
                                     <option value="Alquileres">Alquileres</option>
                                     <option value="Gastos">Gastos</option>
-                                </select>
+                                    <option value="Dominical">Dominical</option>
+                                    <option value="Coordinadores">Coordinadores</option>
+                                    </select>
                                 <button class="btn btn-primary" id="btnBuscar">Buscar</button>
                             </div>
                             <div>
                                 <button class="btn btn-secondary me-2" id="btnImprimir">Imprimir</button>
                                 <button class="btn btn-info text-white me-2" id="btnExportarPDF">Exportar PDF</button>
                                 <?php if ($_SESSION['rol'] === 'Administrador'): ?>
-                               <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregarBalance">Agregar Balance</a>
+                                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregarBalance">Agregar Balance</a>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -228,17 +229,20 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                         <div class="mb-3">
                                             <label for="nombre" class="form-label fw-bold">Nombre / Descripción:</label>
                                             <input type="text" class="form-control" id="nombre" name="nombre" required placeholder="Ej: Balance Mensual, Cierre de Caja">
-                                          </div>
-                                           <div class="mb-3">
+                                        </div>
+                                        <div class="mb-3">
                                             <label for="tipoBalance" class="form-label fw-bold">Tipo de Balance:</label>
                                             <select class="form-select" id="tipoBalance" name="tipoBalance" required>
                                                 <option value="" disabled selected>Seleccione un tipo</option>
-                                                <option value="Cotizaciones">Cotizaciones</option> <option value="Prestamos">Prestamos</option>
+                                                <option value="Cotizaciones">Cotizaciones</option>
+                                                <option value="Prestamos">Prestamos</option>
                                                 <option value="Alquileres">Alquileres</option>
                                                 <option value="Gastos">Gastos</option>
-                                            </select>
+                                                <option value="Dominical">Dominical</option>
+                                                <option value="Coordinadores">Coordinadores</option>
+                                                </select>
                                         </div>
-                                      <div class="mb-3">
+                                        <div class="mb-3">
                                             <label for="mes" class="form-label fw-bold">Mes:</label>
                                             <input type="month" class="form-control" id="mes" name="mes" required>
                                         </div>
@@ -269,13 +273,16 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                             <label for="edit_nombre" class="form-label fw-bold">Nombre / Descripción:</label>
                                             <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
                                         </div>
-                                          <div class="mb-3">
+                                        <div class="mb-3">
                                             <label for="edit_tipoBalance" class="form-label fw-bold">Tipo de Balance:</label>
                                             <select class="form-select" id="edit_tipoBalance" name="tipoBalance" required>
-                                                <option value="Cotizaciones">Cotizaciones</option> <option value="Prestamos">Prestamos</option>
+                                                <option value="Cotizaciones">Cotizaciones</option>
+                                                <option value="Prestamos">Prestamos</option>
                                                 <option value="Alquileres">Alquileres</option>
                                                 <option value="Gastos">Gastos</option>
-                                            </select>
+                                                <option value="Dominical">Dominical</option>
+                                                <option value="Coordinadores">Coordinadores</option>
+                                                </select>
                                         </div>
                                         <div class="mb-3">
                                             <label for="edit_mes" class="form-label fw-bold">Mes:</label>
@@ -295,36 +302,36 @@ verificarPermiso(['Administrador', 'Secretaria']);
                     </div>
 
                     <div class="modal fade" id="eliminarModalBalance" tabindex="-1" aria-labelledby="eliminarModalBalanceLabel" aria-hidden="true">
-                      <div class="modal-dialog modal-dialog-centered">
-                          <div class="modal-content">
-                              <div class="modal-header bg-danger text-white"> <h5 class="modal-title" id="eliminarModalBalanceLabel">¿Confirmar Eliminación?</h5> <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button> </div>
-                              <div class="modal-body">
-                                  ¿Estás seguro de que deseas eliminar este registro de balance? Esta acción no se puede deshacer.
-                                  </div>
-                              <div class="modal-footer">
-                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                  <button type="button" class="btn btn-danger" id="confirmarEliminarBalance">Eliminar</button>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white"> <h5 class="modal-title" id="eliminarModalBalanceLabel">¿Confirmar Eliminación?</h5> <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button> </div>
+                                <div class="modal-body">
+                                    ¿Estás seguro de que deseas eliminar este registro de balance? Esta acción no se puede deshacer.
+                                    </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-danger" id="confirmarEliminarBalance">Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                      <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;"> <div id="toastSuccess" class="toast text-white bg-success" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
-                          <div class="d-flex">
-                              <div class="toast-body" id="toastSuccessBody">
-                                  </div>
-                              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                          </div>
-                      </div>
+                    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050;"> <div id="toastSuccess" class="toast text-white bg-success" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                        <div class="d-flex">
+                            <div class="toast-body" id="toastSuccessBody">
+                                </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
 
-                      <div id="toastError" class="toast text-white bg-danger" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
-                          <div class="d-flex">
-                              <div class="toast-body" id="toastErrorBody">
-                                  </div>
-                              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                          </div>
-                      </div>
-                  </div>
+                    <div id="toastError" class="toast text-white bg-danger" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+                        <div class="d-flex">
+                            <div class="toast-body" id="toastErrorBody">
+                                </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    </div>
 
                     <div class="table-responsive my-4">
                         <table class="table table-striped table-bordered" id="tablaBalance"> <thead class="table-dark">
@@ -341,23 +348,22 @@ verificarPermiso(['Administrador', 'Secretaria']);
                         </table>
                     </div>
                     <div class="total-container" id="totalGeneral">Total General: S/. 0.00</div>
-                    <nav aria-label="Page navigation example" class="d-flex justify-content-end">
-                        <ul class="pagination">
-                            <li class="page-item">
-                                <a class="page-link" href="#" aria-label="Previous">
-                                    <span aria-hidden="true">«</span>
-                                </a>
-                            </li>
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#" aria-label="Next">
-                                    <span aria-hidden="true">»</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                    <div id="pagination-container">
+                        <nav aria-label="Navegación de páginas" class="d-flex justify-content-end">
+                            <ul class="pagination" id="pagination-list">
+                                <li class="page-item disabled" id="pagination-prev">
+                                    <a class="page-link" href="#" aria-label="Anterior">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item" id="pagination-next">
+                                    <a class="page-link" href="#" aria-label="Siguiente">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
 
                 </div>
             </main>

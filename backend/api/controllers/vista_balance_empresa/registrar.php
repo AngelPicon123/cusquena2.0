@@ -34,10 +34,10 @@ $mes_map = [
 $mes_nombre = $mes_map[$mes_numero] ?? null;
 
 // EXTRAER EL AÑO DEL mes_raw
-$anio = (int)substr($mes_raw, 0, 4); // Obtiene los primeros 4 caracteres (el año)
+$anio = (int)substr($mes_raw, 0, 4);
 
 // Validar que el nombre del mes sea uno de los valores permitidos por el ENUM
-$allowed_meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+$allowed_meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 if (!in_array($mes_nombre, $allowed_meses)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'El valor del mes es inválido.']);
@@ -45,14 +45,14 @@ if (!in_array($mes_nombre, $allowed_meses)) {
 }
 
 // Validar que el año sea un número válido
-if ($anio < 1900 || $anio > 2100) { // Rango razonable de años
+if ($anio < 1900 || $anio > 2100) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'El valor del año es inválido.']);
     exit();
 }
 
-// Validar que el tipo_balance sea uno de los valores permitidos por el ENUM
-$allowed_tipos_balance = ['Cotizaciones', 'Prestamos', 'Alquileres', 'Gastos'];
+// ✅ ahora con los nuevos tipos añadidos
+$allowed_tipos_balance = ['Cotizaciones', 'Prestamos', 'Alquileres', 'Gastos', 'Dominical', 'Coordinadores'];
 if (!in_array($tipo_balance, $allowed_tipos_balance)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'El tipo de balance es inválido.']);
@@ -67,7 +67,7 @@ try {
     $stmt->bindParam(':tipo_balance', $tipo_balance);
     $stmt->bindParam(':mes', $mes_nombre);
     $stmt->bindParam(':monto', $monto);
-    $stmt->bindParam(':anio', $anio, PDO::PARAM_INT); // AÑADIDO: Bindear el año
+    $stmt->bindParam(':anio', $anio, PDO::PARAM_INT);
 
     if ($stmt->execute()) {
         echo json_encode([

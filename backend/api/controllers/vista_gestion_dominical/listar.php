@@ -9,54 +9,56 @@ header('Content-Type: application/json');
 try {
     verificarPermiso(['Administrador', 'Secretaria']);
 
+    // Obtener parámetros de filtro
     $nombre_apellido = $_GET['nombre'] ?? '';
     $semana_inicio_filtro = $_GET['semana_inicio'] ?? '';
     $semana_fin_filtro = $_GET['semana_fin'] ?? '';
     $estado = $_GET['estado'] ?? '';
-
-    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+    
+    // Obtener parámetros de paginación
+    $page = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+    $limit = isset($_GET['limite']) ? (int)$_GET['limite'] : 10;
     $offset = ($page - 1) * $limit;
 
     $conditions = [];
     $params = [];
 
-    // Filtro por nombre o apellidos
+    // Llenar el array de parámetros y condiciones de filtro
     if (!empty($nombre_apellido)) {
         $conditions[] = "(nombre LIKE ? OR apellidos LIKE ?)";
-        $params[] = '%' . $nombre_apellido . '%';
-        $params[] = '%' . $nombre_apellido . '%';
+        $params[] = "%" . $nombre_apellido . "%";
+        $params[] = "%" . $nombre_apellido . "%";
     }
 
-    // Filtro por fechas
     if (!empty($semana_inicio_filtro)) {
         $conditions[] = "semana_inicio >= ?";
         $params[] = $semana_inicio_filtro;
     }
+
     if (!empty($semana_fin_filtro)) {
         $conditions[] = "semana_fin <= ?";
         $params[] = $semana_fin_filtro;
     }
 
-    // Filtro por Estado
     if (!empty($estado)) {
         $conditions[] = "estado = ?";
         $params[] = $estado;
     }
 
+    // Usar la cláusula WHERE 1=1 para una construcción de SQL más segura
     $whereClause = "WHERE 1=1";
     if (!empty($conditions)) {
         $whereClause .= " AND " . implode(" AND ", $conditions);
     }
 
-    // Total registros
+    // Consulta para el total de registros
     $sqlTotal = "SELECT COUNT(*) FROM dominical $whereClause";
     $stmtTotal = $conn->prepare($sqlTotal);
     $stmtTotal->execute($params);
     $totalRecords = $stmtTotal->fetchColumn();
     $stmtTotal = null;
 
-    // Total monto dominical
+    // Consulta para el total del monto dominical
     $sqlMontoTotal = "SELECT SUM(monto_dominical) FROM dominical $whereClause";
     $stmtMonto = $conn->prepare($sqlMontoTotal);
     $stmtMonto->execute($params);
@@ -64,27 +66,27 @@ try {
     $totalGeneralMonto = $totalGeneralMonto !== null ? (float)$totalGeneralMonto : 0.00;
     $stmtMonto = null;
 
-    // --- NUEVO: Cálculo del monto total de la diferencia ---
+    // Consulta para el total de la diferencia
     $sqlTotalDiferencia = "SELECT SUM(diferencia) FROM dominical $whereClause";
     $stmtTotalDiferencia = $conn->prepare($sqlTotalDiferencia);
     $stmtTotalDiferencia->execute($params);
     $totalDiferencia = $stmtTotalDiferencia->fetchColumn();
     $totalDiferencia = $totalDiferencia !== null ? (float)$totalDiferencia : 0.00;
     $stmtTotalDiferencia = null;
-    // ----------------------------------------------------
 
-    // Datos paginados
+    // Consulta principal con paginación
     $sql = "SELECT id, nombre, apellidos, fecha_domingo, semana_inicio, semana_fin, monto_dominical, estado, diferencia
-            FROM dominical 
-            $whereClause 
-            ORDER BY fecha_domingo DESC 
+            FROM dominical
+            $whereClause
+            ORDER BY fecha_domingo DESC
             LIMIT ? OFFSET ?";
     
     $stmt = $conn->prepare($sql);
 
+    // Bind dinámico: primero los parámetros de filtro, luego los de paginación
     $paramIndex = 1;
-    foreach ($params as $param) {
-        $stmt->bindValue($paramIndex++, $param);
+    foreach ($params as $val) {
+        $stmt->bindValue($paramIndex++, $val);
     }
     $stmt->bindValue($paramIndex++, $limit, PDO::PARAM_INT);
     $stmt->bindValue($paramIndex++, $offset, PDO::PARAM_INT);
@@ -93,14 +95,18 @@ try {
     $dominicales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
+        'success' => true,
         'dominicales' => $dominicales,
-        'total' => $totalRecords,
+        'total_registros' => $totalRecords,
         'total_general_monto' => $totalGeneralMonto,
-        'total_diferencia' => $totalDiferencia // <-- NUEVO: Retornamos el total de la diferencia
+        'total_diferencia' => $totalDiferencia
     ]);
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Error al listar dominicales: ' . $e->getMessage()]);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Error al listar dominicales: ' . $e->getMessage()
+    ]);
 }
 ?>

@@ -32,6 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let balanceIdAEliminar = null;
 
+    // --- VARIABLES PARA LA PAGINACIÓN ---
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    const paginationList = document.getElementById('pagination-list');
+    const paginationPrev = document.getElementById('pagination-prev');
+    const paginationNext = document.getElementById('pagination-next');
+
     // --- Funciones de Utilidad ---
     function showToast(type, message) {
         if (type === 'success' && toastSuccessBody) {
@@ -59,23 +66,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Carga y Renderizado de la Tabla de Balance ---
-    async function cargarBalances(filtros = {}) {
+    async function cargarBalances(page = 1, filtros = {}) {
+        currentPage = page;
         try {
-            const params = new URLSearchParams(filtros);
+            const params = new URLSearchParams({
+                ...filtros,
+                page: currentPage,
+                limit: itemsPerPage
+            });
             
-            // Construir la URL de forma segura, agregando solo los filtros que tienen valor
-            let queryString = '';
-            const filtroArray = [];
-            for (const key in filtros) {
-                if (filtros[key] && filtros[key].trim() !== '') {
-                    filtroArray.push(`${encodeURIComponent(key)}=${encodeURIComponent(filtros[key])}`);
-                }
-            }
-            if (filtroArray.length > 0) {
-                queryString = `?${filtroArray.join('&')}`;
-            }
-
-            const response = await fetch(`${API_BASE_URL}listar.php${queryString}`);
+            const response = await fetch(`${API_BASE_URL}listar.php?${params.toString()}`);
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Error HTTP: ${response.status} - ${errorText}`);
@@ -86,16 +86,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 renderizarTablaBalance(data.balances || []);
                 actualizarTotalGeneral(data.total_general_monto || 0);
+                renderizarPaginacion(data.total_items, itemsPerPage, currentPage);
             } else {
                 showToast('error', data.error || '❌ Error al obtener los balances.');
                 renderizarTablaBalance([]);
                 actualizarTotalGeneral(0);
+                renderizarPaginacion(0, itemsPerPage, 1);
             }
         } catch (error) {
             console.error('Error al cargar balances:', error);
             showToast('error', '❌ Error de conexión al cargar los balances. Intenta de nuevo.');
             renderizarTablaBalance([]);
             actualizarTotalGeneral(0);
+            renderizarPaginacion(0, itemsPerPage, 1);
         }
     }
 
@@ -137,15 +140,69 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- FUNCIÓN CORREGIDA PARA RENDERIZAR LA PAGINACIÓN ---
+    function renderizarPaginacion(totalItems, itemsPerPage, currentPage) {
+        paginationList.innerHTML = '';
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        // Si no hay registros, ocultar la paginación.
+        if (totalItems === 0) {
+            paginationList.style.display = 'none';
+            return;
+        }
+        
+        // Mostrar la paginación si hay registros
+        paginationList.style.display = 'flex';
+
+        // Botón "Anterior"
+        paginationList.appendChild(paginationPrev);
+        if (currentPage === 1) {
+            paginationPrev.classList.add('disabled');
+        } else {
+            paginationPrev.classList.remove('disabled');
+        }
+
+        // Botones de números de página
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, currentPage + 2);
+
+        if (endPage - startPage < 4) {
+            if (startPage === 1) {
+                endPage = Math.min(totalPages, startPage + 4);
+            } else if (endPage === totalPages) {
+                startPage = Math.max(1, endPage - 4);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+            li.addEventListener('click', (e) => {
+                e.preventDefault();
+                aplicarFiltros(i);
+            });
+            paginationList.appendChild(li);
+        }
+
+        // Botón "Siguiente"
+        paginationList.appendChild(paginationNext);
+        if (currentPage === totalPages) {
+            paginationNext.classList.add('disabled');
+        } else {
+            paginationNext.classList.remove('disabled');
+        }
+    }
+
     // Función unificada para aplicar filtros
-    function aplicarFiltros() {
+    function aplicarFiltros(page = 1) {
         const filtros = {
             nombre: buscarNombreInput.value.trim(),
             mes: buscarMesSelect.value,
             anio: buscarAnioInput.value,
-            tipo_balance: filterTipoBalanceSelect.value // Incluimos el nuevo filtro
+            tipo_balance: filterTipoBalanceSelect.value
         };
-        cargarBalances(filtros);
+        cargarBalances(page, filtros);
     }
 
     // --- Manejo de Eventos ---
@@ -168,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalAgregarBalance.hide();
                 resetForm(formAgregarBalance);
                 showToast('success', '✅ Balance registrado exitosamente.');
-                aplicarFiltros(); // Recargamos la tabla con los filtros actuales
+                aplicarFiltros();
             } else {
                 showToast('error', data.error || '❌ Error al registrar el balance.');
             }
@@ -222,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 modalEditarBalance.hide();
                 showToast('success', '✅ Balance actualizado exitosamente.');
-                aplicarFiltros(); // Recargar la tabla para ver los cambios
+                aplicarFiltros(currentPage);
             } else {
                 showToast('error', data.error || '❌ Error al actualizar el balance.');
             }
@@ -253,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 showToast('success', '✅ Balance eliminado exitosamente!');
                 balanceIdAEliminar = null;
-                aplicarFiltros();
+                aplicarFiltros(currentPage);
             } else {
                 showToast('error', data.error || '❌ Error al eliminar el balance.');
             }
@@ -264,11 +321,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Eventos de los filtros para que la tabla se actualice dinámicamente
-    btnBuscar.addEventListener('click', aplicarFiltros);
-    buscarNombreInput.addEventListener('input', aplicarFiltros);
-    buscarMesSelect.addEventListener('change', aplicarFiltros);
-    buscarAnioInput.addEventListener('input', aplicarFiltros);
-    filterTipoBalanceSelect.addEventListener('change', aplicarFiltros); // Escucha el cambio en el nuevo filtro
+    btnBuscar.addEventListener('click', () => aplicarFiltros(1));
+    buscarNombreInput.addEventListener('input', () => aplicarFiltros(1));
+    buscarMesSelect.addEventListener('change', () => aplicarFiltros(1));
+    buscarAnioInput.addEventListener('input', () => aplicarFiltros(1));
+    filterTipoBalanceSelect.addEventListener('change', () => aplicarFiltros(1));
+
+    // Manejadores de eventos para los botones de paginación
+    paginationPrev.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (currentPage > 1) {
+            aplicarFiltros(currentPage - 1);
+        }
+    });
+
+    paginationNext.addEventListener('click', (e) => {
+        e.preventDefault();
+        const totalPages = Math.ceil(tablaBalance.dataset.totalItems / itemsPerPage);
+        if (currentPage < totalPages) {
+            aplicarFiltros(currentPage + 1);
+        }
+    });
 
     // Carga inicial de la tabla al cargar la página
     cargarBalances();

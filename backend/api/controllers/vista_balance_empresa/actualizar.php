@@ -45,7 +45,7 @@ if ($anio < 1900 || $anio > 2100) { // Rango razonable de años
     echo json_encode(['success' => false, 'error' => 'El valor del año es inválido.']);
     exit();
 }
-$allowed_tipos_balance = ['Cotizaciones', 'Prestamos', 'Alquileres', 'Gastos'];
+$allowed_tipos_balance = ['Cotizaciones', 'Prestamos', 'Alquileres', 'Gastos', 'Dominical', 'Coordinadores'];
 if (!in_array($tipo_balance, $allowed_tipos_balance)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'El tipo de balance es inválido.']);

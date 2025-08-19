@@ -9,7 +9,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
 $nombre_filtro = $_GET['nombre'] ?? '';
 $mes_filtro_num = $_GET['mes'] ?? '';
 $anio_filtro = $_GET['anio'] ?? '';
-$tipo_balance_filtro = $_GET['tipo_balance'] ?? ''; // CORRECCIÓN: Agregado para obtener el tipo de balance
+$tipo_balance_filtro = $_GET['tipo_balance'] ?? '';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
 $offset = ($page - 1) * $limit;
@@ -87,11 +87,11 @@ try {
     echo json_encode([
         'success' => true,
         'balances' => $balances,
-        'total_registros' => $totalRecords,
+        'total_items' => (int)$totalRecords, 
         'total_general_monto' => $totalGeneralMonto,
-        'pagina_actual' => $page,
-        'registros_por_pagina' => $limit,
-        'total_paginas' => ceil($totalRecords / $limit)
+        'current_page' => $page, 
+        'items_per_page' => $limit, 
+        'total_pages' => ceil($totalRecords / $limit) 
     ]);
 
 } catch (PDOException $e) {

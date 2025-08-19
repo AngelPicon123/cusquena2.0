@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const API_BASE_URL = 'http://localhost/cusquena/backend/api/controllers/vista_gestion_coordinadores/';
     
-    // ... (Mantén tus otras constantes y funciones como showToast, resetForm, etc.) ...
     const tablaCoordinadores = document.getElementById('tablaCoordinadores');
     const formAgregar = document.getElementById('formAgregarCoordinador');
     const formEditar = document.getElementById('formEditarCoordinador');
@@ -19,10 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Elementos de filtro y paginación
     const buscarCoordinadorInput = document.getElementById('buscarCoordinador');
-    const fechaFiltroInput = document.getElementById('fechaFiltro'); // ID ÚNICO para la fecha
+    const fechaFiltroInput = document.getElementById('fechaFiltro');
     const paraderoFiltroInput = document.getElementById('paraderoFiltro');
     const btnBuscar = document.getElementById('btnBuscar');
     const paginationContainer = document.querySelector('.pagination');
+    const totalGeneralElement = document.getElementById('totalGeneral');
 
     let currentPage = 1;
     const recordsPerPage = 10;
@@ -47,6 +47,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /**
+     * Devuelve el HTML para una etiqueta de estado con colores.
+     * @param {string} estado
+     * @returns {string}
+     */
+    function getBadgeEstado(estado) {
+        const estadoNormalizado = estado.toLowerCase().trim();
+        switch (estadoNormalizado) {
+            case 'pagado':
+                return `<span class="badge bg-success">Pagado</span>`;
+            case 'pendiente':
+                return `<span class="badge bg-warning text-dark">Pendiente</span>`;
+            default:
+                return `<span class="badge bg-secondary">${estado}</span>`;
+        }
+    }
+
     // --- Paginación ---
     function renderPagination(totalRecords, currentPage) {
         paginationContainer.innerHTML = '';
@@ -59,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             if (currentPage > 1) {
                 currentPage--;
-                cargarCoordinadores(currentPage, getCurrentFilters()); // Pasa los filtros actuales
+                cargarCoordinadores(currentPage, getCurrentFilters());
             }
         });
         paginationContainer.appendChild(liPrev);
@@ -71,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
             li.addEventListener('click', (e) => {
                 e.preventDefault();
                 currentPage = i;
-                cargarCoordinadores(currentPage, getCurrentFilters()); // Pasa los filtros actuales
+                cargarCoordinadores(currentPage, getCurrentFilters());
             });
             paginationContainer.appendChild(li);
         }
@@ -83,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             if (currentPage < totalPages) {
                 currentPage++;
-                cargarCoordinadores(currentPage, getCurrentFilters()); // Pasa los filtros actuales
+                cargarCoordinadores(currentPage, getCurrentFilters());
             }
         });
         paginationContainer.appendChild(liNext);
@@ -96,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filters.nombre_apellido) {
             queryString += `&nombre=${encodeURIComponent(filters.nombre_apellido)}`;
         }
-        if (filters.fecha) { // Ahora solo 'fecha'
+        if (filters.fecha) {
             queryString += `&fecha=${encodeURIComponent(filters.fecha)}`;
         }
         if (filters.paradero) {
@@ -115,59 +132,73 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast('error', `❌ Error al cargar los coordinadores: ${data.error}`);
                 renderizarTabla([]);
                 renderPagination(0, 1);
+                totalGeneralElement.textContent = 'S/. 0.00'; // Resetear el total en caso de error
             } else {
                 renderizarTabla(data.coordinadores || []);
                 renderPagination(data.total || 0, page);
+                // ✅ MODIFICACIÓN: Leer el total del monto directamente de la respuesta del servidor
+                totalGeneralElement.textContent = `S/. ${parseFloat(data.total_general_monto).toFixed(2)}`;
             }
         } catch (error) {
             console.error('Error de red o parsing al cargar coordinadores:', error);
             showToast('error', '❌ Error de conexión al cargar los coordinadores. Intenta de nuevo.');
             renderizarTabla([]);
             renderPagination(0, 1);
+            totalGeneralElement.textContent = 'S/. 0.00'; // Resetear el total en caso de error de red
         }
     }
 
-function renderizarTabla(coordinadores) {
-    tablaCoordinadores.innerHTML = '';
+    function renderizarTabla(coordinadores) {
+        tablaCoordinadores.innerHTML = '';
+        // ✅ ELIMINADO: La variable totalMontoDiario ya no es necesaria aquí.
+        
+        if (!coordinadores || coordinadores.length === 0) {
+            tablaCoordinadores.innerHTML = '<tr><td colspan="8" class="text-center">No hay coordinadores registrados que coincidan con la búsqueda.</td></tr>';
+            // ✅ ELIMINADO: La actualización del total se hace en cargarCoordinadores.
+            return;
+        }
 
-    if (!coordinadores || coordinadores.length === 0) {
-        tablaCoordinadores.innerHTML = '<tr><td colspan="8" class="text-center">No hay coordinadores registrados que coincidan con la búsqueda.</td></tr>';
-        return;
+        coordinadores.forEach(c => {
+            const row = tablaCoordinadores.insertRow();
+            // ✅ ELIMINADO: La suma se hace en el backend.
+            
+            row.insertCell().textContent = c.nombre;
+            row.insertCell().textContent = c.apellidos;
+            row.insertCell().textContent = c.paradero;
+            row.insertCell().textContent = `S/. ${parseFloat(c.monto_diario).toFixed(2)}`;
+            row.insertCell().textContent = c.fecha;
+            
+            const estadoCell = row.insertCell();
+            estadoCell.innerHTML = getBadgeEstado(c.estado);
+            
+            row.insertCell().textContent = c.contacto || '';
+
+            const acciones = row.insertCell();
+
+            // Botón Editar con icono
+            const btnEditar = document.createElement('button');
+            btnEditar.className = 'btn btn-warning btn-sm me-1';
+            btnEditar.innerHTML = '<i class="fas fa-edit"></i>';
+            btnEditar.title = 'Editar Coordinador';
+            btnEditar.addEventListener('click', () => llenarModalEditar(c));
+            acciones.appendChild(btnEditar);
+
+            // Botón Eliminar con icono
+            const btnEliminar = document.createElement('button');
+            btnEliminar.className = 'btn btn-danger btn-sm';
+            btnEliminar.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            btnEliminar.title = 'Eliminar Coordinador';
+            btnEliminar.addEventListener('click', () => {
+                idAEliminar = c.id;
+                modalEliminar.show();
+            });
+            acciones.appendChild(btnEliminar);
+        });
+
+        // ✅ ELIMINADO: La actualización del total se hace en cargarCoordinadores.
     }
 
-    coordinadores.forEach(c => {
-        const row = tablaCoordinadores.insertRow();
-
-        row.insertCell().textContent = c.nombre;
-        row.insertCell().textContent = c.apellidos;
-        row.insertCell().textContent = c.paradero;
-        row.insertCell().textContent = `S/. ${parseFloat(c.monto_diario).toFixed(2)}`;
-        row.insertCell().textContent = c.fecha;
-        row.insertCell().textContent = c.estado;
-        row.insertCell().textContent = c.contacto || '';
-
-        const acciones = row.insertCell();
-
-        // Botón Editar con icono
-        const btnEditar = document.createElement('button');
-        btnEditar.className = 'btn btn-warning btn-sm me-1';
-        btnEditar.innerHTML = '<i class="fas fa-edit"></i>'; // Icono de lápiz
-        btnEditar.title = 'Editar Coordinador'; // Tooltip para accesibilidad
-        btnEditar.addEventListener('click', () => llenarModalEditar(c));
-        acciones.appendChild(btnEditar);
-
-        // Botón Eliminar con icono
-        const btnEliminar = document.createElement('button');
-        btnEliminar.className = 'btn btn-danger btn-sm';
-        btnEliminar.innerHTML = '<i class="fas fa-trash-alt"></i>'; // Icono de bote de basura
-        btnEliminar.title = 'Eliminar Coordinador'; // Tooltip para accesibilidad
-        btnEliminar.addEventListener('click', () => {
-            idAEliminar = c.id;
-            modalEliminar.show();
-        });
-        acciones.appendChild(btnEliminar);
-    });
-}
+    // ... (rest of the code is unchanged) ...
 
     function llenarModalEditar(coordinador) {
         document.getElementById('editCoordinadorId').value = coordinador.id;
@@ -267,7 +298,7 @@ function renderizarTabla(coordinadores) {
     function getCurrentFilters() {
         return {
             nombre_apellido: buscarCoordinadorInput.value.trim(),
-            fecha: fechaFiltroInput.value.trim(), // Solo un campo de fecha
+            fecha: fechaFiltroInput.value.trim(),
             paradero: paraderoFiltroInput.value.trim()
         };
     }
@@ -283,7 +314,6 @@ function renderizarTabla(coordinadores) {
     buscarCoordinadorInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') btnBuscar.click(); });
     fechaFiltroInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') btnBuscar.click(); });
     paraderoFiltroInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') btnBuscar.click(); });
-
 
     // --- Inicialización ---
     cargarCoordinadores(currentPage, getCurrentFilters()); 

@@ -76,11 +76,12 @@ document.addEventListener('DOMContentLoaded', () => {
      * Renderiza los préstamos en la tabla principal.
      * @param {Array<Object>} prestamos - Array de objetos de préstamos.
      */
-  function renderizarTabla(prestamos) {
+    function renderizarTabla(prestamos) {
         tablaDeudas.innerHTML = ''; // Limpia la tabla antes de renderizar
 
         if (prestamos.length === 0) {
             tablaDeudas.innerHTML = '<tr><td colspan="7" class="text-center">No hay préstamos registrados.</td></tr>';
+            calcularTotales();
             return;
         }
 
@@ -95,28 +96,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const acciones = row.insertCell();
 
-            // Botón Editar con icono (AHORA VA PRIMERO)
             const btnEditar = document.createElement('button');
             btnEditar.className = 'btn btn-warning btn-sm me-1';
             btnEditar.innerHTML = '<i class="fas fa-edit"></i>';
             btnEditar.title = 'Editar Préstamo';
             btnEditar.onclick = () => llenarModalEditar(p);
-            acciones.appendChild(btnEditar); // Añadimos primero el de editar
+            acciones.appendChild(btnEditar);
 
-            // Botón Eliminar con icono (AHORA VA SEGUNDO)
             const btnEliminar = document.createElement('button');
-            btnEliminar.className = 'btn btn-danger btn-sm me-1'; // Agregamos me-1 para un pequeño margen
+            btnEliminar.className = 'btn btn-danger btn-sm me-1';
             btnEliminar.innerHTML = '<i class="fas fa-trash-alt"></i>';
             btnEliminar.title = 'Eliminar Préstamo';
             btnEliminar.onclick = () => {
                 idAEliminar = p.id;
                 modalEliminar.show();
             };
-            acciones.appendChild(btnEliminar); // Añadimos el de eliminar
+            acciones.appendChild(btnEliminar);
 
-            // Botón Vista Pago Préstamo con icono (AHORA VA TERCERO, AL FINAL)
             const btnVistaPago = document.createElement('button');
-            btnVistaPago.className = 'btn btn-info btn-sm'; // Quitamos me-1 ya que es el último
+            btnVistaPago.className = 'btn btn-info btn-sm';
             btnVistaPago.innerHTML = '<i class="fas fa-eye"></i>';
             btnVistaPago.title = 'Ver/Registrar Pago';
             btnVistaPago.onclick = () => {
@@ -126,9 +124,60 @@ document.addEventListener('DOMContentLoaded', () => {
                 cargarHistorialPagosPrestamo(p.id);
                 modalVerPagosPrestamo.show();
             };
-            acciones.appendChild(btnVistaPago); // Añadimos al final el de ver pagos
+            acciones.appendChild(btnVistaPago);
         });
+
+        calcularTotales();
     }
+    
+    // --- Función para Calcular y Mostrar los Totales (CORREGIDA) ---
+    
+    /**
+     * Calcula la suma de los montos de deuda y saldos pendientes y los muestra.
+     */
+    function calcularTotales() {
+        let totalMontoDeuda = 0;
+        let totalSaldoPendiente = 0;
+
+        // Selecciona todas las filas del tbody con ID 'tablaDeudas'
+        const filas = tablaDeudas.querySelectorAll('tr');
+
+        filas.forEach(fila => {
+            const columnas = fila.querySelectorAll('td');
+
+            // Verifica que la fila contenga datos (7 columnas) y no sea el mensaje de "No hay préstamos"
+            if (columnas.length === 7) {
+                const montoDeudaTexto = columnas[2].innerText;
+                const saldoPendienteTexto = columnas[3].innerText;
+                
+                // Limpia el texto de la moneda "S/. " y convierte a un número flotante
+                const montoDeudaValor = parseFloat(montoDeudaTexto.replace('S/. ', ''));
+                const saldoPendienteValor = parseFloat(saldoPendienteTexto.replace('S/. ', ''));
+
+                if (!isNaN(montoDeudaValor)) {
+                    totalMontoDeuda += montoDeudaValor;
+                }
+                if (!isNaN(saldoPendienteValor)) {
+                    totalSaldoPendiente += saldoPendienteValor;
+                }
+            }
+        });
+
+        // Actualiza los elementos HTML con los totales
+        const totalMontoDeudaElemento = document.getElementById('totalMontoDeuda');
+        const totalSaldoPendienteElemento = document.getElementById('totalSaldoPendiente');
+
+        // Solo actualiza si los elementos existen para evitar errores
+        if (totalMontoDeudaElemento) {
+            totalMontoDeudaElemento.innerText = `S/. ${totalMontoDeuda.toFixed(2)}`;
+        }
+
+        if (totalSaldoPendienteElemento) {
+            totalSaldoPendienteElemento.innerText = `S/. ${totalSaldoPendiente.toFixed(2)}`;
+        }
+    }
+    
+    // --------------------------------------------------------
 
     /**
      * Carga el historial de pagos para un préstamo específico desde la API.
@@ -170,15 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btnEliminarPago.innerHTML = '<i class="fas fa-trash-alt"></i>';
             btnEliminarPago.title = 'Eliminar Pago';
             btnEliminarPago.onclick = () => {
-                // Almacena el ID del pago y el ID del préstamo para la confirmación de eliminación
                 document.getElementById('pagoIdParaEliminarPrestamoConfirmacion').value = pago.id;
-                document.getElementById('prestamoIdParaPagoEliminarConfirmacion').value = pago.prestamo_id;
-
-              
-                console.log("DEBUG JS (renderizarHistorialPagos): ID de pago al hacer clic:", pago.id);
-                console.log("DEBUG JS (renderizarHistorialPagos): ID de préstamo asociado:", pago.id_prestamo);
+                document.getElementById('prestamoIdParaPagoEliminarConfirmacion').value = pago.id_prestamo;
                 
-
                 modalEliminarPagoPrestamoConfirmacion.show();
             };
             acciones.appendChild(btnEliminarPago);
@@ -188,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Llenar Modales ---
 
     /**
-     * 
      * @param {Object} prestamo 
      */
     function llenarModalEditar(prestamo) {
@@ -205,7 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Listeners de Formularios y Botones ---
 
-    
     formAgregar.addEventListener('submit', async e => {
         e.preventDefault();
         const formData = new FormData(formAgregar);
@@ -234,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Evento para el formulario de Editar Préstamo
     formEditar.addEventListener('submit', async e => {
         e.preventDefault();
         const formData = new FormData(formEditar);
@@ -263,7 +303,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Evento para el formulario de Registro de Pago de Préstamo
     formAgregarPagoPrestamo.addEventListener('submit', async e => {
         e.preventDefault();
         const fechaNuevoPago = document.getElementById('fechaNuevoPago').value;
@@ -295,9 +334,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.success) {
                 showToast('success', '✅ Pago de préstamo registrado exitosamente!');
-                resetForm(formAgregarPagoPrestamo); // Resetea el formulario de nuevo pago
-                cargarHistorialPagosPrestamo(idPrestamoParaPago); // Recarga el historial de pagos dentro del modal
-                cargarPrestamos(); // Recarga la tabla principal para reflejar los cambios en el saldo
+                resetForm(formAgregarPagoPrestamo);
+                cargarHistorialPagosPrestamo(idPrestamoParaPago);
+                cargarPrestamos();
             } else {
                 showToast('error', `❌ Error al registrar pago: ${data.error || 'Mensaje de error desconocido.'}`);
             }
@@ -307,7 +346,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Evento para el botón de Confirmar Eliminación de Préstamo (completo)
     document.getElementById('confirmarEliminarPrestamo').addEventListener('click', async () => {
         if (!idAEliminar) return;
 
@@ -335,15 +373,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // Evento para el botón de Confirmar Eliminación de un Pago específico de Préstamo
     document.getElementById('btnConfirmarEliminarPagoPrestamo').addEventListener('click', async () => {
         const pagoId = document.getElementById('pagoIdParaEliminarPrestamoConfirmacion').value;
         const prestamoId = document.getElementById('prestamoIdParaPagoEliminarConfirmacion').value;
-
-        
-        console.log("DEBUG JS (btnConfirmarEliminarPagoPrestamo): ID de pago a enviar:", pagoId);
-        console.log("DEBUG JS (btnConfirmarEliminarPagoPrestamo): ID de préstamo asociado a enviar:", prestamoId);
-        
 
         if (!pagoId || !prestamoId) {
             showToast('error', '❌ No se pudo determinar el pago o préstamo a eliminar.');
@@ -352,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await fetch(`${API_BASE_URL}eliminar_pago.php`, {
-                method: 'POST', // Aunque PHP maneja DELETE, POST es más universal para formularios
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: pagoId }) 
             });
@@ -362,8 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.success) {
                 showToast('success', '✅ Pago eliminado exitosamente! Saldo actualizado.');
-                // Recargar el historial de pagos y la tabla principal para reflejar los cambios
-                cargarHistorialPagosPrestamo(prestamoId); // Usas prestamoId aquí para recargar, lo cual es correcto
+                cargarHistorialPagosPrestamo(prestamoId);
                 cargarPrestamos();
             } else {
                 showToast('error', `❌ Error al eliminar pago: ${data.error || 'Mensaje de error desconocido.'}`);
@@ -374,14 +405,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Event listener para el botón de búsqueda de préstamos
     document.getElementById('btnBuscar').addEventListener('click', async () => {
         const searchTerm = document.getElementById('buscarPrestamo').value;
         try {
-            // Envía el término de búsqueda como parámetro en la URL
             const response = await fetch(`${API_BASE_URL}listar.php?nombre=${encodeURIComponent(searchTerm)}`);
             const data = await response.json();
-            renderizarTabla(data.prestamos || []); // Renderiza los resultados de la búsqueda
+            renderizarTabla(data.prestamos || []);
         } catch (error) {
             console.error('Error al buscar préstamos:', error);
             showToast('error', '❌ Error al realizar la búsqueda de préstamos.');
@@ -389,6 +418,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.addEventListener('DOMContentLoaded', () => {
+    const btnBuscar = document.getElementById('btnBuscar');
+    const btnLimpiar = document.getElementById('btnLimpiar');
 
+    btnBuscar.addEventListener('click', () => {
+        const filtros = {
+            nombre: document.getElementById('buscarNombre').value,
+            tipo_persona: document.getElementById('filtroTipoPersona').value,
+            estado: document.getElementById('filtroEstado').value,
+            fecha_inicio: document.getElementById('filtroFechaInicio').value
+        };
+
+        // Llamada a la API PHP con los filtros
+        fetch(`backend/api/deudas/listar.php?nombre=${filtros.nombre}&tipo_persona=${filtros.tipo_persona}&estado=${filtros.estado}&fecha_inicio=${filtros.fecha_inicio}`)
+            .then(res => res.json())
+            .then(data => {
+                // Aquí renderizas la tabla con los resultados
+                console.log(data);
+            });
+    });
+
+    btnLimpiar.addEventListener('click', () => {
+        document.getElementById('buscarNombre').value = '';
+        document.getElementById('filtroTipoPersona').value = '';
+        document.getElementById('filtroEstado').value = '';
+        document.getElementById('filtroFechaInicio').value = '';
+        // Vuelves a cargar la lista completa
+        fetch(`backend/api/deudas/listar.php`)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+            });
+    });
+});
+
+
+    // Carga inicial de los datos
     cargarPrestamos();
 });

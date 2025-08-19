@@ -38,6 +38,15 @@ verificarPermiso(['Administrador', 'Secretaria']);
                 max-width: 150px;
             }
         }
+        .total-container {
+            text-align: right;
+            margin-top: 1rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        .total-item {
+            margin-left: 20px;
+        }
     </style>
 </head>
 <body class="sb-nav-fixed">
@@ -88,10 +97,51 @@ verificarPermiso(['Administrador', 'Secretaria']);
                     <h1 class="mb-4 text-center">Gestión de Préstamos</h1>
                     <div class="row">
                         <div class="col-12 d-flex justify-content-between align-items-center">
-                            <div class="d-flex">
-                                <input type="text" class="form-control me-2" id="buscarPrestamo" placeholder="Buscar Préstamo">
-                                <button class="btn btn-primary" id="btnBuscar">Buscar</button>
-                            </div>
+                            <!-- INICIO: Filtros de Búsqueda -->
+<div class="card card-body mb-4 shadow-sm">
+    <div class="row g-3 align-items-end">
+        <!-- Buscar por Nombre -->
+        <div class="col-lg-3 col-md-6">
+            <label for="buscarNombre" class="form-label">Buscar por Nombre</label>
+            <input type="text" class="form-control" id="buscarNombre" placeholder="Nombre...">
+        </div>
+
+        <!-- Tipo de Persona -->
+        <div class="col-lg-3 col-md-6">
+            <label for="filtroTipoPersona" class="form-label">Tipo de Persona</label>
+            <select id="filtroTipoPersona" class="form-select">
+                <option value="">Todos</option>
+                <option value="cliente">Cliente</option>
+                <option value="empleado">Empleado</option>
+                <option value="proveedor">Proveedor</option>
+            </select>
+        </div>
+
+        <!-- Estado -->
+        <div class="col-lg-3 col-md-6">
+            <label for="filtroEstado" class="form-label">Estado</label>
+            <select id="filtroEstado" class="form-select">
+                <option value="">Todos</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="pagada">Pagada</option>
+            </select>
+        </div>
+
+        <!-- Fecha Inicio Deuda -->
+        <div class="col-lg-3 col-md-6">
+            <label for="filtroFechaInicio" class="form-label">Fecha Inicio Deuda</label>
+            <input type="date" class="form-control" id="filtroFechaInicio">
+        </div>
+
+        <!-- Botones -->
+        <div class="col-lg-12 col-md-12 d-flex mt-3">
+            <button class="btn btn-primary w-50 me-2" id="btnBuscar"><i class="fas fa-search"></i> Filtrar</button>
+            <button class="btn btn-secondary w-50" id="btnLimpiar"><i class="fas fa-eraser"></i> Limpiar</button>
+        </div>
+    </div>
+</div>
+<!-- FIN: Filtros de Búsqueda -->
+
                             <?php if ($_SESSION['rol'] === 'Administrador'): ?>
                             <div>
                                 <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregar">Agregar</a>
@@ -115,8 +165,9 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                         <div class="mb-3">
                                             <label for="tipo_persona" class="form-label fw-bold">Tipo de Persona:</label>
                                             <select class="form-select" id="tipo_persona" name="tipo_persona" required>
-                                                <option value="natural">Natural</option>
-                                                <option value="juridica">Jurídica</option>
+                                                <option value="cliente">Cliente</option>
+                                                <option value="empleado">Empleado</option>
+                                                <option value="proveedor">Proveedor</option>
                                             </select>
                                         </div>
                                         <div class="mb-3">
@@ -130,8 +181,8 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                         <div class="mb-3">
                                             <label for="estado" class="form-label fw-bold">Estado:</label>
                                             <select class="form-select" id="estado" name="estado" required>
-                                                <option value="activo">Activo</option>
-                                                <option value="inactivo">Inactivo</option>
+                                                <option value="pendiente">Pendiente</option>
+                                                <option value="pagado">Pagado</option>
                                             </select>
                                         </div>
                                         <div class="mb-3">
@@ -163,8 +214,9 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                         <div class="mb-3">
                                             <label for="editTipoPersona" class="form-label fw-bold">Tipo de Persona:</label>
                                             <select class="form-select" id="editTipoPersona" name="tipo_persona" required>
-                                                <option value="natural">Natural</option>
-                                                <option value="juridica">Jurídica</option>
+                                               <option value="cliente">Cliente</option>
+                                                <option value="empleado">Empleado</option>
+                                                <option value="proveedor">Proveedor</option>
                                             </select>
                                         </div>
                                         <div class="mb-3">
@@ -178,8 +230,8 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                         <div class="mb-3">
                                             <label for="editEstado" class="form-label fw-bold">Estado:</label>
                                             <select class="form-select" id="editEstado" name="estado" required>
-                                                <option value="activo">Activo</option>
-                                                <option value="inactivo">Inactivo</option>
+                                                <option value="pendiente">Pendiente</option>
+                                                <option value="pagado">Pagado</option>
                                             </select>
                                         </div>
                                         <div class="mb-3">
@@ -250,7 +302,7 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                                 </tr>
                                             </thead>
                                             <tbody id="tablaPagosHistorialPrestamo">
-                                                </tbody>
+                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -293,8 +345,12 @@ verificarPermiso(['Administrador', 'Secretaria']);
                                 </tr>
                             </thead>
                             <tbody id="tablaDeudas">
-                                </tbody>
+                            </tbody>
                         </table>
+                    </div>
+                    <div class="total-container">
+                        <span>Monto Deuda: <span id="totalMontoDeuda">0.00</span></span>
+                        <span class="total-item">Saldo Pendiente: <span id="totalSaldoPendiente">0.00</span></span>
                     </div>
                     <nav aria-label="Page navigation example" class="d-flex justify-content-end">
                         <ul class="pagination">
